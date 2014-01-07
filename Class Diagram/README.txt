@@ -1,0 +1,1 @@
+Szkic. Nie patrzcie na zale¿noœci, czy sam zamys³ pokrywa siê z Waszymi?
