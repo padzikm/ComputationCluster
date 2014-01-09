@@ -1,1 +1,1 @@
-Szkic. Nie patrzcie na zale¿noœci, czy sam zamys³ pokrywa siê z Waszymi?
+Nie mog³em dodaæ cyferek. Nie jestem pewny czy powinna byæ agregacja czy asocjacja. Poza tym jasne?
