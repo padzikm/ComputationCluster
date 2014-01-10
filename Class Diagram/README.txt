@@ -1,1 +1,1 @@
-Nie mog³em dodaæ cyferek. Nie jestem pewny czy powinna byæ agregacja czy asocjacja. Poza tym jasne?
+Wersja alpha.
