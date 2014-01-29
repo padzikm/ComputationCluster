@@ -4,7 +4,7 @@
     xmlns="http://www.w3schools.com"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
 >
-  <xs:element name="ServerResponse">
+  <xs:element name="ServerRequest">
     <xs:complexType>
       <xs:sequence>
         <xs:element name="IP" type="xs:string"></xs:element>
@@ -38,7 +38,6 @@
                       </xs:simpleType>
                     </xs:element>
                     <xs:element name="Weight" type="xs:double" />
-                    <xs:element name="IsChosen" type="xs:boolean" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
