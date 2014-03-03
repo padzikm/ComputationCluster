@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 namespace CommunicationServer
 {
     class Program
-    {
+    {        
         static void Main(string[] args)
         {
+
         }
     }
 }
