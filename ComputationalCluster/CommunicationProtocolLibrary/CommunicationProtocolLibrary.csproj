@@ -39,37 +39,57 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MessageValidation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <None Include="XMLSchemas\DivideProblemMessage.xsd">
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="XMLSchemas\DivideProblemMessage.xsd">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="XMLSchemas\PartialProblemsMessage.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XMLSchemas\PartialProblemsMessage.xsd">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="XMLSchemas\RegisterMessage.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XMLSchemas\RegisterMessage.xsd">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="XMLSchemas\RegisterResponseMessage.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XMLSchemas\RegisterResponseMessage.xsd">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="XMLSchemas\SolutionRequestMessage.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XMLSchemas\SolutionRequestMessage.xsd">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="XMLSchemas\SolutionsMessage.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XMLSchemas\SolutionsMessage.xsd">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="XMLSchemas\SolveRequestMessage.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XMLSchemas\SolveRequestMessage.xsd">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="XMLSchemas\SolveRequestResponseMessage.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XMLSchemas\SolveRequestResponseMessage.xsd">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="XMLSchemas\StatusMessage.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XMLSchemas\StatusMessage.xsd">
       <SubType>Designer</SubType>
-    </None>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
