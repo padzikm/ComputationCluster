@@ -39,7 +39,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="DivideProblemMessage.cs" />
     <Compile Include="MessageValidation.cs" />
     <Compile Include="PartialProblemsMessage.cs" />
@@ -64,42 +63,33 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="XMLSchemas\DivideProblemMessage.xsd">
+    <EmbeddedResource Include="XMLSchemas\DivideProblemMessage.xsd">
       <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="XMLSchemas\PartialProblemsMessage.xsd">
+    </EmbeddedResource>
+    <EmbeddedResource Include="XMLSchemas\PartialProblemsMessage.xsd">
       <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="XMLSchemas\RegisterMessage.xsd">
+    </EmbeddedResource>
+    <EmbeddedResource Include="XMLSchemas\RegisterMessage.xsd">
       <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="XMLSchemas\RegisterResponseMessage.xsd">
+    </EmbeddedResource>
+    <EmbeddedResource Include="XMLSchemas\RegisterResponseMessage.xsd">
       <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="XMLSchemas\SolutionRequestMessage.xsd">
+    </EmbeddedResource>
+    <EmbeddedResource Include="XMLSchemas\SolutionRequestMessage.xsd">
       <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="XMLSchemas\SolutionsMessage.xsd">
+    </EmbeddedResource>
+    <EmbeddedResource Include="XMLSchemas\SolutionsMessage.xsd">
       <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="XMLSchemas\SolveRequestMessage.xsd">
+    </EmbeddedResource>
+    <EmbeddedResource Include="XMLSchemas\SolveRequestMessage.xsd">
       <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="XMLSchemas\SolveRequestResponseMessage.xsd">
+    </EmbeddedResource>
+    <EmbeddedResource Include="XMLSchemas\SolveRequestResponseMessage.xsd">
       <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="XMLSchemas\StatusMessage.xsd">
+    </EmbeddedResource>
+    <EmbeddedResource Include="XMLSchemas\StatusMessage.xsd">
       <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

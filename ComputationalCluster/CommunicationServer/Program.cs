@@ -34,6 +34,13 @@ namespace CommunicationServer
                  )
              );
 
+            bool ok = MessageValidation.IsMessageValid(MessageType.DivideProblemMessage, result);
+
+            if (ok)
+                Console.WriteLine("OK!");
+            else
+                Console.WriteLine("Error!");
+            Console.ReadLine();
             //IEnumerable<string> list = MessageValidation.IsMessageValid(MessageType.RegisterResponseMessage, result);
 
             //if (list.Count() == 0)
