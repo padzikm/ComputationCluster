@@ -13,7 +13,7 @@ namespace CommunicationProtocolLibrary
 {
     public enum MessageType
     {
-       RegisterMessage,
+        RegisterMessage,
         RegisterResponseMessage,
         SolveRequestMessage,
         SolveRequestResponseMessage,
@@ -26,13 +26,13 @@ namespace CommunicationProtocolLibrary
 
     public class MessageValidation
     {
-        private static string schemaNamespace = "http://www.mini.pw.edu.pl/ucc/";
+        private static string schemaNamespace = @"http://www.mini.pw.edu.pl/ucc/";
 
         private static string ConvertMessageTypeToSchemaPath(MessageType msgType)
         {
-            string catalogPath = "/XMLSchemas/";
+            string catalogPath = "XMLSchemas/";
 
-            switch(msgType)
+            switch (msgType)
             {
                 case MessageType.DivideProblemMessage: return catalogPath + "DivideProblemMessage.xsd";
                 case MessageType.PartialProblemsMessage: return catalogPath + "PartialProblemsMessage.xsd";
@@ -47,29 +47,30 @@ namespace CommunicationProtocolLibrary
             }
         }
 
-        public static IEnumerable<string> ValidateMessage(MessageType messageType, XDocument message)
+        public static bool IsMessageValid(MessageType messageType, XDocument message)
         {
             List<string> errorList = new List<string>();
+            bool isValid = true;
 
-            string schemaPath = ConvertMessageTypeToSchemaPath(messageType);            
-            
+            string schemaPath = ConvertMessageTypeToSchemaPath(messageType);
+
             XmlSchemaSet schemas = new XmlSchemaSet();
-            schemas.Add(schemaNamespace, schemaPath);            
+            schemas.Add(schemaNamespace, schemaPath);
 
             message.Validate(schemas, (o, e) =>
-            {                
+            {
                 errorList.Add(e.Message);
-                
+                isValid = false;
             });            
 
-            return errorList;
+            return isValid;
         }
 
-        public static IEnumerable<string> ValidateMessage(MessageType messageType, string message)
+        public static bool IsMessageValid(MessageType messageType, string message)
         {
             XDocument xmlDoc = XDocument.Parse(message);
 
-            return ValidateMessage(messageType, xmlDoc);
+            return IsMessageValid(messageType, xmlDoc);
         }
     }
 }
