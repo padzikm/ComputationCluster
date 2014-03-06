@@ -9,22 +9,11 @@ using System.Xml.Schema;
 using System.Xml.Linq;
 using System.Resources;
 using System.Reflection;
+using System.Xml.Serialization;
+
 
 namespace CommunicationProtocolLibrary
-{
-    public enum MessageType
-    {
-        RegisterMessage,
-        RegisterResponseMessage,
-        SolveRequestMessage,
-        SolveRequestResponseMessage,
-        StatusMessage,
-        DivideProblemMessage,
-        PartialProblemsMessage,
-        SolutionRequestMessage,
-        SolutionsMessage
-    }
-
+{   
     public class MessageValidation
     {
         private static string assemblyNamespaces = "CommunicationProtocolLibrary.XMLSchemas.";
@@ -81,6 +70,6 @@ namespace CommunicationProtocolLibrary
             {
                 return false;
             }            
-        }
+        }        
     }
 }

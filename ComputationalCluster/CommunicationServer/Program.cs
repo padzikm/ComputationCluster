@@ -35,6 +35,15 @@ namespace CommunicationServer
              );
 
             bool ok = MessageValidation.IsMessageValid(MessageType.DivideProblemMessage, result);
+            RegisterResponse rmsg = new RegisterResponse() { Id = 3, Timeout = DateTime.Now };
+            string cos = MessageSerialization.Serialize<RegisterResponse>(rmsg);
+
+            Console.WriteLine(cos);
+
+            RegisterResponse cc = MessageSerialization.Deserialize<RegisterResponse>(cos);
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine(cc.ToString());
 
             if (ok)
                 Console.WriteLine("OK!");
