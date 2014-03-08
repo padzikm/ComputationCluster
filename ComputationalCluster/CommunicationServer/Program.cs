@@ -37,6 +37,8 @@ namespace CommunicationServer
             bool ok = MessageValidation.IsMessageValid(MessageType.DivideProblemMessage, result);
             RegisterResponse rmsg = new RegisterResponse() { Id = 3, Timeout = DateTime.Now };
             string cos = MessageSerialization.Serialize<RegisterResponse>(rmsg);
+            MessageType msg = MessageTypeConverter.ConvertToMessageType(cos);
+            Console.WriteLine(msg);
 
             Console.WriteLine(cos);
 
@@ -60,6 +62,8 @@ namespace CommunicationServer
             //    foreach (string error in list)
             //        Console.WriteLine(error);
             //}
+
+            //UCCTaskSolver.TaskSolver
         }
     }
 }
