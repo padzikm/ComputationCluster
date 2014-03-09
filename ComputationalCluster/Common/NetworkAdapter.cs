@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Common
 {
-    public class Client
+    public class NetworkAdapter
     {
         private TcpClient client;
         private int port;
@@ -57,8 +57,5 @@ namespace Common
                 return null;
             }
         }
-
-
-
     }
 }
