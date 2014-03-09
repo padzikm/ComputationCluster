@@ -1,15 +1,17 @@
-﻿<?xml version="1.0" encoding="utf-8"?> 
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.mini.pw.edu.pl/ucc/" xmlns:xs="http://www.w3.org/2001/XMLSchema"> 
-<xs:element name="Status">
+﻿<?xml version="1.0" encoding="utf-8"?> <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.mini.pw.edu.pl/ucc/" xmlns:xs="http://www.w3.org/2001/XMLSchema"> 
+  <xs:element name="Status">
   <xs:complexType>
     <xs:sequence>
+      <!-- the ID of node (the one assigned by server) -->
       <xs:element name="Id" type="xs:unsignedLong" />
+      <!-- list of statuses for different threads -->
       <xs:element name="Threads">
         <xs:complexType>
           <xs:sequence>
             <xs:element maxOccurs="unbounded" name="Thread">
               <xs:complexType>
                 <xs:sequence>
+                  <!-- information if the tread is currently computing something -->
                   <xs:element name="State">
                     <xs:simpleType>
                       <xs:restriction base="xs:string">
@@ -18,15 +20,13 @@
                       </xs:restriction>
                     </xs:simpleType>
                   </xs:element>
-                  <xs:element minOccurs="0" name="HowLong">
-                    <xs:simpleType>
-                      <xs:restriction base="xs:string">
-                        <xs:pattern value="([0-9]+[.])?[0-9]{2}:[0-9]{2}:[0-9]{2}" />
-                      </xs:restriction>
-                    </xs:simpleType>
-                  </xs:element>
+                  <!-- how long it is in given state (in ms) -->
+                  <xs:element name="HowLong" type="xs:unsignedLong" />
+                  <!-- the ID of the problem assigned when client connected -->
                   <xs:element minOccurs="0" name="ProblemInstanceId" type="xs:unsignedLong" />
+                  <!-- the ID of the task within given problem instance -->
                   <xs:element minOccurs="0" name="TaskId" type="xs:unsignedLong" />
+                  <!-- the name of the type as given by TaskSolver -->
                   <xs:element minOccurs="0" name="ProblemType" type="xs:string" />
                 </xs:sequence>
               </xs:complexType>

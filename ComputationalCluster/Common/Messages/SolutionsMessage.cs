@@ -22,11 +22,25 @@ using System.Xml.Serialization;
 [System.ComponentModel.DesignerCategoryAttribute("code")]
 [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="http://www.mini.pw.edu.pl/ucc/")]
 [System.Xml.Serialization.XmlRootAttribute(Namespace="http://www.mini.pw.edu.pl/ucc/", IsNullable=false)]
-public partial class Status {
+public partial class Solutions {
+    
+    private string problemTypeField;
     
     private ulong idField;
     
-    private StatusThread[] threadsField;
+    private byte[] commonDataField;
+    
+    private SolutionsSolution[] solutions1Field;
+    
+    /// <uwagi/>
+    public string ProblemType {
+        get {
+            return this.problemTypeField;
+        }
+        set {
+            this.problemTypeField = value;
+        }
+    }
     
     /// <uwagi/>
     public ulong Id {
@@ -39,13 +53,25 @@ public partial class Status {
     }
     
     /// <uwagi/>
-    [System.Xml.Serialization.XmlArrayItemAttribute("Thread", IsNullable=false)]
-    public StatusThread[] Threads {
+    [System.Xml.Serialization.XmlElementAttribute(DataType="base64Binary")]
+    public byte[] CommonData {
         get {
-            return this.threadsField;
+            return this.commonDataField;
         }
         set {
-            this.threadsField = value;
+            this.commonDataField = value;
+        }
+    }
+    
+    /// <uwagi/>
+    [System.Xml.Serialization.XmlArrayAttribute("Solutions")]
+    [System.Xml.Serialization.XmlArrayItemAttribute("Solution", IsNullable=false)]
+    public SolutionsSolution[] Solutions1 {
+        get {
+            return this.solutions1Field;
+        }
+        set {
+            this.solutions1Field = value;
         }
     }
 }
@@ -56,62 +82,19 @@ public partial class Status {
 [System.Diagnostics.DebuggerStepThroughAttribute()]
 [System.ComponentModel.DesignerCategoryAttribute("code")]
 [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="http://www.mini.pw.edu.pl/ucc/")]
-public partial class StatusThread {
-    
-    private StatusThreadState stateField;
-    
-    private string howLongField;
-    
-    private ulong problemInstanceIdField;
-    
-    private bool problemInstanceIdFieldSpecified;
+public partial class SolutionsSolution {
     
     private ulong taskIdField;
     
     private bool taskIdFieldSpecified;
     
-    private string problemTypeField;
+    private bool timeoutOccuredField;
     
-    /// <uwagi/>
-    public StatusThreadState State {
-        get {
-            return this.stateField;
-        }
-        set {
-            this.stateField = value;
-        }
-    }
+    private SolutionsSolutionType typeField;
     
-    /// <uwagi/>
-    public string HowLong {
-        get {
-            return this.howLongField;
-        }
-        set {
-            this.howLongField = value;
-        }
-    }
+    private ulong computationsTimeField;
     
-    /// <uwagi/>
-    public ulong ProblemInstanceId {
-        get {
-            return this.problemInstanceIdField;
-        }
-        set {
-            this.problemInstanceIdField = value;
-        }
-    }
-    
-    /// <uwagi/>
-    [System.Xml.Serialization.XmlIgnoreAttribute()]
-    public bool ProblemInstanceIdSpecified {
-        get {
-            return this.problemInstanceIdFieldSpecified;
-        }
-        set {
-            this.problemInstanceIdFieldSpecified = value;
-        }
-    }
+    private byte[] dataField;
     
     /// <uwagi/>
     public ulong TaskId {
@@ -135,12 +118,43 @@ public partial class StatusThread {
     }
     
     /// <uwagi/>
-    public string ProblemType {
+    public bool TimeoutOccured {
         get {
-            return this.problemTypeField;
+            return this.timeoutOccuredField;
         }
         set {
-            this.problemTypeField = value;
+            this.timeoutOccuredField = value;
+        }
+    }
+    
+    /// <uwagi/>
+    public SolutionsSolutionType Type {
+        get {
+            return this.typeField;
+        }
+        set {
+            this.typeField = value;
+        }
+    }
+    
+    /// <uwagi/>
+    public ulong ComputationsTime {
+        get {
+            return this.computationsTimeField;
+        }
+        set {
+            this.computationsTimeField = value;
+        }
+    }
+    
+    /// <uwagi/>
+    [System.Xml.Serialization.XmlElementAttribute(DataType="base64Binary")]
+    public byte[] Data {
+        get {
+            return this.dataField;
+        }
+        set {
+            this.dataField = value;
         }
     }
 }
@@ -149,11 +163,14 @@ public partial class StatusThread {
 [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.18020")]
 [System.SerializableAttribute()]
 [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="http://www.mini.pw.edu.pl/ucc/")]
-public enum StatusThreadState {
+public enum SolutionsSolutionType {
     
     /// <uwagi/>
-    Idle,
+    Ongoing,
     
     /// <uwagi/>
-    Busy,
+    Partial,
+    
+    /// <uwagi/>
+    Final,
 }

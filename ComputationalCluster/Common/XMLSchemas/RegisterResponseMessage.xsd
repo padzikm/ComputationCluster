@@ -3,7 +3,9 @@
   <xs:element name="RegisterResponse">
     <xs:complexType>
       <xs:sequence>
+        <!-- the ID assigned by the Communication Server -->
         <xs:element name="Id" type="xs:unsignedLong" />
+        <!-- the communication timeout configured on Communication Server -->
         <xs:element name="Timeout" type="xs:time" />
       </xs:sequence>
     </xs:complexType>

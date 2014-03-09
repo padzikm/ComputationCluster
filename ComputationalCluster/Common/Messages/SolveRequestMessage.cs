@@ -22,17 +22,15 @@ using System.Xml.Serialization;
 [System.ComponentModel.DesignerCategoryAttribute("code")]
 [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="http://www.mini.pw.edu.pl/ucc/")]
 [System.Xml.Serialization.XmlRootAttribute(Namespace="http://www.mini.pw.edu.pl/ucc/", IsNullable=false)]
-public partial class PartialProblems {
+public partial class SolveRequest {
     
     private string problemTypeField;
     
-    private ulong idField;
+    private ulong solvingTimeoutField;
     
-    private byte[] commonDataField;
+    private bool solvingTimeoutFieldSpecified;
     
-    private string solvingTimeoutField;
-    
-    private PartialProblemsPartialProblem[] partialProblems1Field;
+    private byte[] dataField;
     
     /// <uwagi/>
     public string ProblemType {
@@ -45,28 +43,7 @@ public partial class PartialProblems {
     }
     
     /// <uwagi/>
-    public ulong Id {
-        get {
-            return this.idField;
-        }
-        set {
-            this.idField = value;
-        }
-    }
-    
-    /// <uwagi/>
-    [System.Xml.Serialization.XmlElementAttribute(DataType="base64Binary")]
-    public byte[] CommonData {
-        get {
-            return this.commonDataField;
-        }
-        set {
-            this.commonDataField = value;
-        }
-    }
-    
-    /// <uwagi/>
-    public string SolvingTimeout {
+    public ulong SolvingTimeout {
         get {
             return this.solvingTimeoutField;
         }
@@ -76,37 +53,13 @@ public partial class PartialProblems {
     }
     
     /// <uwagi/>
-    [System.Xml.Serialization.XmlArrayAttribute("PartialProblems")]
-    [System.Xml.Serialization.XmlArrayItemAttribute("PartialProblem", IsNullable=false)]
-    public PartialProblemsPartialProblem[] PartialProblems1 {
+    [System.Xml.Serialization.XmlIgnoreAttribute()]
+    public bool SolvingTimeoutSpecified {
         get {
-            return this.partialProblems1Field;
+            return this.solvingTimeoutFieldSpecified;
         }
         set {
-            this.partialProblems1Field = value;
-        }
-    }
-}
-
-/// <uwagi/>
-[System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.18020")]
-[System.SerializableAttribute()]
-[System.Diagnostics.DebuggerStepThroughAttribute()]
-[System.ComponentModel.DesignerCategoryAttribute("code")]
-[System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="http://www.mini.pw.edu.pl/ucc/")]
-public partial class PartialProblemsPartialProblem {
-    
-    private ulong taskIdField;
-    
-    private byte[] dataField;
-    
-    /// <uwagi/>
-    public ulong TaskId {
-        get {
-            return this.taskIdField;
-        }
-        set {
-            this.taskIdField = value;
+            this.solvingTimeoutFieldSpecified = value;
         }
     }
     

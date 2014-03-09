@@ -3,6 +3,7 @@
   <xs:element name="Register">
     <xs:complexType>
       <xs:sequence>
+        <!-- defines the type of node (either TM or CN) -->
         <xs:element name="Type">
           <xs:simpleType>
             <xs:restriction base="xs:string">
@@ -11,6 +12,7 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
+        <!-- gives the list of names of the problems which could be solved (probably sth like DVRP-[group no.]) -->
         <xs:element name="SolvableProblems">
           <xs:complexType>
             <xs:sequence>
@@ -18,6 +20,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
+        <!-- the number of threads that could be efficiently run in parallel -->
         <xs:element name="ParallelThreads" type="xs:unsignedByte" />
       </xs:sequence>
     </xs:complexType>

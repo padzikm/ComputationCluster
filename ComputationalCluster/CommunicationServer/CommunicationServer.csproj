@@ -39,9 +39,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="UCCTaskSolver">
-      <HintPath>..\..\Documentation\UCCTaskSolver.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -51,9 +48,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CommunicationProtocolLibrary\CommunicationProtocolLibrary.csproj">
-      <Project>{627dfa3c-3a92-49ca-84b9-f28e5c2be573}</Project>
-      <Name>CommunicationProtocolLibrary</Name>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{627e7240-1177-4665-971a-9b935261e8da}</Project>
+      <Name>Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

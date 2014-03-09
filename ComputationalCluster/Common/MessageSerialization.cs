@@ -9,7 +9,7 @@ using System.Resources;
 using System.Reflection;
 using System.Xml.Serialization;
 
-namespace CommunicationProtocolLibrary
+namespace Common
 {
     public class MessageSerialization
     {
