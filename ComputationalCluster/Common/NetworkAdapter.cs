@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace Common
 {
+    //TODO implement keepalive loop
     public class NetworkAdapter
     {
         private TcpClient client;
         private int port;
         private NetworkStream stream;
-
 
         public virtual void StartConnection(String server)
         {
