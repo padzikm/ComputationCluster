@@ -9,14 +9,17 @@ namespace TaskManager
 {
     public class TaskManager : NetworkAdapter
     {
-        public void Register()
+        public void RegisterResponse()
         {
             //TODO fill Register with data
-            var registerMessage = new Register();
-            Send<Register>(registerMessage);
+            var registerResponseMessage = new RegisterResponse();
+            Send<RegisterResponse>(registerResponseMessage);
         }
 
-        public 
+        public void DivideProblem()
+        {
+
+        }
 
     }
 }
