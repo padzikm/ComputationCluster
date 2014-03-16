@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace Common
 {
+    //TODO implement keepalive loop
     public class NetworkAdapter
     {
         private TcpClient client;
         private int port;
         private NetworkStream stream;
-
 
         public virtual void StartConnection(String server)
         {
@@ -49,7 +49,14 @@ namespace Common
             {
                 byte[] readBuffer = new byte[1024];
                 stream.BeginRead(readBuffer, 0, readBuffer.Length, null, stream);
-                return MessageSerialization.Deserialize<T>(readBuffer.ToString());
+                string readMessage = readBuffer.ToString();
+                if (MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
+                {
+                    return MessageSerialization.Deserialize<T>(readBuffer.ToString());
+                }
+                else
+                    throw new Exception("Message not valid");
+                
             }
             else
             {
