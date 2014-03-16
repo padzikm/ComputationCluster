@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Common;
+using System.Net;
+using System.Net.Sockets;
+using System.IO;
 
 namespace CommunicationServer
 {   
@@ -12,58 +16,17 @@ namespace CommunicationServer
     {        
         static void Main(string[] args)
         {
-            string xml = "";
+            Server server = new Server(IPAddress.Any, 12345);            
+            string msg = "";
 
-            XDocument doc1 = new XDocument(
-                new XElement("Register",
-                    new XElement("Child1", "content1"),
-                    new XElement("Child3", "content1")
-                    //new XElement("Child2", "content1")
-                )
-            );
+            server.Start();
 
-            XNamespace ns = @"http://www.mini.pw.edu.pl/ucc/";
-            var result = new XDocument(
-                new XElement(ns + "RegisterResponse",
-                    new XElement(ns + "Id",
-                        new XText("34")
-                     ),
-                     new XElement(ns + "Timeout",
-                        new XText("23:56:45")
-                     )
-                 )
-             );
+            Console.WriteLine("Type 'stop' to stop server");
+            
+            while(msg.ToLower() != "stop")            
+                msg = Console.ReadLine();           
 
-            bool ok = MessageValidation.IsMessageValid(MessageType.DivideProblemMessage, result);
-            RegisterResponse rmsg = new RegisterResponse() { Id = 3, Timeout = DateTime.Now };
-            string cos = MessageSerialization.Serialize<RegisterResponse>(rmsg);
-            MessageType msg = MessageTypeConverter.ConvertToMessageType(cos);
-            Console.WriteLine(msg);
-
-            Console.WriteLine(cos);
-
-            RegisterResponse cc = MessageSerialization.Deserialize<RegisterResponse>(cos);
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.WriteLine(cc.ToString());
-
-            if (ok)
-                Console.WriteLine("OK!");
-            else
-                Console.WriteLine("Error!");
-            Console.ReadLine();
-            //IEnumerable<string> list = MessageValidation.IsMessageValid(MessageType.RegisterResponseMessage, result);
-
-            //if (list.Count() == 0)
-            //    Console.WriteLine("no errors!");
-            //else
-            //{
-            //    Console.WriteLine("errors!");
-            //    foreach (string error in list)
-            //        Console.WriteLine(error);
-            //}
-
-            //UCCTaskSolver.TaskSolver
+            server.Stop();
         }
     }
 }
