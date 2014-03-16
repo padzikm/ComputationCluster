@@ -39,7 +39,7 @@ namespace CommunicationServer
                 listener.Start();
                 currentThread.Start();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine("Error in server start: {0}", ex.Message);
             }
@@ -54,7 +54,7 @@ namespace CommunicationServer
                 currentThread.Join();
                 currentThread = null;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine("Error in server stop: {0}", ex.Message);
             }
@@ -62,7 +62,7 @@ namespace CommunicationServer
 
         private void Listen()
         {
-            while(!stop)
+            while (!stop)
             {
                 try
                 {
@@ -70,7 +70,7 @@ namespace CommunicationServer
                     Thread thread = new Thread(new ParameterizedThreadStart(HandleConnection));
                     thread.Start(socet);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Console.WriteLine("Error in server listen: {0}", ex.Message);
                 }
@@ -80,27 +80,21 @@ namespace CommunicationServer
         private void HandleConnection(object o)
         {
             Socket soc = (Socket)o;
-            Stream s = new NetworkStream(soc);
-            StreamReader sr = new StreamReader(s);
-            StreamWriter sw = new StreamWriter(s);
-            sw.AutoFlush = true;
-            
-            char[] table = new char[10];            
-            sr.Read(table, 0, table.Length);
-            string msg = new string(table);
+            Stream stream = new NetworkStream(soc);            
 
-            //while (!sr.EndOfStream)
-            //{
-                //msg += sr.ReadLine();
+            byte[] buffer = new byte[1024];
 
-                Console.WriteLine("Odebrano: \n{0}", msg);
-            //}
+            stream.Read(buffer, 0, buffer.Length);            
+
+            string msg = MessageSerialization.GetString(buffer);
+
+            Console.WriteLine("Odebrano: \n{0}", msg);
 
             //MessageStrategyFactory strategyFactory = MessageStrategyFactory.Instance;
             //IMessageStrategy strategy = strategyFactory.GetMessageStrategy(msg);
-            //strategy.HandleMessage(msg);
+            //strategy.HandleMessage(stream, msg);
 
-            s.Close();
+            stream.Close();
             soc.Close();
         }
     }
