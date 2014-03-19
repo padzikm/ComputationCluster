@@ -26,7 +26,7 @@ namespace ComputationalClient
 
         public void ClientWork(string server)
         {
-            StartConnection(server);
+            StartConnection(server);            
             try
             {
                 SolveRequest sr = new SolveRequest();

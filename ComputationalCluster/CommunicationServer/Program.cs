@@ -16,17 +16,17 @@ namespace CommunicationServer
     {        
         static void Main(string[] args)
         {
-            Server server = new Server(IPAddress.Any, 12345);            
+            Server server = new Server(IPAddress.Any, 12345);
             string msg = "";
 
             server.Start();
 
             Console.WriteLine("Type 'stop' to stop server");
-            
-            while(msg.ToLower() != "stop")            
-                msg = Console.ReadLine();           
 
-            server.Stop();
+            while (msg.ToLower() != "stop")
+                msg = Console.ReadLine();
+
+            server.Stop();            
         }
     }
 }

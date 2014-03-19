@@ -87,11 +87,11 @@ namespace CommunicationServer
             {                                
                 stream.Read(buffer, 0, buffer.Length);
 
-                string msg = MessageSerialization.GetString(buffer);
+                string msg = MessageSerialization.GetString(buffer).Replace("\0", string.Empty).Trim();
 
                 Console.WriteLine("Odebrano: \n{0}", msg);
 
-                MessageType msgType = MessageTypeConverter.ConvertToMessageType(msg);
+                MessageType msgType = MessageTypeConverter.ConvertToMessageType(msg);               
 
                 MessageStrategyFactory strategyFactory = MessageStrategyFactory.Instance;
                 IMessageStrategy strategy = strategyFactory.GetMessageStrategy(msgType);
