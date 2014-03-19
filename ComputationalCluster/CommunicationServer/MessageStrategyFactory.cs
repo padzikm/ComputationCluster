@@ -10,8 +10,7 @@ namespace CommunicationServer
     class MessageStrategyFactory
     {
         private static MessageStrategyFactory instance;
-        private Dictionary<MessageType, IMessageStrategy> messageStrategies;
-        private IMessageStrategy invalidMessageStrategy;
+        private Dictionary<MessageType, IMessageStrategy> messageStrategies;        
 
         public static MessageStrategyFactory Instance
         {
@@ -31,18 +30,9 @@ namespace CommunicationServer
             //messageStrategies.Add(MessageType.DivideProblemMessage, );
         }
 
-        public IMessageStrategy GetMessageStrategy(string message)
+        public IMessageStrategy GetMessageStrategy(MessageType msgType)
         {
-            try
-            {
-                MessageType messageType = MessageTypeConverter.ConvertToMessageType(message);
-
-                return messageStrategies[messageType];
-            }
-            catch
-            {
-                return invalidMessageStrategy;
-            }
+            return messageStrategies.ContainsKey(msgType) ? messageStrategies[msgType] : null;
         }
     }
 }

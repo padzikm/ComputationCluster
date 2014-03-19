@@ -80,22 +80,34 @@ namespace CommunicationServer
         private void HandleConnection(object o)
         {
             Socket soc = (Socket)o;
-            Stream stream = new NetworkStream(soc);            
-
+            Stream stream = new NetworkStream(soc);
             byte[] buffer = new byte[1024];
 
-            stream.Read(buffer, 0, buffer.Length);            
+            try
+            {                                
+                stream.Read(buffer, 0, buffer.Length);
 
-            string msg = MessageSerialization.GetString(buffer);
+                string msg = MessageSerialization.GetString(buffer);
 
-            Console.WriteLine("Odebrano: \n{0}", msg);
+                Console.WriteLine("Odebrano: \n{0}", msg);
 
-            //MessageStrategyFactory strategyFactory = MessageStrategyFactory.Instance;
-            //IMessageStrategy strategy = strategyFactory.GetMessageStrategy(msg);
-            //strategy.HandleMessage(stream, msg);
+                MessageType msgType = MessageTypeConverter.ConvertToMessageType(msg);
 
-            stream.Close();
-            soc.Close();
+                MessageStrategyFactory strategyFactory = MessageStrategyFactory.Instance;
+                IMessageStrategy strategy = strategyFactory.GetMessageStrategy(msgType);
+
+                if(strategy != null)
+                    strategy.HandleMessage(stream, msg);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                stream.Close();
+                soc.Close();   
+            }            
         }
     }
 }
