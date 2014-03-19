@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Common
 {
-    //TODO implement keepalive loop
+    
     public class NetworkAdapter
     {
         private TcpClient client;
@@ -23,8 +24,34 @@ namespace Common
         {
             client.Close();
         }
+
+        //TODO implement keepalive loop - what about this?
+        public virtual void StatusMessage(StatusThread[] threads, ulong id, DateTime time)
+        {
+            Thread t = new Thread(() =>
+            {
+                while(true)
+                {  
+                    Status statusMessage = new Status();
+                    statusMessage.Id = id;
+                    statusMessage.Threads = threads;
+
+                    if(!Send<Status>(statusMessage))
+                    {
+                        //t.join();
+                        return;
+                    }
+                    
+                    Thread.Sleep(time.Millisecond);
+                }
+            });
+            t.Start();
+            while (t.ThreadState == ThreadState.Stopped)  // ?
+                t.Join();
+        }
+
         //TODO async or not
-        public virtual void Send<T>(T message) where T : class
+        public virtual bool Send<T>(T message) where T : class
         {
             try
             {
@@ -33,17 +60,20 @@ namespace Common
                 Byte[] data = System.Text.Encoding.UTF8.GetBytes(xml);
                 stream.Write(data, 0, data.Length);
                 stream.Close();
+                return true;
             }
             catch (ArgumentNullException e)
             {
                 Console.WriteLine("ArgumentNullException: {0}", e);
+                return true;
             }
             catch (SocketException e)
             {
                 Console.WriteLine("SocketException: {0}", e);
+                return false;
             }
         }
-        public virtual T Recieve<T>(T message) where T : class
+        public virtual T Recieve<T>() where T : class
         {
             if (stream.CanRead)
             {
