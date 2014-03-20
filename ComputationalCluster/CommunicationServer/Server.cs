@@ -93,9 +93,39 @@ namespace CommunicationServer
             //MessageStrategyFactory strategyFactory = MessageStrategyFactory.Instance;
             //IMessageStrategy strategy = strategyFactory.GetMessageStrategy(msg);
             //strategy.HandleMessage(stream, msg);
-
+            SolveRequestResponse srr = new SolveRequestResponse();
+            srr.Id = 2333;
+            Send<SolveRequestResponse>(srr, (NetworkStream)stream);
             stream.Close();
             soc.Close();
+        }
+
+        public void Send<T>(T message, NetworkStream stream) where T : class
+        {
+            Thread t = new Thread(() =>
+            {
+                try
+                {
+
+                    string xml = MessageSerialization.Serialize<T>(message);
+                    Byte[] data = System.Text.Encoding.UTF8.GetBytes(xml);
+                    stream.Write(data, 0, data.Length);
+                    stream.Close();
+
+                }
+                catch (ArgumentNullException e)
+                {
+                    Console.WriteLine("ArgumentNullException: {0}", e);
+
+                }
+                catch (SocketException e)
+                {
+                    Console.WriteLine("SocketException: {0}", e);
+                }
+            });
+            t.Start();
+            while (t.ThreadState == ThreadState.Aborted || t.ThreadState == ThreadState.Stopped)  // ?
+                t.Abort();
         }
     }
 }
