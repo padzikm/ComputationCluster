@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Common;
+using System.Net;
 
 namespace TaskManager
 {
@@ -12,11 +13,11 @@ namespace TaskManager
         private DivideProblem problem;
         private StatusThread[] statusThreads;
 
-        public void Start(string server)
+        public void Start(IPAddress server, int port)
         {
-            StartConnection(server, 90);
+            StartConnection(server, 12345);
             RegisterResponse();
-            RecieveProblemData();
+            //RecieveProblemData();
         }
         public void RegisterResponse()
         {
@@ -27,7 +28,6 @@ namespace TaskManager
             Send<Register>(registerMessage);
         }
 
-
         public void RecieveProblemData()
         {
             try
@@ -37,7 +37,7 @@ namespace TaskManager
             
             catch (Exception e)
             {
-
+                Console.WriteLine(e);
             }
         }
 
@@ -48,6 +48,11 @@ namespace TaskManager
             solution.Id = problem.Id;
             //TODO Common data?
             Send<Solutions>(solution);
+        }
+
+        public void Close()
+        {
+            this.CloseConnection();
         }
 
 

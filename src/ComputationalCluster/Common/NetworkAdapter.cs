@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -13,12 +14,11 @@ namespace Common
     public class NetworkAdapter
     {
         private TcpClient client;
-        protected int port;
         private NetworkStream stream;
-
-        protected virtual void StartConnection(String server, int _port)
+        protected int port;
+        protected virtual void StartConnection(IPAddress server, int _port)
         {
-            client = new TcpClient(server, _port);
+            client = new TcpClient("localhost", _port);
             stream = client.GetStream();
         }
         protected virtual void CloseConnection()
@@ -26,7 +26,6 @@ namespace Common
             client.Close();
         }
 
-        //TODO implement keepalive loop - what about this?
         protected virtual void StatusMessage(StatusThread[] threads, ulong id, DateTime time)
         {
             Thread t = new Thread(() =>
@@ -46,7 +45,7 @@ namespace Common
             t.Start();
         }
 
-        //TODO rather async ?
+        
         protected virtual bool Send<T>(T message) where T : class
         {
             Thread t = new Thread(() =>
