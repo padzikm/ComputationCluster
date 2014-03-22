@@ -10,17 +10,19 @@ namespace ComputationalNode
     {
         static void Main(string[] args)
         {
-            ComputationalNode node = new ComputationalNode();
             string msg = "";
 
-            node.StartConnection("12345");
+            var node = new ComputationalNode(12345);
 
+            Console.WriteLine("Node created. Start working...\n");
             Console.WriteLine("Type 'stop' to stop node");
+
+            node.Start("192.168.0.12");
 
             while (msg.ToLower() != "stop")
                 msg = Console.ReadLine();
 
-            node.CloseConnection();
+            node.Stop();
 
 
         }

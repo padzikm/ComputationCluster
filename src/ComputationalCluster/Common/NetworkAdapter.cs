@@ -16,18 +16,18 @@ namespace Common
         protected int port;
         private NetworkStream stream;
 
-        public virtual void StartConnection(String server, int _port)
+        protected virtual void StartConnection(String server, int _port)
         {
             client = new TcpClient(server, _port);
             stream = client.GetStream();
         }
-        public virtual void CloseConnection()
+        protected virtual void CloseConnection()
         {
             client.Close();
         }
 
         //TODO implement keepalive loop - what about this?
-        public virtual void StatusMessage(StatusThread[] threads, ulong id, DateTime time)
+        protected virtual void StatusMessage(StatusThread[] threads, ulong id, DateTime time)
         {
             Thread t = new Thread(() =>
             {
@@ -44,23 +44,19 @@ namespace Common
                 }
             });
             t.Start();
-            while (t.ThreadState == ThreadState.Aborted || t.ThreadState == ThreadState.Stopped)  // ?
-                t.Abort();
         }
 
         //TODO rather async ?
-        public virtual bool Send<T>(T message) where T : class
+        protected virtual bool Send<T>(T message) where T : class
         {
             Thread t = new Thread(() =>
             {
                 try
                 {
-                    
                     string xml = MessageSerialization.Serialize<T>(message);
                     Byte[] data = System.Text.Encoding.UTF8.GetBytes(xml);
                     stream.Write(data, 0, data.Length);
                     stream.Close();
-                
                 }
                 catch (ArgumentNullException e)
                 {
@@ -73,19 +69,17 @@ namespace Common
                 }
             });
             t.Start();
-            while (t.ThreadState == ThreadState.Aborted || t.ThreadState == ThreadState.Stopped)  // ?
-                t.Abort();
 
             return true;
         }
 
         //TODO: rather not async
-        public virtual T Recieve<T>() where T : class
+        protected virtual T Recieve<T>() where T : class
         {
             if (stream.CanRead)
             {
                 byte[] readBuffer = new byte[1024];
-                stream.BeginRead(readBuffer, 0, readBuffer.Length, null, stream);
+                stream.Read(readBuffer, 0, readBuffer.Length);
                 string readMessage = readBuffer.ToString();
                 if (MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
                 {
