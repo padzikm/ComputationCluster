@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
@@ -13,7 +14,7 @@ namespace Common
 {
     public class MessageSerialization
     {
-        public static string Serialize<T>(T value)
+        public static string Serialize<T>(T value) where T : class 
         {
             string serializedXML;
 
@@ -24,18 +25,16 @@ namespace Common
             {
                 XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
                 StringWriter stringWriter = new StringWriter();
-                XmlWriter writer = XmlWriter.Create(stringWriter);
-
-                xmlSerializer.Serialize(writer, value);
-
-                serializedXML = stringWriter.ToString();
-
-                writer.Close();
+                
+                xmlSerializer.Serialize(stringWriter, value);
+                
+                serializedXML = stringWriter.ToString();                                
                 
                 return serializedXML;
             }
-            catch
+            catch(Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 return null;
             }
         }
@@ -56,9 +55,9 @@ namespace Common
 
                 return result;
             }
-            catch
+            catch(Exception ex)
             {
-                return null;
+                throw ex;
             }
         }
 

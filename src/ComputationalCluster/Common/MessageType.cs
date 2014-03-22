@@ -24,16 +24,9 @@ namespace Common
     {
         public static MessageType ConvertToMessageType(string message)
         {
-            try
-            {
-                XDocument doc = XDocument.Parse(message);
+            XDocument doc = XDocument.Parse(message);
 
-                return (MessageType)Enum.Parse(typeof(MessageType), doc.Root.Name.LocalName + "Message");
-            }
-            catch
-            {
-                throw new InvalidCastException("Message doesn't fit any MessageType");
-            }            
+            return (MessageType)Enum.Parse(typeof(MessageType), doc.Root.Name.LocalName + "Message");
         }
     }
 }

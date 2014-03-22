@@ -25,7 +25,7 @@ namespace ComputationalClient
         }
 
         public void Start(string server)
-        {
+        {                   
             if (clientThread != null)
                 throw new InvalidOperationException("Client is already running! Wait for partial or final solution.");
 

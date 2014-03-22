@@ -14,70 +14,113 @@ namespace ComputationalNode
 {
     class ComputationalNode : NetworkAdapter
     {
-        private ulong id;
+        private Thread nodeThread;
+        private Thread loopingThread;
         private DateTime time;
         private StatusThread[] threads;
-        private bool recieve = false;
-        private Thread sender;
-        private bool stop = false;
+        private bool working;
+        private ulong id;
+        private ulong problemId;
 
-        public ulong ID
+        public ComputationalNode(int _port)
         {
-            get { return this.id; }
-            set { this.id = value; }
+            port = _port;
+            working = true;
         }
 
-        public DateTime Time
+        public void Start(string server)
         {
-            get { return this.time; }
-            set { this.time = value; }
-        }
 
-        public StatusThread[] Threads
-        {
-            get { return this.threads; }
-            set { this.threads = value; }
-        }
-
-        public void Start()
-        {
-            // bool recieve=false;
-
-            Register();
-
-            while (!recieve)
-            {
-                RegisterResponse();
-            }
+            if (nodeThread != null)
+                throw new InvalidOperationException("Node is already running!");
 
             try
             {
-
-                sender = new Thread(sendStatus);
-                sender.Start();
-
+                nodeThread = new Thread(NodeWork);
+                StartConnection(server, port);
+                nodeThread.Start();
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Console.WriteLine("Error in node status: {0}", ex.Message);
+                Console.WriteLine("Error in node start: {0}", e.Message);
             }
-
-            //TODO work
-
         }
 
-        public void sendStatus()
+        public void Stop()
         {
-            while (!stop)
+            try
             {
+                if (loopingThread != null)
+                {
+                    loopingThread.Abort();
+                    loopingThread = null;
+                }
+                nodeThread.Abort();
+                nodeThread = null;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error in node stop: {0}", e.Message);
+            }
+            finally
+            {
+                CloseConnection();
+            }
+
+        }
+
+        private void NodeWork()
+        {
+            try
+            {
+                Register();
+                RegisterResponse();
                 Status();
+            }
+            catch
+            {
 
-                // TODO time to sleep numbers of threads
+            }
 
+            while (working)
+            {
+                try
+                {
+                    PartialProblems();
+                    //TODO solve problem, new thread
+                    Solution();
+                }               
+
+                catch (SocketException se)
+                {
+                    Console.WriteLine("Socket exception appeared. Closing connection. / {0}", se.Message);
+                    working = false;
+                }
+                catch (Exception e)
+                {
+                    if (e.Message == "Message not valid")
+                    {
+                        Console.WriteLine(" 'Message not valid' occured - continue processing. / {0}", e.Message);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unexpected error. Closing connection. / {0}", e.Message);
+                        working = false;
+                    }
+                }
+                finally
+                {
+                    if (!working)
+                    {
+                        nodeThread.Abort();
+                        nodeThread = null;
+                        CloseConnection();
+                    }
+                }
             }
         }
 
-        public void Register()
+        private void Register()
         {
             var registerMessage = new Register();
             registerMessage.Type = RegisterType.ComputationalNode;
@@ -86,36 +129,50 @@ namespace ComputationalNode
             Send<Register>(registerMessage);
         }
 
-        public void RegisterResponse()
-        {
-            
-            var registerResponseMessage = Recieve<RegisterResponse>();
-            if (registerResponseMessage != null)
-                recieve = true;
-            ID = registerResponseMessage.Id;
-            Time = registerResponseMessage.Timeout;
-
+        private void RegisterResponse()
+        {           
+            var registerResponseMessage = Recieve<RegisterResponse>();         
+            id = registerResponseMessage.Id;
+            time = registerResponseMessage.Timeout;
         }
 
-        public void Status()
+        private void Status()
         {
-            var statusMessage = new Status();
-            statusMessage.Id = ID;
-            statusMessage.Threads = Threads;
-            Send<Status>(statusMessage);
+            loopingThread = new Thread(() =>
+                {
+                    while (true)
+                    {
+                        var statusMessage = new Status();
+                        statusMessage.Id = id;
+                        statusMessage.Threads = threads;
+
+                        if (!Send<Status>(statusMessage))
+                            throw new Exception("StatusMessage");
+
+                        Thread.Sleep(time.Millisecond);
+                    }
+                });
+            loopingThread.Start();
         }
 
-        public void PartialProblems()
+        private void PartialProblems()
         {
-            
-            var partialProblemsMaessage = Recieve<SolvePartialProblems>();
-            //TODO take message
+            try
+            {
+                var partialProblemsMaessage = Recieve<SolvePartialProblems>();
+                problemId = partialProblemsMaessage.Id;
+            }
+            catch(Exception e)
+            {
 
+            }
         }
 
-        public void Solution()
+        private void Solution()
         {
             var solutionMessage = new Solutions();
+            solutionMessage.ProblemType = "DVRT";
+            solutionMessage.Id = problemId;
             //TODO fill message
             Send<Solutions>(solutionMessage);
 
