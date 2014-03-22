@@ -13,12 +13,13 @@ namespace Common
     public class NetworkAdapter
     {
         private TcpClient client;
-        private int port;
+        protected int port;
         private NetworkStream stream;
 
-        public virtual void StartConnection(String server)
+        public virtual void StartConnection(String server, int _port)
         {
-            client = new TcpClient(server, port);
+            client = new TcpClient(server, _port);
+            stream = client.GetStream();
         }
         public virtual void CloseConnection()
         {
@@ -36,43 +37,49 @@ namespace Common
                     statusMessage.Id = id;
                     statusMessage.Threads = threads;
 
-                    if(!Send<Status>(statusMessage))
-                    {
-                        //t.join();
-                        return;
-                    }
+                    if (!Send<Status>(statusMessage))
+                        throw new Exception("StatusMessage");
                     
                     Thread.Sleep(time.Millisecond);
                 }
             });
             t.Start();
-            while (t.ThreadState == ThreadState.Stopped)  // ?
-                t.Join();
+            while (t.ThreadState == ThreadState.Aborted || t.ThreadState == ThreadState.Stopped)  // ?
+                t.Abort();
         }
 
-        //TODO async or not
+        //TODO rather async ?
         public virtual bool Send<T>(T message) where T : class
         {
-            try
+            Thread t = new Thread(() =>
             {
-                stream = client.GetStream();
-                string xml = MessageSerialization.Serialize<T>(message);
-                Byte[] data = System.Text.Encoding.UTF8.GetBytes(xml);
-                stream.Write(data, 0, data.Length);
-                stream.Close();
-                return true;
-            }
-            catch (ArgumentNullException e)
-            {
-                Console.WriteLine("ArgumentNullException: {0}", e);
-                return true;
-            }
-            catch (SocketException e)
-            {
-                Console.WriteLine("SocketException: {0}", e);
-                return false;
-            }
+                try
+                {
+                    
+                    string xml = MessageSerialization.Serialize<T>(message);
+                    Byte[] data = System.Text.Encoding.UTF8.GetBytes(xml);
+                    stream.Write(data, 0, data.Length);
+                    stream.Close();
+                
+                }
+                catch (ArgumentNullException e)
+                {
+                    Console.WriteLine("ArgumentNullException: {0}", e);
+                
+                }
+                catch (SocketException e)
+                {
+                    Console.WriteLine("SocketException: {0}", e);
+                }
+            });
+            t.Start();
+            while (t.ThreadState == ThreadState.Aborted || t.ThreadState == ThreadState.Stopped)  // ?
+                t.Abort();
+
+            return true;
         }
+
+        //TODO: rather not async
         public virtual T Recieve<T>() where T : class
         {
             if (stream.CanRead)
@@ -86,7 +93,6 @@ namespace Common
                 }
                 else
                     throw new Exception("Message not valid");
-                
             }
             else
             {
