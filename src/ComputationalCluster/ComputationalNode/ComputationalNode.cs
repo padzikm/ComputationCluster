@@ -39,7 +39,7 @@ namespace ComputationalNode
             set { this.threads = value; }
         }
 
-        public void Satrt()
+        public void Start()
         {
             // bool recieve=false;
 

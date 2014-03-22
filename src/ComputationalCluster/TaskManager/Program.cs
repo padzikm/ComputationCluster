@@ -10,6 +10,10 @@ namespace TaskManager
     {
         static void Main(string[] args)
         {
+            var taskManager = new TaskManager();
+            Console.WriteLine("Starting Task Manager");
+            
+
         }
     }
 }
