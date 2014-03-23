@@ -16,8 +16,6 @@ namespace Common
     {
         public static string Serialize<T>(T value) where T : class 
         {
-            string serializedXML;
-
             if (value == null)
                 return null;
 
@@ -28,7 +26,7 @@ namespace Common
                 
                 xmlSerializer.Serialize(stringWriter, value);
                 
-                serializedXML = stringWriter.ToString();                                
+                string serializedXML = stringWriter.ToString();                                
                 
                 return serializedXML;
             }
@@ -44,21 +42,13 @@ namespace Common
             if (value == null)
                 return null;
 
-            try
-            {
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
+            StringReader stringReader = new StringReader(value);
+            XmlReader reader = XmlReader.Create(stringReader);
 
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
-                StringReader stringReader = new StringReader(value);
-                XmlReader reader = XmlReader.Create(stringReader);
+            T result = (T)xmlSerializer.Deserialize(reader);
 
-                T result = (T)xmlSerializer.Deserialize(reader);
-
-                return result;
-            }
-            catch(Exception ex)
-            {
-                throw ex;
-            }
+            return result;
         }
 
         public static byte[] GetBytes(string str)

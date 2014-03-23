@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Common;
 
 namespace CommunicationServer
@@ -10,17 +6,11 @@ namespace CommunicationServer
     class MessageStrategyFactory
     {
         private static MessageStrategyFactory instance;
-        private Dictionary<MessageType, IMessageStrategy> messageStrategies;        
+        private readonly Dictionary<MessageType, IMessageStrategy> messageStrategies;        
 
         public static MessageStrategyFactory Instance
         {
-            get
-            {
-                if (instance == null)
-                    instance = new MessageStrategyFactory();
-
-                return instance;
-            }
+            get { return instance ?? (instance = new MessageStrategyFactory()); }
         }
 
         private MessageStrategyFactory()

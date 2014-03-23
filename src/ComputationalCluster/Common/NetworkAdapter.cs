@@ -77,8 +77,12 @@ namespace Common
         {
             if (stream.CanRead)
             {
+                client = new TcpClient("localhost", port);
+                stream = client.GetStream();
                 var readBuffer = new byte[1024];
                 stream.Read(readBuffer, 0, readBuffer.Length);
+                stream.Close();
+                client.Close();
                 var readMessage = readBuffer.ToString();
                 if (MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
                 {
