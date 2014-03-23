@@ -15,24 +15,28 @@ namespace TaskManager
 
         public void Start(IPAddress server, int port)
         {
-            StartConnection(server, 12345);
+            StartConnection(server, port);
             RegisterResponse();
-            //RecieveProblemData();
+            CurrentStatus = new Status {Id = 1, Threads = statusThreads};
+            StartKeepAlive(6000);
+            RecieveProblemData();
         }
         public void RegisterResponse()
         {
-            var registerMessage = new Register();
-            registerMessage.Type = RegisterType.TaskManager;
-            registerMessage.SolvableProblems = new string[] { "problem A", "problem B" };
-            registerMessage.ParallelThreads = (byte)5;
-            Send<Register>(registerMessage);
+            var registerMessage = new Register
+            {
+                Type = RegisterType.TaskManager,
+                SolvableProblems = new[] {"problem A", "problem B"},
+                ParallelThreads = 5
+            };
+            Send(registerMessage);
         }
 
         public void RecieveProblemData()
         {
             try
             {
-                problem = this.Recieve<DivideProblem>();
+                problem = Recieve<DivideProblem>();
             }
             
             catch (Exception e)
@@ -43,11 +47,9 @@ namespace TaskManager
 
         private void SendSolution()
         {
-            var solution = new Solutions();
-            solution.ProblemType = "DVRT";
-            solution.Id = problem.Id;
+            var solution = new Solutions {ProblemType = "DVRT", Id = problem.Id};
             //TODO Common data?
-            Send<Solutions>(solution);
+            Send(solution);
         }
 
         public void Close()

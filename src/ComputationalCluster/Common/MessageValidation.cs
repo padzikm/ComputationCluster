@@ -31,7 +31,7 @@ namespace Common
                 case MessageType.SolutionsMessage: return assemblyNamespaces + "SolutionsMessage.xsd";
                 case MessageType.SolveRequestMessage: return assemblyNamespaces + "SolveRequestMessage.xsd";
                 case MessageType.SolveRequestResponseMessage: return assemblyNamespaces + "SolveRequestResponseMessage.xsd";
-                case MessageType.StatusMessage: return assemblyNamespaces + "StatusMessage.xsd";
+                case MessageType.StatusMessage: return assemblyNamespaces + "StartKeepAlive.xsd";
                 default: return null;
             }
         }

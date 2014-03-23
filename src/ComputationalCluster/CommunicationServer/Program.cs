@@ -1,14 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using Common;
 using System.Net;
-using System.Net.Sockets;
-using System.IO;
 
 namespace CommunicationServer
 {   
@@ -16,14 +7,14 @@ namespace CommunicationServer
     {        
         static void Main(string[] args)
         {
-            Server server = new Server(IPAddress.Any, 12345);
-            string msg = "";
+            var server = new Server(IPAddress.Any, 12345);
+            var msg = "";
 
             server.Start();
 
             Console.WriteLine("Type 'stop' to stop server");
 
-            while (msg.ToLower() != "stop")
+            while (msg != null && msg.ToLower() != "stop")
                 msg = Console.ReadLine();
 
             server.Stop();            

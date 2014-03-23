@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TaskManager
 {
@@ -21,7 +17,7 @@ namespace TaskManager
 
             taskManager.Start(IPAddress.Any, 12345);
 
-            while (msg.ToLower() != "stop")
+            while (msg != null && msg.ToLower() != "stop")
                 msg = Console.ReadLine();
 
             taskManager.Close();

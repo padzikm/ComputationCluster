@@ -147,7 +147,7 @@ namespace ComputationalNode
                         statusMessage.Threads = threads;
 
                         if (!Send<Status>(statusMessage))
-                            throw new Exception("StatusMessage");
+                            throw new Exception("StartKeepAlive");
 
                         Thread.Sleep(time.Millisecond);
                     }
