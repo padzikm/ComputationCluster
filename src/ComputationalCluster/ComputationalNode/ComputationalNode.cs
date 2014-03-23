@@ -28,7 +28,7 @@ namespace ComputationalNode
             working = true;
         }
 
-        public void Start(string server)
+        public void Start(IPAddress server)
         {
 
             if (nodeThread != null)
