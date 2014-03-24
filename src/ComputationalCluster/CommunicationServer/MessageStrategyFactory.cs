@@ -17,13 +17,7 @@ namespace CommunicationServer
 
         public static MessageStrategyFactory Instance
         {
-            get
-            {
-                if (instance == null)
-                    instance = new MessageStrategyFactory();
-
-                return instance;
-            }
+            get { return instance ?? (instance = new MessageStrategyFactory()); }
         }
 
         private MessageStrategyFactory()

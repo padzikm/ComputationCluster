@@ -1,7 +1,7 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -9,90 +9,80 @@ using System.Threading.Tasks;
 
 namespace Common
 {
-    
+
     public class NetworkAdapter
     {
         private TcpClient client;
-        protected int port;
         private NetworkStream stream;
+        protected int port;
 
-        protected virtual void StartConnection(String server, int _port)
+        protected Status CurrentStatus { get; set; }
+
+        protected virtual void StartConnection(IPAddress server, int port)
         {
-            client = new TcpClient(server, _port);
+            client = new TcpClient("localhost", port);
             stream = client.GetStream();
+            this.port = port;
         }
         protected virtual void CloseConnection()
         {
+            stream.Close();
             client.Close();
         }
 
-        //TODO implement keepalive loop - what about this?
-        protected virtual void StatusMessage(StatusThread[] threads, ulong id, DateTime time)
+        protected virtual void StartKeepAlive(int period)
         {
-            Thread t = new Thread(() =>
+            var t = new Thread(() =>
             {
-                while(true)
-                {  
-                    Status statusMessage = new Status();
-                    statusMessage.Id = id;
-                    statusMessage.Threads = threads;
+                while (true)
+                {
+                    if (!Send(CurrentStatus))
+                        throw new Exception("StartKeepAlive");
 
-                    if (!Send<Status>(statusMessage))
-                        throw new Exception("StatusMessage");
-                    
-                    Thread.Sleep(time.Millisecond);
+                    Thread.Sleep(period);
                 }
             });
             t.Start();
+
         }
 
-        //TODO rather async ?
+
         protected virtual bool Send<T>(T message) where T : class
         {
-            Thread t = new Thread(() =>
+            try
             {
-                try
-                {
-                    string xml = MessageSerialization.Serialize<T>(message);
-                    Byte[] data = System.Text.Encoding.UTF8.GetBytes(xml);
-                    stream.Write(data, 0, data.Length);
-                    stream.Close();
-                }
-                catch (ArgumentNullException e)
-                {
-                    Console.WriteLine("ArgumentNullException: {0}", e);
-                
-                }
-                catch (SocketException e)
-                {
-                    Console.WriteLine("SocketException: {0}", e);
-                }
-            });
-            t.Start();
+                var xml = MessageSerialization.Serialize(message);
+                var data = Encoding.UTF8.GetBytes(xml);
+                stream.Write(data, 0, data.Length);
+            }
+            catch (ArgumentNullException e)
+            {
+                Console.WriteLine("ArgumentNullException: {0}", e);
+
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("SocketException: {0}", e);
+            }
 
             return true;
         }
 
-        //TODO: rather not async
         protected virtual T Recieve<T>() where T : class
         {
             if (stream.CanRead)
             {
-                byte[] readBuffer = new byte[1024];
+                var readBuffer = new byte[1024];
                 stream.Read(readBuffer, 0, readBuffer.Length);
-                string readMessage = readBuffer.ToString();
+                var readMessage = readBuffer.ToString();
                 if (MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
                 {
                     return MessageSerialization.Deserialize<T>(readBuffer.ToString());
                 }
-                else
-                    throw new Exception("Message not valid");
+                throw new Exception("Message not valid");
             }
-            else
-            {
-                Console.WriteLine("Sorry.  You cannot read from this NetworkStream.");
-                return null;
-            }
+            Console.WriteLine("Sorry.  You cannot read from this NetworkStream.");
+            return null;
         }
     }
 }

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net;
 
 namespace ComputationalNode
 {
@@ -17,7 +14,7 @@ namespace ComputationalNode
             Console.WriteLine("Node created. Start working...\n");
             Console.WriteLine("Type 'stop' to stop node");
 
-            node.Start("192.168.0.12");
+            node.Start(IPAddress.Any);
 
             while (msg.ToLower() != "stop")
                 msg = Console.ReadLine();

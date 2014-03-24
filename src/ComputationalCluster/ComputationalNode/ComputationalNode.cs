@@ -28,7 +28,7 @@ namespace ComputationalNode
             working = true;
         }
 
-        public void Start(string server)
+        public void Start(IPAddress server)
         {
 
             if (nodeThread != null)
@@ -147,7 +147,7 @@ namespace ComputationalNode
                         statusMessage.Threads = threads;
 
                         if (!Send<Status>(statusMessage))
-                            throw new Exception("StatusMessage");
+                            throw new Exception("StartKeepAlive");
 
                         Thread.Sleep(time.Millisecond);
                     }
