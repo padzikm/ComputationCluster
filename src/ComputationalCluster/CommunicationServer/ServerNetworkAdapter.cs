@@ -11,18 +11,21 @@ namespace CommunicationServer
 {
     public class ServerNetworkAdapter
     {
-        public static string Receive(Stream stream)
+        public static void Receive(Stream stream, out string message, out MessageType messageType) //TODO: implement this
         {
             byte[] buffer = new byte[1024];
 
             stream.Read(buffer, 0, buffer.Length);
-
-            return MessageSerialization.GetString(buffer);
+            message = MessageSerialization.GetString(buffer);            
+            messageType = MessageType.UnknownMessage;
         }
 
-        public static void Send(Stream stream, string message)
-        {
-
+        public static void Send<T>(Stream stream, T message) where T : class 
+        {            
+            string xml = MessageSerialization.Serialize<T>(message);
+            Byte[] data = System.Text.Encoding.UTF8.GetBytes(xml);
+            stream.Write(data, 0, data.Length); 
+            stream.Flush();
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Common
             switch (msgType)
             {
                 case MessageType.DivideProblemMessage: return assemblyNamespaces + "DivideProblemMessage.xsd";
-                case MessageType.PartialProblemsMessage: return assemblyNamespaces + "PartialProblemsMessage.xsd";
+                case MessageType.SolvePartialProblemsMessage: return assemblyNamespaces + "SolvePartialProblemsMessage.xsd";
                 case MessageType.RegisterMessage: return assemblyNamespaces + "RegisterMessage.xsd";
                 case MessageType.RegisterResponseMessage: return assemblyNamespaces + "RegisterResponseMessage.xsd";
                 case MessageType.SolutionRequestMessage: return assemblyNamespaces + "SolutionRequestMessage.xsd";

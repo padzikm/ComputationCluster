@@ -15,18 +15,26 @@ namespace Common
         SolveRequestResponseMessage,
         StatusMessage,
         DivideProblemMessage,
-        PartialProblemsMessage,
+        SolvePartialProblemsMessage,
         SolutionRequestMessage,
         SolutionsMessage,
+        UnknownMessage,
     }
 
     public class MessageTypeConverter
     {
         public static MessageType ConvertToMessageType(string message)
         {
-            XDocument doc = XDocument.Parse(message);
+            try
+            {
+                XDocument doc = XDocument.Parse(message);
 
-            return (MessageType)Enum.Parse(typeof(MessageType), doc.Root.Name.LocalName + "Message");
+                return (MessageType) Enum.Parse(typeof (MessageType), doc.Root.Name.LocalName + "Message");
+            }
+            catch
+            {
+                return MessageType.UnknownMessage;
+            }
         }
     }
 }

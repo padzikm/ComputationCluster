@@ -46,7 +46,7 @@
     <Compile Include="DVRPTaskSolver.cs" />
     <Compile Include="MessageSerialization.cs" />
     <Compile Include="Messages\DivideProblemMessage.cs" />
-    <Compile Include="Messages\PartialProblemsMessage.cs" />
+    <Compile Include="Messages\SolvePartialProblemsMessage.cs" />
     <Compile Include="Messages\RegisterMessage.cs" />
     <Compile Include="Messages\RegisterResponseMessage.cs" />
     <Compile Include="Messages\SolutionRequestMessage.cs" />

@@ -19,12 +19,18 @@ namespace CommunicationServer
         private TcpListener listener;
         private bool stop;
         private Thread currentThread;
+        private TimeSpan timeout;
+        private DateTime componentTimeout;
+        private MessageStrategyFactory strategyFactory;        
 
-        public Server(IPAddress ipAddress, int port)
+        public Server(IPAddress ipAddress, int port, TimeSpan timeout)
         {
             this.ipAddress = ipAddress;
             this.port = port;
+            this.timeout = timeout;
             stop = false;
+            strategyFactory = MessageStrategyFactory.Instance;            
+            componentTimeout = new DateTime(0, 0, 0, timeout.Hours, timeout.Minutes, timeout.Seconds);
         }
 
         public void Start()
@@ -82,32 +88,58 @@ namespace CommunicationServer
             Socket soc = (Socket)o;
             Stream stream = new NetworkStream(soc);
             byte[] buffer = new byte[1024];
+            string msg = string.Empty;
+            bool keepAlive = true;
+            AutoResetEvent waitEvent;
+            ulong id = 0;            
+            IMessageStrategy strategy;
+            TimeSpan timeLeft, timePassed;
+            DateTime dateTime;            
 
-            try
-            {                                
-                stream.Read(buffer, 0, buffer.Length);
-
-                string msg = MessageSerialization.GetString(buffer).Replace("\0", string.Empty).Trim();
-
-                Console.WriteLine("Odebrano: \n{0}", msg);
-
-                MessageType msgType = MessageTypeConverter.ConvertToMessageType(msg);               
-
-                MessageStrategyFactory strategyFactory = MessageStrategyFactory.Instance;
-                IMessageStrategy strategy = strategyFactory.GetMessageStrategy(msgType);
-
-                if(strategy != null)
-                    strategy.HandleMessage(stream, msg);
-            }
-            catch (Exception ex)
+            while (keepAlive)
             {
-                Console.WriteLine(ex.Message);
+                try
+                {                    
+                    stream.Read(buffer, 0, buffer.Length);
+                    msg = MessageSerialization.GetString(buffer).Replace("\0", string.Empty).Trim();
+                    Console.WriteLine("Odebrano: \n{0}", msg);
+                }
+                catch (Exception ex)
+                {
+                    keepAlive = false;
+                    msg = string.Empty;
+                    Console.WriteLine(ex.Message);
+                }
+                finally
+                {                    
+                    MessageType msgType = MessageTypeConverter.ConvertToMessageType(msg);
+                    strategy = strategyFactory.GetMessageStrategy(msgType, componentTimeout, id);
+                    strategy.HandleMessage(stream, msg, msgType, componentTimeout, ref id, out keepAlive, out waitEvent);
+
+                    if (waitEvent != null)
+                    {
+                        dateTime = DateTime.UtcNow;
+                        timeLeft = timeout;
+                        while (timeLeft > TimeSpan.Zero)
+                        {
+                            if (waitEvent.WaitOne(timeLeft))
+                            {
+                                strategy = strategyFactory.GetWaitEventStrategy(id);
+                                strategy.HandleWaitEvent(stream, id);
+
+                                timePassed = DateTime.UtcNow - dateTime;
+                                timeLeft -= timePassed;
+                                dateTime = DateTime.UtcNow;                                
+                            }
+                            else
+                                timeLeft = TimeSpan.Zero;
+                        }
+                    }
+                }
             }
-            finally
-            {
-                stream.Close();
-                soc.Close();   
-            }            
-        }       
+
+            stream.Close();
+            soc.Close();
+        }
     }
 }
