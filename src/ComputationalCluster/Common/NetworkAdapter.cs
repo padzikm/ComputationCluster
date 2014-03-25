@@ -10,27 +10,30 @@ using System.Threading.Tasks;
 namespace Common
 {
 
+
     public class NetworkAdapter
     {
         private TcpClient client;
         private NetworkStream stream;
-        protected int port;
 
-        protected Status CurrentStatus { get; set; }
+        private const int MaxBufferLenght = 1024;
 
-        protected virtual void StartConnection(IPAddress server, int port)
+        public Status CurrentStatus { get; set; }
+
+
+
+        public void StartConnection(IPAddress server, int connectionPort)
         {
-            client = new TcpClient("localhost", port);
+            client = new TcpClient(server.ToString(), connectionPort);
             stream = client.GetStream();
-            this.port = port;
         }
-        protected virtual void CloseConnection()
+        public void CloseConnection()
         {
             stream.Close();
             client.Close();
         }
 
-        protected virtual void StartKeepAlive(int period)
+        public void StartKeepAlive(int period)
         {
             var t = new Thread(() =>
             {
@@ -46,43 +49,30 @@ namespace Common
 
         }
 
-
-        protected virtual bool Send<T>(T message) where T : class
+        public bool Send<T>(T message) where T : class
         {
-            try
-            {
-                var xml = MessageSerialization.Serialize(message);
-                var data = Encoding.UTF8.GetBytes(xml);
-                stream.Write(data, 0, data.Length);
-            }
-            catch (ArgumentNullException e)
-            {
-                Console.WriteLine("ArgumentNullException: {0}", e);
+            var xml = MessageSerialization.Serialize(message);
+            var data = MessageSerialization.GetBytes(xml);
+            stream.Write(data, 0, data.Length);
 
-            }
-            catch (SocketException e)
-            {
-                Console.WriteLine("SocketException: {0}", e);
-            }
+            Console.WriteLine("Sent {0}", xml);
 
             return true;
         }
 
-        protected virtual T Recieve<T>() where T : class
+        public T Recieve<T>() where T : class
         {
-            if (stream.CanRead)
+            if (!stream.CanRead) throw new Exception("Sorry.  You cannot read from this NetworkStream.");
+            var readBuffer = new byte[MaxBufferLenght];
+            stream.Read(readBuffer, 0, readBuffer.Length);
+            var readMessage = MessageSerialization.GetString(readBuffer);
+            if (MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
             {
-                var readBuffer = new byte[1024];
-                stream.Read(readBuffer, 0, readBuffer.Length);
-                var readMessage = readBuffer.ToString();
-                if (MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
-                {
-                    return MessageSerialization.Deserialize<T>(readBuffer.ToString());
-                }
-                throw new Exception("Message not valid");
+                var deserialized = MessageSerialization.Deserialize<T>(readMessage);
+                Console.WriteLine(deserialized);
+                return deserialized;
             }
-            Console.WriteLine("Sorry.  You cannot read from this NetworkStream.");
-            return null;
+            throw new Exception("Message not valid");
         }
     }
 }

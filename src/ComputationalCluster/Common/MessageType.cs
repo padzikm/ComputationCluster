@@ -21,7 +21,7 @@ namespace Common
         UnknownMessage,
     }
 
-    public class MessageTypeConverter
+    public static class MessageTypeConverter
     {
         public static MessageType ConvertToMessageType(string message)
         {
