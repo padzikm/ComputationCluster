@@ -21,6 +21,7 @@ namespace ComputationalNode
         private bool working;
         private ulong id;
         private ulong problemId;
+        private int port;
 
         public ComputationalNode(int _port)
         {
