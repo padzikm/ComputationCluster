@@ -30,7 +30,7 @@ namespace CommunicationServer
             this.timeout = timeout;
             stop = false;
             strategyFactory = MessageStrategyFactory.Instance;            
-            componentTimeout = new DateTime(1,1,1,timeout.Hours, timeout.Minutes, timeout.Seconds);
+            componentTimeout = new DateTime(1, 1, 1, timeout.Hours, timeout.Minutes, timeout.Seconds);
         }
 
         public void Start()

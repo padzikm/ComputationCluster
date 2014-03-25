@@ -1,42 +1,83 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using Common;
 using System.Net;
 
 namespace TaskManager
 {
-    public class TaskManager : NetworkAdapter
+    public class TaskManager 
     {
         private DivideProblem problem;
+        private RegisterResponse registerResponse;
         private StatusThread[] statusThreads;
+        private NetworkAdapter networkAdapter;
+        private bool isStarted;
 
-        public void Start(IPAddress server, int port)
+        private readonly IPAddress serverIpAddress;
+        private readonly int port;
+
+
+        public TaskManager(IPAddress serverIp, int port)
         {
-            StartConnection(server, port);
-            RegisterResponse();
-            CurrentStatus = new Status {Id = 1, Threads = statusThreads};
-            StartKeepAlive(6000);
-            RecieveProblemData();
+            serverIpAddress = serverIp;
+            this.port = port;
         }
-        public void RegisterResponse()
+
+        public void Start()
+        {
+            var thread = new Thread(TaskWork);
+            thread.Start();
+        }
+
+        private void TaskWork()
+        {
+            networkAdapter = new NetworkAdapter();
+            networkAdapter.StartConnection(serverIpAddress, port);
+            SendRegisterMessage();
+            RecieveRegisterResponse();
+            statusThreads = new StatusThread[5];
+            foreach (var statusThread in statusThreads)
+            {
+                statusThread.HowLong = 0;
+                //statusThread.TaskId = registerResponse.Id;
+                statusThread.ProblemType = "DVRP";
+            }
+            networkAdapter.CurrentStatus = new Status {Id = registerResponse.Id, Threads = statusThreads};
+
+            networkAdapter.StartKeepAlive(registerResponse.Timeout.Millisecond);
+            isStarted = true;
+
+            while (isStarted)
+            {
+                RecieveProblemData();
+                SendSolution();
+            }
+
+        }
+
+        private void SendRegisterMessage()
         {
             var registerMessage = new Register
             {
                 Type = RegisterType.TaskManager,
-                SolvableProblems = new[] {"problem A", "problem B"},
+                SolvableProblems = new[] { "DVRP", "DVRP" },
                 ParallelThreads = 5
             };
-            Send(registerMessage);
+            networkAdapter.Send(registerMessage);
+            Console.WriteLine("Send Register Message");
         }
 
-        public void RecieveProblemData()
+        private void RecieveRegisterResponse()
+        {
+            registerResponse = networkAdapter.Recieve<RegisterResponse>();
+
+        }
+
+        private void RecieveProblemData()
         {
             try
             {
-                problem = Recieve<DivideProblem>();
+                problem = networkAdapter.Recieve<DivideProblem>();
             }
             
             catch (Exception e)
@@ -47,14 +88,15 @@ namespace TaskManager
 
         private void SendSolution()
         {
-            var solution = new Solutions {ProblemType = "DVRT", Id = problem.Id};
+            var solution = new Solutions {ProblemType = "DVRP", Id = problem.Id};
             //TODO Common data?
-            Send(solution);
+            networkAdapter.Send(solution);
         }
 
         public void Close()
         {
-            this.CloseConnection();
+            isStarted = false;
+            networkAdapter.CloseConnection();
         }
 
 

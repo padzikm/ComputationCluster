@@ -16,14 +16,14 @@ namespace ComputationalClient
         {
             string msg = "";
 
-            //ComputationalClient client = new ComputationalClient(args[0], ulong.Parse(args[1]), Encoding.UTF8.GetBytes(args[2]), 12345);
+            //ComputationalClient client = new ComputationalClient(args[0], ulong.Parse(args[1]), Encoding.UTF8.GetBytes(args[2]));
 
-            ComputationalClient client = new ComputationalClient("IO communication", 1000, null, 12345);
+            ComputationalClient client = new ComputationalClient("drvp", 1000, null);
 
             Console.WriteLine("Client created. Start working...\n");
             Console.WriteLine("Type 'stop' to stop client.\n");
 
-            client.Start("192.168.0.12");
+            client.Start("192.168.0.12", 12345);
 
             while (msg.ToLower() != "stop")
                 msg = Console.ReadLine();   
