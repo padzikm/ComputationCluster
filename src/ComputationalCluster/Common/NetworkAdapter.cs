@@ -103,6 +103,8 @@ namespace Common
             var readBuffer = new byte[MaxBufferLenght];
             stream.Read(readBuffer, 0, readBuffer.Length);
             var readMessage = MessageSerialization.GetString(readBuffer);
+            readMessage = readMessage.Replace("\0", string.Empty).Trim();
+
             if (MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
             {
                 var deserialized = MessageSerialization.Deserialize<T>(readMessage);
