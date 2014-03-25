@@ -56,7 +56,7 @@ namespace CommunicationServer
 
         public static ulong CreateSaveID() //TODO: do better
         {
-            ulong id = (ulong)IDList.Count;
+            ulong id = (ulong)IDList.Count + 1;
             Random r = new Random(DateTime.UtcNow.Millisecond);
 
             while (IDList.Contains(id))

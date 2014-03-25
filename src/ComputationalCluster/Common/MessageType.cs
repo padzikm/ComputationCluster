@@ -31,8 +31,9 @@ namespace Common
 
                 return (MessageType) Enum.Parse(typeof (MessageType), doc.Root.Name.LocalName + "Message");
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine("Blad parsera: {0}", ex.Message);
                 return MessageType.UnknownMessage;
             }
         }

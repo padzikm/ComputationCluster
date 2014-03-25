@@ -6,8 +6,8 @@ namespace CommunicationServer
     class Program
     {        
         static void Main(string[] args)
-        {           
-            Server server = new Server(IPAddress.Any, 12345, new TimeSpan(0,1,0));
+        {                       
+            Server server = new Server(IPAddress.Any, 12345, new TimeSpan(0,0,10));
             string msg = "";
 
             server.Start();

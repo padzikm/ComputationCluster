@@ -23,12 +23,12 @@ namespace Common
             {
                 XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
                 StringWriter stringWriter = new StringWriter();
-                
+                                
                 xmlSerializer.Serialize(stringWriter, value);
                 
-                string serializedXML = stringWriter.ToString();                                
-                
-                return serializedXML;
+                string serializedXML = stringWriter.ToString();
+
+                return serializedXML.Replace("utf-16", "utf-8");
             }
             catch(Exception ex)
             {

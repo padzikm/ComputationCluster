@@ -18,6 +18,7 @@ namespace CommunicationServer
 
             if (!DvrpProblem.IDList.Contains(id))
                 return;
+
             time = DateTime.UtcNow - DvrpProblem.ComponentsLastStatus[id];
             if (time > span + delay)
             {

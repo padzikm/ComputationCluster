@@ -23,6 +23,7 @@ namespace CommunicationServer
         public static void Send<T>(Stream stream, T message) where T : class 
         {            
             string xml = MessageSerialization.Serialize<T>(message);
+            Console.WriteLine("Wyslano: {0}", xml);
             Byte[] data = System.Text.Encoding.UTF8.GetBytes(xml);
             stream.Write(data, 0, data.Length); 
             stream.Flush();

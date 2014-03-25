@@ -11,7 +11,7 @@ namespace CommunicationServer
     {
         public void HandleMessage(System.IO.Stream stream, string message, Common.MessageType messageType, DateTime timeout, ref ulong id, out bool keepAlive, out System.Threading.AutoResetEvent waitEvent)
         {
-            SolutionRequest request = MessageSerialization.Deserialize<SolutionRequest>(message);            
+            SolutionRequest request = MessageSerialization.Deserialize<SolutionRequest>(message);
             waitEvent = null;
             keepAlive = false;
 
@@ -30,18 +30,20 @@ namespace CommunicationServer
             response.ProblemType = problem.ProblemType;
             response.CommonData = problem.Data;
             List<SolutionsSolution> solutionList = new List<SolutionsSolution>();
-            foreach (var element in DvrpProblem.PartialSolutions[request.Id])            
-                solutionList.AddRange(element.Solutions1);
+            if (DvrpProblem.PartialSolutions.ContainsKey(request.Id))
+                foreach (var element in DvrpProblem.PartialSolutions[request.Id])
+                    solutionList.AddRange(element.Solutions1);
 
-            foreach (var element in DvrpProblem.PartialProblemsComputing[request.Id])
-                foreach (var pr in element.PartialProblems)
-                {
-                    SolutionsSolution sol = new SolutionsSolution();
-                    sol.TaskId = pr.TaskId;
-                    sol.Data = pr.Data;
-                    sol.Type = SolutionsSolutionType.Ongoing;
-                    solutionList.Add(sol);                    
-                }                           
+            if (DvrpProblem.PartialProblemsComputing.ContainsKey(request.Id))
+                foreach (var element in DvrpProblem.PartialProblemsComputing[request.Id])
+                    foreach (var pr in element.PartialProblems)
+                    {
+                        SolutionsSolution sol = new SolutionsSolution();
+                        sol.TaskId = pr.TaskId;
+                        sol.Data = pr.Data;
+                        sol.Type = SolutionsSolutionType.Ongoing;
+                        solutionList.Add(sol);
+                    }
 
             response.Solutions1 = solutionList.ToArray();
             ServerNetworkAdapter.Send(stream, response);

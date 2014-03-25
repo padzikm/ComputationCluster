@@ -30,7 +30,7 @@ namespace CommunicationServer
             this.timeout = timeout;
             stop = false;
             strategyFactory = MessageStrategyFactory.Instance;            
-            componentTimeout = new DateTime(0, 0, 0, timeout.Hours, timeout.Minutes, timeout.Seconds);
+            componentTimeout = new DateTime(1,1,1,timeout.Hours, timeout.Minutes, timeout.Seconds);
         }
 
         public void Start()
@@ -83,11 +83,10 @@ namespace CommunicationServer
             }
         }
 
-        private void HandleConnection(object o)
+        private void HandleConnection(object o) //TODO: handle multiple messages at once from read, change serializer encoding to utf-8, handle closing connections
         {
             Socket soc = (Socket)o;
-            Stream stream = new NetworkStream(soc);
-            byte[] buffer = new byte[1024];
+            Stream stream = new NetworkStream(soc);            
             string msg = string.Empty;
             bool keepAlive = true;
             AutoResetEvent waitEvent;
@@ -99,7 +98,8 @@ namespace CommunicationServer
             while (keepAlive)
             {
                 try
-                {                    
+                {
+                    byte[] buffer = new byte[1024];
                     stream.Read(buffer, 0, buffer.Length);
                     msg = MessageSerialization.GetString(buffer).Replace("\0", string.Empty).Trim();
                     Console.WriteLine("Odebrano: \n{0}", msg);
@@ -111,28 +111,31 @@ namespace CommunicationServer
                     Console.WriteLine(ex.Message);
                 }
                 finally
-                {                    
-                    MessageType msgType = MessageTypeConverter.ConvertToMessageType(msg);
-                    strategy = strategyFactory.GetMessageStrategy(msgType, componentTimeout, id);
-                    strategy.HandleMessage(stream, msg, msgType, componentTimeout, ref id, out keepAlive, out waitEvent);
-
-                    if (waitEvent != null)
+                {
+                    if (keepAlive)
                     {
-                        dateTime = DateTime.UtcNow;
-                        timeLeft = timeout;
-                        while (timeLeft > TimeSpan.Zero)
-                        {
-                            if (waitEvent.WaitOne(timeLeft))
-                            {
-                                strategy = strategyFactory.GetWaitEventStrategy(id);
-                                strategy.HandleWaitEvent(stream, id);
+                        MessageType msgType = MessageTypeConverter.ConvertToMessageType(msg);
+                        strategy = strategyFactory.GetMessageStrategy(msgType, componentTimeout, id);
+                        strategy.HandleMessage(stream, msg, msgType, componentTimeout, ref id, out keepAlive, out waitEvent);
 
-                                timePassed = DateTime.UtcNow - dateTime;
-                                timeLeft -= timePassed;
-                                dateTime = DateTime.UtcNow;                                
+                        if (waitEvent != null)
+                        {
+                            dateTime = DateTime.UtcNow;
+                            timeLeft = timeout;
+                            while (timeLeft > TimeSpan.Zero)
+                            {
+                                if (waitEvent.WaitOne(timeLeft))
+                                {
+                                    strategy = strategyFactory.GetWaitEventStrategy(id);
+                                    strategy.HandleWaitEvent(stream, id);
+
+                                    timePassed = DateTime.UtcNow - dateTime;
+                                    timeLeft -= timePassed;
+                                    dateTime = DateTime.UtcNow;
+                                }
+                                else
+                                    timeLeft = TimeSpan.Zero;
                             }
-                            else
-                                timeLeft = TimeSpan.Zero;
                         }
                     }
                 }

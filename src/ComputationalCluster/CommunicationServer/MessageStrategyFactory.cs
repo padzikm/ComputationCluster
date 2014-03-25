@@ -35,14 +35,21 @@ namespace CommunicationServer
 
         public IMessageStrategy GetMessageStrategy(MessageType msgType, DateTime timeout, ulong id)
         {
-            TimeSpan time, delay;
-            TimeSpan span = new TimeSpan(timeout.Hour, timeout.Minute, timeout.Second);
-            bool keepAlive = false;    
-            delay = new TimeSpan(0, 1, 0);
-            
-            time = DateTime.UtcNow - DvrpProblem.ComponentsLastStatus[id];
-            if (time < span + delay)            
-                keepAlive = true;            
+            bool keepAlive = false;
+            if (id > 0 && msgType != MessageType.SolutionRequestMessage)
+            {
+                TimeSpan time, delay;
+                TimeSpan span = new TimeSpan(timeout.Hour, timeout.Minute, timeout.Second);                
+                delay = new TimeSpan(0, 1, 0);
+
+                time = DateTime.UtcNow - DvrpProblem.ComponentsLastStatus[id];
+                if (time < span + delay)
+                    keepAlive = true;
+            }
+            else
+            {
+                keepAlive = true;
+            }
 
             return (keepAlive && messageStrategies.ContainsKey(msgType)) ? messageStrategies[msgType] : messageStrategies[MessageType.UnknownMessage];
         }
