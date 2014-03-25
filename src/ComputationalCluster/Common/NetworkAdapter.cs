@@ -9,28 +9,41 @@ using System.Threading.Tasks;
 
 namespace Common
 {
-
     public class NetworkAdapter
     {
         private TcpClient client;
         private NetworkStream stream;
-        protected int port;
 
-        protected Status CurrentStatus { get; set; }
-
-        protected virtual void StartConnection(IPAddress server, int port)
+        /// <summary>
+        /// Property of processing status that is sent to server. Contains actual working threads and ID of a task.
+        /// </summary>
+        public Status CurrentStatus { get; set; }
+        
+        /// <summary>
+        /// Creates ne Tcp client and open a network stream form it.
+        /// </summary>
+        /// <param name="server"> Specifies string value of IP which client use to connect to server. May be localhost. </param>
+        /// <param name="port"> Port that server is listening to. </param>
+        public void StartConnection(string server, int port)
         {
-            client = new TcpClient("localhost", port);
+            client = new TcpClient(server, port);
             stream = client.GetStream();
-            this.port = port;
         }
-        protected virtual void CloseConnection()
+
+        /// <summary>
+        /// Closes the previously opened network stream and client.
+        /// </summary>
+        public void CloseConnection()
         {
             stream.Close();
             client.Close();
         }
 
-        protected virtual void StartKeepAlive(int period)
+        /// <summary>
+        /// In newly created thread CurrentStatus are sent due to inform server that component that uses it is alive.
+        /// </summary>
+        /// <param name="period"> Time at which a message is sent/ </param>
+        public void StartKeepAlive(int period)
         {
             var t = new Thread(() =>
             {
@@ -43,11 +56,15 @@ namespace Common
                 }
             });
             t.Start();
-
         }
 
-
-        protected virtual bool Send<T>(T message) where T : class
+        /// <summary>
+        /// Generic method sends serialized and encoded message to network stream.
+        /// </summary>
+        /// <typeparam name="T"> Type of message class. </typeparam>
+        /// <param name="message"> Message to sentm as a instance of T class. </param>
+        /// <returns> True if sending was complete. False otherwise. </returns>
+        public bool Send<T>(T message) where T : class
         {
             try
             {
@@ -68,7 +85,13 @@ namespace Common
             return true;
         }
 
-        protected virtual T Recieve<T>() where T : class
+        /// <summary>
+        /// Uses newtwork stream to wait (read) for a message for a specific lenght (1024 bytes).  Obtained string is validating
+        /// and converting to to type T.
+        /// </summary>
+        /// <typeparam name="T"> Type of message class that method returns. </typeparam>
+        /// <returns> Deserialized message of type T if stream can be read and if serialization is ok. Null otherwise.</returns>
+        public T Recieve<T>() where T : class
         {
             if (stream.CanRead)
             {
