@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 namespace Common
 {
 
-
     public class NetworkAdapter
     {
         private TcpClient client;
@@ -18,21 +17,46 @@ namespace Common
 
         private const int MaxBufferLenght = 1024;
 
+        /// <summary>
+        /// Property of processing status that is sent to server. Contains actual working threads and ID of a task.
+        /// </summary>
         public Status CurrentStatus { get; set; }
 
-
-
-        public void StartConnection(IPAddress server, int connectionPort)
+        /// <summary>
+        /// Creates ne Tcp client and open a network stream form it.
+        /// </summary>
+        /// <param name="serverIpAddress">Specifies IPAddress value of IP which client use to connect to serverName. May be localhost.</param>
+        /// <param name="connectionPort">Port that server is listening to.</param>
+        public void StartConnection(IPAddress serverIpAddress, int connectionPort)
         {
-            client = new TcpClient(server.ToString(), connectionPort);
+            client = new TcpClient(serverIpAddress.ToString(), connectionPort);
             stream = client.GetStream();
         }
+
+        /// <summary>
+        /// Creates ne Tcp client and open a network stream form it.
+        /// </summary>
+        /// <param name="serverName"> Specifies string value of IP which client use to connect to serverName. May be localhost. </param>
+        /// <param name="port"> Port that server is listening to. </param>
+        public void StartConnection(string serverName, int port)
+        {
+            client = new TcpClient(serverName, port);
+            stream = client.GetStream();
+        }
+
+        /// <summary>
+        /// Closes the previously opened network stream and client.
+        /// </summary>
         public void CloseConnection()
         {
             stream.Close();
             client.Close();
         }
 
+        /// <summary>
+        /// In newly created thread CurrentStatus are sent due to inform server that component that uses it is alive.
+        /// </summary>
+        /// <param name="period"> Time at which a message is sent/ </param>
         public void StartKeepAlive(int period)
         {
             var t = new Thread(() =>
@@ -46,9 +70,15 @@ namespace Common
                 }
             });
             t.Start();
-
         }
 
+
+        /// <summary>
+        /// Generic method sends serialized and encoded message to network stream.
+        /// </summary>
+        /// <typeparam name="T"> Type of message class. </typeparam>
+        /// <param name="message"> Message to sentm as a instance of T class. </param>
+        /// <returns> True if sending was complete. False otherwise. </returns>
         public bool Send<T>(T message) where T : class
         {
             var xml = MessageSerialization.Serialize(message);
@@ -60,6 +90,13 @@ namespace Common
             return true;
         }
 
+
+        /// <summary>
+        /// Uses newtwork stream to wait (read) for a message for a specific lenght (1024 bytes).  Obtained string is validating
+        /// and converting to to type T.
+        /// </summary>
+        /// <typeparam name="T"> Type of message class that method returns. </typeparam>
+        /// <returns> Deserialized message of type T if stream can be read and if serialization is ok. Null otherwise.</returns>
         public T Recieve<T>() where T : class
         {
             if (!stream.CanRead) throw new Exception("Sorry.  You cannot read from this NetworkStream.");
