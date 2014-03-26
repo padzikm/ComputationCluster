@@ -18,7 +18,7 @@ namespace ComputationalClient
 
             //ComputationalClient client = new ComputationalClient(args[0], ulong.Parse(args[1]), Encoding.UTF8.GetBytes(args[2]));
 
-            ComputationalClient client = new ComputationalClient("192.168.0.12", 12345, "dvrp", 1000, null);
+            Client client = new Client("192.168.0.12", 12345, "dvrp", 10000, null);
 
             Console.WriteLine("Client created. Start working...\n");
             Console.WriteLine("Type 'stop' to stop client.\n");

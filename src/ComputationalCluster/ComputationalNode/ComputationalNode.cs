@@ -12,7 +12,7 @@ using Common;
 
 namespace ComputationalNode
 {
-    class ComputationalNode : NetworkAdapter
+    class ComputationalNode 
     {
         private Thread nodeThread;
         private Thread loopingThread;
@@ -38,7 +38,7 @@ namespace ComputationalNode
             try
             {
                 nodeThread = new Thread(NodeWork);
-                StartConnection(server, port);
+                //StartConnection(server, port);
                 nodeThread.Start();
             }
             catch (Exception e)
@@ -65,7 +65,7 @@ namespace ComputationalNode
             }
             finally
             {
-                CloseConnection();
+                //CloseConnection();
             }
 
         }
@@ -115,7 +115,7 @@ namespace ComputationalNode
                     {
                         nodeThread.Abort();
                         nodeThread = null;
-                        CloseConnection();
+                        //CloseConnection();
                     }
                 }
             }
@@ -127,14 +127,14 @@ namespace ComputationalNode
             registerMessage.Type = RegisterType.ComputationalNode;
             registerMessage.SolvableProblems = new string[] { "problem A", "problem B" };
             registerMessage.ParallelThreads = (byte)5;
-            Send<Register>(registerMessage);
+            //Send<Register>(registerMessage);
         }
 
         private void RegisterResponse()
         {           
-            var registerResponseMessage = Recieve<RegisterResponse>();         
-            id = registerResponseMessage.Id;
-            time = registerResponseMessage.Timeout;
+            //var registerResponseMessage = Recieve<RegisterResponse>();         
+            //id = registerResponseMessage.Id;
+            //time = registerResponseMessage.Timeout;
         }
 
         private void Status()
@@ -147,8 +147,8 @@ namespace ComputationalNode
                         statusMessage.Id = id;
                         statusMessage.Threads = threads;
 
-                        if (!Send<Status>(statusMessage))
-                            throw new Exception("StartKeepAlive");
+                        //if (!Send<Status>(statusMessage))
+                            //throw new Exception("StartKeepAlive");
 
                         Thread.Sleep(time.Millisecond);
                     }
@@ -160,8 +160,8 @@ namespace ComputationalNode
         {
             try
             {
-                var partialProblemsMaessage = Recieve<SolvePartialProblems>();
-                problemId = partialProblemsMaessage.Id;
+                //var partialProblemsMaessage = Recieve<SolvePartialProblems>();
+                //problemId = partialProblemsMaessage.Id;
             }
             catch(Exception e)
             {
@@ -175,7 +175,7 @@ namespace ComputationalNode
             solutionMessage.ProblemType = "DVRT";
             solutionMessage.Id = problemId;
             //TODO fill message
-            Send<Solutions>(solutionMessage);
+            //Send<Solutions>(solutionMessage);
 
 
         }
