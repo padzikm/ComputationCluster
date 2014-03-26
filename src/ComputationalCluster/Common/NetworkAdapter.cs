@@ -12,8 +12,10 @@ namespace Common
 
     public class NetworkAdapter
     {
-        private string serverName;
-        private int connectionPort;
+        private readonly string serverName;
+        private readonly int connectionPort;
+        private TcpClient client;
+        private NetworkStream stream;
 
         private const int MaxBufferLenght = 1024;
 
@@ -44,6 +46,12 @@ namespace Common
             connectionPort = _connectionPort;
         }
 
+        public void StartConnection()
+        {
+            client = new TcpClient(serverName, connectionPort);
+            stream = client.GetStream();
+        }
+
         /// <summary>
         /// In newly created thread CurrentStatus are sent due to inform server that component that uses it is alive.
         /// </summary>
@@ -54,10 +62,11 @@ namespace Common
             {
                 while (true)
                 {
-                    if (!Send(CurrentStatus))
-                        throw new Exception("StartKeepAlive");
 
+                    if (!Send(CurrentStatus, true))
+                        break;
                     Thread.Sleep(period);
+
                 }
             });
             t.Start();
@@ -69,22 +78,38 @@ namespace Common
         /// </summary>
         /// <typeparam name="T"> Type of message class. </typeparam>
         /// <param name="message"> Message to sentm as a instance of T class. </param>
+        /// <param name="closeConnection">Indicates whether connections should be recreated and closed</param>
         /// <returns> True if sending was complete. False otherwise. </returns>
-        public bool Send<T>(T message) where T : class
+        public bool Send<T>(T message, bool closeConnection) where T : class
         {
-            TcpClient client = new TcpClient(serverName, connectionPort);
-            NetworkStream stream = client.GetStream();
+            try
+            {
+                if (closeConnection)
+                {
+                    client = new TcpClient(serverName, connectionPort);
+                    stream = client.GetStream();
+                }
 
-            var xml = MessageSerialization.Serialize(message);
-            var data = MessageSerialization.GetBytes(xml);
-            stream.Write(data, 0, data.Length);
+                var xml = MessageSerialization.Serialize(message);
+                var data = MessageSerialization.GetBytes(xml);
+                stream.Write(data, 0, data.Length);
 
-            stream.Close();
-            client.Close();
+                if (closeConnection)
+                {
+                    stream.Close();
+                    client.Close();
+                }
 
-            Console.WriteLine("Sent \n\n{0}\n\n", xml);
+                Console.WriteLine("Sent \n\n{0}\n\n", xml);
 
-            return true;
+                return true;
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+
         }
 
 
@@ -93,20 +118,24 @@ namespace Common
         /// and converting to to type T.
         /// </summary>
         /// <typeparam name="T"> Type of message class that method returns. </typeparam>
+        /// <param name="closeConnection">Indicates whether connections should be recreated and closed</param>
         /// <returns> Deserialized message of type T if stream can be read and if serialization is ok. Null otherwise.</returns>
-        public T Recieve<T>() where T : class
+        public T Recieve<T>(bool closeConnection) where T : class
         {
-            TcpClient client = new TcpClient(serverName, connectionPort);
-            NetworkStream stream = client.GetStream();
-
+            if (closeConnection)
+            {
+                client = new TcpClient(serverName, connectionPort);
+                stream = client.GetStream();
+            }
             if (!stream.CanRead) throw new Exception("NetworkStream unavaiable\n\n");
 
             var readBuffer = new byte[MaxBufferLenght];
             stream.Read(readBuffer, 0, readBuffer.Length);
-
-            stream.Close();
-            client.Close();
-
+            if (closeConnection)
+            {
+                stream.Close();
+                client.Close();
+            }
             var readMessage = MessageSerialization.GetString(readBuffer);
             readMessage = readMessage.Replace("\0", string.Empty).Trim();
 

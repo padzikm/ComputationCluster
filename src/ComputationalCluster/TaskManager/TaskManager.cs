@@ -11,7 +11,7 @@ namespace TaskManager
         private DivideProblem problem;
         private RegisterResponse registerResponse;
         private StatusThread[] statusThreads;
-        private NetworkAdapter networkAdapter;
+        private readonly NetworkAdapter networkAdapter;
         private bool isStarted;
 
         private readonly IPAddress serverIpAddress;
@@ -34,7 +34,7 @@ namespace TaskManager
         private void TaskWork()
         {
            
-            //networkAdapter.StartConnection(serverIpAddress, port);
+            networkAdapter.StartConnection();
             SendRegisterMessage();
             RecieveRegisterResponse();
             statusThreads = new StatusThread[5];
@@ -52,8 +52,8 @@ namespace TaskManager
 
             while (isStarted)
             {
-                RecieveProblemData();
-                SendSolution();
+                if(RecieveProblemData())
+                    SendSolution();
             }
 
         }
@@ -66,34 +66,53 @@ namespace TaskManager
                 SolvableProblems = new[] { "DVRP", "DVRP" },
                 ParallelThreads = 5
             };
-            networkAdapter.Send(registerMessage);
+            networkAdapter.Send(registerMessage, false);
             Console.WriteLine("Send Register Message");
         }
 
         private void RecieveRegisterResponse()
         {
-            registerResponse = networkAdapter.Recieve<RegisterResponse>();
+            try
+            {
+                registerResponse = networkAdapter.Recieve<RegisterResponse>(false);
+            }
+            catch (Exception)
+            {
+                
+                Console.WriteLine("Cannot recieve RegisterResponse");
+            }
+            
 
         }
 
-        private void RecieveProblemData()
+        private bool RecieveProblemData()
         {
             try
             {
-                problem = networkAdapter.Recieve<DivideProblem>();
+                problem = networkAdapter.Recieve<DivideProblem>(false);
+                if (problem != null) return true;
             }
-            
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e);
+                //Console.WriteLine(e);
+                return false;
             }
+            return false;
         }
 
         private void SendSolution()
         {
-            var solution = new Solutions {ProblemType = "DVRP", Id = problem.Id};
-            //TODO Common data?
-            networkAdapter.Send(solution);
+            try
+            {
+                var solution = new Solutions { ProblemType = "DVRP", Id = 1 };
+                //TODO Common data?
+                networkAdapter.Send(solution, true);
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Cannot send solution to server");
+            }
+
         }
 
         public void Close()
