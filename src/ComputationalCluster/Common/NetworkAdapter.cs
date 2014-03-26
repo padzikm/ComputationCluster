@@ -12,8 +12,8 @@ namespace Common
 
     public class NetworkAdapter
     {
-        private TcpClient client;
-        private NetworkStream stream;
+        private string serverName;
+        private int connectionPort;
 
         private const int MaxBufferLenght = 1024;
 
@@ -23,34 +23,25 @@ namespace Common
         public Status CurrentStatus { get; set; }
 
         /// <summary>
-        /// Creates ne Tcp client and open a network stream form it.
+        /// Constructor that takes IPAddress class as first parameter. Stores input data in private variables.
         /// </summary>
         /// <param name="serverIpAddress">Specifies IPAddress value of IP which client use to connect to serverName. May be localhost.</param>
         /// <param name="connectionPort">Port that server is listening to.</param>
-        public void StartConnection(IPAddress serverIpAddress, int connectionPort)
+        public NetworkAdapter(IPAddress serverIpAddress, int _connectionPort)
         {
-            client = new TcpClient(serverIpAddress.ToString(), connectionPort);
-            stream = client.GetStream();
+            serverName = serverIpAddress.ToString();
+            connectionPort = _connectionPort;
         }
 
         /// <summary>
-        /// Creates ne Tcp client and open a network stream form it.
+        /// Constructor that takes string variable as first parameter. Stores input data in private variables.
         /// </summary>
         /// <param name="serverName"> Specifies string value of IP which client use to connect to serverName. May be localhost. </param>
         /// <param name="port"> Port that server is listening to. </param>
-        public void StartConnection(string serverName, int port)
+        public NetworkAdapter(string _serverName, int _connectionPort)
         {
-            client = new TcpClient(serverName, port);
-            stream = client.GetStream();
-        }
-
-        /// <summary>
-        /// Closes the previously opened network stream and client.
-        /// </summary>
-        public void CloseConnection()
-        {
-            stream.Close();
-            client.Close();
+            serverName = _serverName;
+            connectionPort = _connectionPort;
         }
 
         /// <summary>
@@ -81,11 +72,17 @@ namespace Common
         /// <returns> True if sending was complete. False otherwise. </returns>
         public bool Send<T>(T message) where T : class
         {
+            TcpClient client = new TcpClient(serverName, connectionPort);
+            NetworkStream stream = client.GetStream();
+
             var xml = MessageSerialization.Serialize(message);
             var data = MessageSerialization.GetBytes(xml);
             stream.Write(data, 0, data.Length);
 
-            Console.WriteLine("Sent {0}", xml);
+            stream.Close();
+            client.Close();
+
+            Console.WriteLine("Sent \n\n{0}\n\n", xml);
 
             return true;
         }
@@ -99,17 +96,26 @@ namespace Common
         /// <returns> Deserialized message of type T if stream can be read and if serialization is ok. Null otherwise.</returns>
         public T Recieve<T>() where T : class
         {
-            if (!stream.CanRead) throw new Exception("Sorry.  You cannot read from this NetworkStream.");
+            TcpClient client = new TcpClient(serverName, connectionPort);
+            NetworkStream stream = client.GetStream();
+
+            if (!stream.CanRead) throw new Exception("NetworkStream unavaiable\n\n");
+
             var readBuffer = new byte[MaxBufferLenght];
             stream.Read(readBuffer, 0, readBuffer.Length);
+
+            stream.Close();
+            client.Close();
+
             var readMessage = MessageSerialization.GetString(readBuffer);
             readMessage = readMessage.Replace("\0", string.Empty).Trim();
 
             //if (MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
             //{
-                var deserialized = MessageSerialization.Deserialize<T>(readMessage);
-                Console.WriteLine(deserialized);
-                return deserialized;
+            var deserialized = MessageSerialization.Deserialize<T>(readMessage);
+            Console.WriteLine(deserialized);
+
+            return deserialized;
             //}
             //throw new Exception("Message not valid");
         }

@@ -18,12 +18,12 @@ namespace ComputationalClient
 
             //ComputationalClient client = new ComputationalClient(args[0], ulong.Parse(args[1]), Encoding.UTF8.GetBytes(args[2]));
 
-            ComputationalClient client = new ComputationalClient("dvrp", 1000, null);
+            ComputationalClient client = new ComputationalClient("localhost", 12345, "dvrp", 1000, null);
 
             Console.WriteLine("Client created. Start working...\n");
             Console.WriteLine("Type 'stop' to stop client.\n");
 
-            client.Start("localhost", 12345);
+            client.Start();
 
             while (msg.ToLower() != "stop")
                 msg = Console.ReadLine();   
