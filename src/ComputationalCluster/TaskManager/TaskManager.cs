@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using Common;
 using System.Net;
@@ -21,6 +22,7 @@ namespace TaskManager
         {
             serverIpAddress = serverIp;
             this.port = port;
+            networkAdapter = new NetworkAdapter(serverIp, port);
         }
 
         public void Start()
@@ -31,13 +33,14 @@ namespace TaskManager
 
         private void TaskWork()
         {
-            networkAdapter = new NetworkAdapter();
-            networkAdapter.StartConnection(serverIpAddress, port);
+           
+            //networkAdapter.StartConnection(serverIpAddress, port);
             SendRegisterMessage();
             RecieveRegisterResponse();
             statusThreads = new StatusThread[5];
-            foreach (var statusThread in statusThreads)
+            foreach (var statusThread in statusThreads.Select(statusThread => new StatusThread()))
             {
+
                 statusThread.HowLong = 0;
                 //statusThread.TaskId = registerResponse.Id;
                 statusThread.ProblemType = "DVRP";
@@ -96,7 +99,7 @@ namespace TaskManager
         public void Close()
         {
             isStarted = false;
-            networkAdapter.CloseConnection();
+            //networkAdapter.CloseConnection();
         }
 
 
