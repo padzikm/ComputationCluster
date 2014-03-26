@@ -25,6 +25,9 @@ namespace ComputationalClient
         public ComputationalClient(string _problemType, ulong _solvingTimeout, byte[] _data)
         {
             networkAdapter = new NetworkAdapter();
+            if(_problemType == null)
+                throw new ArgumentNullException();
+            
             problemType = _problemType;
             solvingTimeout = _solvingTimeout;
             data = _data;

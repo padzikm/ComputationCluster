@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>e7238aba-af69-4191-8f50-8f67874e64ae</ProjectGuid>
+    <ProjectGuid>{3A79DA83-DF62-496D-A711-A9F5359FB1BD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>UnitTests</RootNamespace>
@@ -52,6 +52,28 @@
   <ItemGroup>
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{627e7240-1177-4665-971a-9b935261e8da}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CommunicationServer\CommunicationServer.csproj">
+      <Project>{9faab6cc-edbc-4c22-b8ae-f58b0ff717b0}</Project>
+      <Name>CommunicationServer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ComputationalClient\ComputationalClient.csproj">
+      <Project>{26a1d6e8-75ba-4b03-b2a4-044527ffbb81}</Project>
+      <Name>ComputationalClient</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ComputationalNode\ComputationalNode.csproj">
+      <Project>{d4322dd1-ac18-49a5-865d-374b20a7bc2b}</Project>
+      <Name>ComputationalNode</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TaskManager\TaskManager.csproj">
+      <Project>{b3d62d63-3043-4b77-b081-b316ea1ee4b2}</Project>
+      <Name>TaskManager</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
