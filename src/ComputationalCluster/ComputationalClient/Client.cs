@@ -5,7 +5,7 @@ using System.Net.Sockets;
 
 namespace ComputationalClient
 {
-    class ComputationalClient
+    public class Client
     {
         private NetworkAdapter networkAdapter;
         private Thread askForSolutionThread;
@@ -24,10 +24,10 @@ namespace ComputationalClient
         /// <param name="_problemType"> String value of name of a problem type. For example 'drvp'. </param>
         /// <param name="_solvingTimeout"> Time that client wait for solution. After it clients terminates. </param>
         /// <param name="_data"> Data that is sent to server. </param>
-        public ComputationalClient(string serverName, int port, string _problemType, ulong _solvingTimeout, byte[] _data)
+        public Client(string serverName, int port, string _problemType, ulong _solvingTimeout, byte[] _data)
         {
             networkAdapter = new NetworkAdapter(serverName, port);
-            if(_problemType == null)
+            if(_problemType == null || serverName == null || port < 0)
                 throw new ArgumentNullException();
             
             problemType = _problemType;
@@ -42,7 +42,7 @@ namespace ComputationalClient
         /// </summary>
         /// <param name="server"> Specifies string value of IP which client use to connect to server. May be localhost. </param>
         /// <param name="port"> Port that server is listening to. </param>
-        public void Start()
+        public bool Start()
         {                   
             if (clientThread != null)
                 throw new InvalidOperationException("Client is already running! Wait for partial or final solution.\n\n");
@@ -51,17 +51,19 @@ namespace ComputationalClient
             {
                 clientThread = new Thread(ClientWork);
                 clientThread.Start();
+                return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error in client start: {0}\n\n", ex.Message);
+                return false;
             }
         }
 
         /// <summary>
         /// Allow to terminate correctly program execution. Manages ClientWork thread and askForSolution thread.
         /// </summary>
-        public void Stop()
+        public bool Stop()
         {
             try
             {
@@ -72,10 +74,12 @@ namespace ComputationalClient
                 }
                 clientThread.Join();
                 clientThread = null;
+                return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error in client stop: {0}\n\n", ex.Message);
+                return false;
             }
         }  
 
