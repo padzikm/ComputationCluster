@@ -133,8 +133,8 @@ namespace ComputationalClient
             {
                 if (!working)
                 {
-                    //loopingThread.Abort();
-                    //loopingThread = null;
+                    askForSolutionThread.Abort();
+                    askForSolutionThread = null;
                     clientThread.Abort();
                     clientThread = null;
                 }
