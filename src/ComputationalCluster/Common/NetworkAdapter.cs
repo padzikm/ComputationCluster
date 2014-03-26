@@ -139,14 +139,12 @@ namespace Common
             var readMessage = MessageSerialization.GetString(readBuffer);
             readMessage = readMessage.Replace("\0", string.Empty).Trim();
 
-            //if (MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
-            //{
+            if (!MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
+                throw new Exception("Message not valid");
             var deserialized = MessageSerialization.Deserialize<T>(readMessage);
             Console.WriteLine(deserialized);
 
             return deserialized;
-            //}
-            //throw new Exception("Message not valid");
         }
     }
 }
