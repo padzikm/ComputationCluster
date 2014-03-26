@@ -16,8 +16,8 @@ namespace Common
 {   
     public class MessageValidation
     {
-        private static string assemblyNamespaces = "CommunicationProtocolLibrary.XMLSchemas.";
-        private static string schemaNamespace = @"http://www.mini.pw.edu.pl/ucc/";
+        private static readonly string assemblyNamespaces = Assembly.GetExecutingAssembly().GetName().Name + ".XMLSchemas.";
+        private const string schemaNamespace = @"http://www.mini.pw.edu.pl/ucc/";
 
         private static string ConvertMessageTypeToSchemaName(MessageType msgType)
         {            
