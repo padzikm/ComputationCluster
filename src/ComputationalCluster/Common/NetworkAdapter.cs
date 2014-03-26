@@ -31,6 +31,9 @@ namespace Common
         /// <param name="connectionPort">Port that server is listening to.</param>
         public NetworkAdapter(IPAddress serverIpAddress, int _connectionPort)
         {
+            if(serverIpAddress.ToString() == null || _connectionPort < 0)
+                throw new ArgumentNullException();
+
             serverName = serverIpAddress.ToString();
             connectionPort = _connectionPort;
         }
@@ -42,14 +45,29 @@ namespace Common
         /// <param name="port"> Port that server is listening to. </param>
         public NetworkAdapter(string _serverName, int _connectionPort)
         {
+            if (_serverName == null || _connectionPort < 0)
+                throw new ArgumentNullException();
+
             serverName = _serverName;
             connectionPort = _connectionPort;
         }
 
+        /// <summary>
+        /// Creates TcpClient and gets a stream from it.
+        /// </summary>
         public void StartConnection()
         {
             client = new TcpClient(serverName, connectionPort);
             stream = client.GetStream();
+        }
+
+        /// <summary>
+        /// Closes previously opened stream from TcpClient ale closes this client too.
+        /// </summary>
+        public void CloseConnection()
+        {
+            stream.Close();
+            client.Close();
         }
 
         /// <summary>
@@ -106,10 +124,8 @@ namespace Common
             }
             catch (Exception)
             {
-
                 return false;
             }
-
         }
 
 
@@ -127,15 +143,18 @@ namespace Common
                 client = new TcpClient(serverName, connectionPort);
                 stream = client.GetStream();
             }
+
             if (!stream.CanRead) throw new Exception("NetworkStream unavaiable\n\n");
 
             var readBuffer = new byte[MaxBufferLenght];
             stream.Read(readBuffer, 0, readBuffer.Length);
+
             if (closeConnection)
             {
                 stream.Close();
                 client.Close();
             }
+
             var readMessage = MessageSerialization.GetString(readBuffer);
             readMessage = readMessage.Replace("\0", string.Empty).Trim();
 
