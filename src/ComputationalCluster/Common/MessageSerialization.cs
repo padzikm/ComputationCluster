@@ -24,7 +24,10 @@ namespace Common
                 XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
                 StringWriter stringWriter = new StringWriter();
                                 
-                xmlSerializer.Serialize(stringWriter, value);
+                XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+                ns.Add("ucc", "http://www.mini.pw.edu.pl/ucc/");
+
+                xmlSerializer.Serialize(stringWriter, value, ns);
                 
                 string serializedXML = stringWriter.ToString();
 

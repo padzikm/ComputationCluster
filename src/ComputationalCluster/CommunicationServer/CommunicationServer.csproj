@@ -44,15 +44,16 @@
     <Compile Include="DvrpProblem.cs" />
     <Compile Include="IMessageStrategy.cs" />
     <Compile Include="MessageStrategyFactory.cs" />
+    <Compile Include="SolvePartialProblemsStrategy.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegisterStrategy.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="ServerNetworkAdapter.cs" />
     <Compile Include="SolutionRequestStrategy.cs" />
+    <Compile Include="SolutionsStrategy.cs" />
     <Compile Include="SolveRequestStrategy.cs" />
     <Compile Include="StatusStrategy.cs" />
-    <Compile Include="UnknownStatusStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

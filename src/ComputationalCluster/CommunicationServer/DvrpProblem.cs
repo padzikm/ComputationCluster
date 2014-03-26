@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Remoting.Contexts;
 using System.Text;
@@ -9,17 +10,16 @@ using System.Threading.Tasks;
 using Common;
 
 namespace CommunicationServer
-{
-    [Synchronization]
+{    
     static class DvrpProblem
     {
-        public static List<ulong> IDList { get; set; }
+        public static List<ulong> ComponentsID { get; set; }
+        public static List<ulong> ProblemsID { get; set; }
+        public static Dictionary<ulong, EndPoint> ComponentsAddress { get; set; } 
         public static Dictionary<ulong, DateTime> ComponentsLastStatus { get; set; } 
-        public static Dictionary<ulong, Register> Tasks { get; set; }
-        public static Dictionary<ulong, Socket> TasksSockets { get; set; }
+        public static Dictionary<ulong, Register> Tasks { get; set; }        
         public static Dictionary<ulong, bool> TasksBusy { get; set; }
-        public static Dictionary<ulong, Register> Nodes { get; set; }
-        public static Dictionary<ulong, Socket> NodesSockets { get; set; }
+        public static Dictionary<ulong, Register> Nodes { get; set; }        
         public static Dictionary<ulong, bool> NodesBusy { get; set; }
         public static Dictionary<ulong, SolveRequest> Problems { get; set; }
         public static Dictionary<ulong, bool> ProblemsDivideWaiting { get; set; }
@@ -31,16 +31,17 @@ namespace CommunicationServer
         public static Dictionary<ulong, Solutions> ProblemSolutions { get; set; }
         public static AutoResetEvent TaskEvent { get; set; }
         public static AutoResetEvent NodeEvent { get; set; }
+        public static AutoResetEvent WaitEvent { get; set; }
 
         static DvrpProblem()
         {
-            IDList = new List<ulong>();
+            ComponentsID = new List<ulong>();
+            ProblemsID = new List<ulong>();
+            ComponentsAddress = new Dictionary<ulong, EndPoint>();
             ComponentsLastStatus = new Dictionary<ulong, DateTime>();
-            Tasks = new Dictionary<ulong, Register>();
-            TasksSockets = new Dictionary<ulong, Socket>();
+            Tasks = new Dictionary<ulong, Register>();            
             TasksBusy = new Dictionary<ulong, bool>();
-            Nodes = new Dictionary<ulong, Register>();
-            NodesSockets = new Dictionary<ulong, Socket>();
+            Nodes = new Dictionary<ulong, Register>();            
             NodesBusy = new Dictionary<ulong, bool>();
             Problems = new Dictionary<ulong, SolveRequest>();
             ProblemsDivideWaiting = new Dictionary<ulong, bool>();
@@ -52,17 +53,31 @@ namespace CommunicationServer
             ProblemSolutions = new Dictionary<ulong, Solutions>();
             TaskEvent = new AutoResetEvent(false);
             NodeEvent = new AutoResetEvent(false);
+            WaitEvent = new AutoResetEvent(true);
         }
 
-        public static ulong CreateSaveID() //TODO: do better
+        public static ulong CreateSaveComponentID() //TODO: do better
         {
-            ulong id = (ulong)IDList.Count + 1;
+            ulong id = (ulong)ComponentsID.Count + 1;
             Random r = new Random(DateTime.UtcNow.Millisecond);
 
-            while (IDList.Contains(id))
-                id = (ulong)r.Next(0, IDList.Count);
+            while (ComponentsID.Contains(id))
+                id = (ulong)r.Next(0, ComponentsID.Count);
             
-            IDList.Add(id);
+            ComponentsID.Add(id);
+
+            return id;
+        }
+
+        public static ulong CreateSaveProblemID() //TODO: do better
+        {
+            ulong id = (ulong)ProblemsID.Count + 1;
+            Random r = new Random(DateTime.UtcNow.Millisecond);
+
+            while (ProblemsID.Contains(id))
+                id = (ulong)r.Next(0, ProblemsID.Count);
+
+            ProblemsID.Add(id);
 
             return id;
         }

@@ -20,8 +20,7 @@ namespace CommunicationServer
         private bool stop;
         private Thread currentThread;
         private TimeSpan timeout;
-        private DateTime componentTimeout;
-        private MessageStrategyFactory strategyFactory;        
+        private MessageStrategyFactory strategyFactory;
 
         public Server(IPAddress ipAddress, int port, TimeSpan timeout)
         {
@@ -29,8 +28,7 @@ namespace CommunicationServer
             this.port = port;
             this.timeout = timeout;
             stop = false;
-            strategyFactory = MessageStrategyFactory.Instance;            
-            componentTimeout = new DateTime(1, 1, 1, timeout.Hours, timeout.Minutes, timeout.Seconds);
+            strategyFactory = MessageStrategyFactory.Instance;
         }
 
         public void Start()
@@ -83,66 +81,35 @@ namespace CommunicationServer
             }
         }
 
-        private void HandleConnection(object o) //TODO: handle multiple messages at once from read, change serializer encoding to utf-8, handle closing connections
+        private void HandleConnection(object o)
         {
             Socket soc = (Socket)o;
-            Stream stream = new NetworkStream(soc);            
+            Stream stream = new NetworkStream(soc);
+            EndPoint endPoint = soc.RemoteEndPoint;
+
             string msg = string.Empty;
-            bool keepAlive = true;
-            AutoResetEvent waitEvent;
-            ulong id = 0;            
-            IMessageStrategy strategy;
-            TimeSpan timeLeft, timePassed;
-            DateTime dateTime;            
 
-            while (keepAlive)
+            try
             {
-                try
-                {
-                    byte[] buffer = new byte[1024];
-                    stream.Read(buffer, 0, buffer.Length);
-                    msg = MessageSerialization.GetString(buffer).Replace("\0", string.Empty).Trim();
-                    Console.WriteLine("Odebrano: \n{0}", msg);
-                }
-                catch (Exception ex)
-                {
-                    keepAlive = false;
-                    msg = string.Empty;
-                    Console.WriteLine(ex.Message);
-                }
-                finally
-                {
-                    if (keepAlive)
-                    {
-                        MessageType msgType = MessageTypeConverter.ConvertToMessageType(msg);
-                        strategy = strategyFactory.GetMessageStrategy(msgType, componentTimeout, id);
-                        strategy.HandleMessage(stream, msg, msgType, componentTimeout, ref id, out keepAlive, out waitEvent);
-
-                        if (waitEvent != null)
-                        {
-                            dateTime = DateTime.UtcNow;
-                            timeLeft = timeout;
-                            while (timeLeft > TimeSpan.Zero)
-                            {
-                                if (waitEvent.WaitOne(timeLeft))
-                                {
-                                    strategy = strategyFactory.GetWaitEventStrategy(id);
-                                    strategy.HandleWaitEvent(stream, id);
-
-                                    timePassed = DateTime.UtcNow - dateTime;
-                                    timeLeft -= timePassed;
-                                    dateTime = DateTime.UtcNow;
-                                }
-                                else
-                                    timeLeft = TimeSpan.Zero;
-                            }
-                        }
-                    }
-                }
+                byte[] buffer = new byte[1024];
+                stream.Read(buffer, 0, buffer.Length);
+                msg = MessageSerialization.GetString(buffer).Replace("\0", string.Empty).Trim();
+                Console.WriteLine("Odebrano: \n{0}", msg);
+                MessageType msgType = MessageTypeConverter.ConvertToMessageType(msg);
+                IMessageStrategy strategy = strategyFactory.GetMessageStrategy(msgType);
+                if (strategy != null)
+                    strategy.HandleMessage(stream, msg, msgType, timeout, endPoint);
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
 
-            stream.Close();
-            soc.Close();
+                stream.Close();
+                soc.Close();
+            }
         }
     }
 }
