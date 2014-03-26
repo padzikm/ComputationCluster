@@ -17,16 +17,17 @@ namespace ComputationalClient
         private const int sleepTime = 30000;
 
         /// <summary>
-        /// Specific constructor for ComputationalClient class. Allows to execute client's correctly.
+        /// Specific constructor for ComputationalClient class. Allows to execute client's correctly. Also creates NetworkAdapter inside. Throws ArgumentNullException when incorrent inputs.
         /// </summary>
-        /// <param name="serverName"> String value of a server address name. </param>
-        /// <param name="port"> Port on which server is listening. </param>
-        /// <param name="_problemType"> String value of name of a problem type. For example 'drvp'. </param>
+        /// <param name="serverName"> String value of a server address name. Cannot be empty. </param>
+        /// <param name="port"> Port on which server is listening. Cannot be negative. </param>
+        /// <param name="_problemType"> String value of name of a problem type. For example 'drvp'. Cannot be empty. </param>
         /// <param name="_solvingTimeout"> Time that client wait for solution. After it clients terminates. </param>
         /// <param name="_data"> Data that is sent to server. </param>
         public Client(string serverName, int port, string _problemType, ulong _solvingTimeout, byte[] _data)
         {
             networkAdapter = new NetworkAdapter(serverName, port);
+
             if(_problemType == null || serverName == null || port < 0)
                 throw new ArgumentNullException();
             
@@ -35,13 +36,11 @@ namespace ComputationalClient
             data = _data;
             working = true;
         }
-
+        
         /// <summary>
-        /// This method starts whole Client work. A new thread is created due to not block console. Uses StartConnection method 
-        /// from NetworkAdapter class.
+        /// This method starts whole Client work. A new thread is created due to not block console. Uses StartConnection method from NetworkAdapter class.
         /// </summary>
-        /// <param name="server"> Specifies string value of IP which client use to connect to server. May be localhost. </param>
-        /// <param name="port"> Port that server is listening to. </param>
+        /// <returns> True if succed, false otherwise. </returns>
         public bool Start()
         {                   
             if (clientThread != null)
@@ -49,6 +48,7 @@ namespace ComputationalClient
 
             try
             {
+                networkAdapter.StartConnection();
                 clientThread = new Thread(ClientWork);
                 clientThread.Start();
                 return true;
@@ -92,7 +92,7 @@ namespace ComputationalClient
                 SendSolveRequest();
 
                 Console.WriteLine("Solve request sent, waiting for solve request response...\n\n");
-                SolveRequestResponse srp = networkAdapter.Recieve<SolveRequestResponse>();
+                SolveRequestResponse srp = networkAdapter.Recieve<SolveRequestResponse>(false);
 
                 Console.WriteLine("Solve request appeared. ID of a task is: {0}\n\n", srp.Id);
                 SolutionRequestMessage(srp.Id);
@@ -100,7 +100,7 @@ namespace ComputationalClient
                 while (working)
                 {
                     Console.WriteLine("Another thread is asking for solutions, waiting till some solutions show up...\n\n");
-                    Solutions solutions = networkAdapter.Recieve<Solutions>();
+                    Solutions solutions = networkAdapter.Recieve<Solutions>(false);
 
                     Console.WriteLine("Solutions in da hause -\n id: {0}\n problem type: {1}\n Closing connection...\n\n", solutions.Id, solutions.ProblemType);
                 }
@@ -137,10 +137,7 @@ namespace ComputationalClient
             {
                 if (!working)
                 {
-                    askForSolutionThread.Abort();
-                    askForSolutionThread = null;
-                    clientThread.Abort();
-                    clientThread = null;
+                    Stop();
                 }
             }
         }
@@ -153,7 +150,7 @@ namespace ComputationalClient
             sr.SolvingTimeout = solvingTimeout;
             sr.SolvingTimeoutSpecified = true;
 
-            networkAdapter.Send<SolveRequest>(sr);
+            networkAdapter.Send<SolveRequest>(sr, false);
         }
 
         private void SolutionRequestMessage(ulong id)
@@ -165,7 +162,7 @@ namespace ComputationalClient
                     SolutionRequest solutionRequestMessage = new SolutionRequest();
                     solutionRequestMessage.Id = id;
 
-                    if (!networkAdapter.Send<SolutionRequest>(solutionRequestMessage))
+                    if (!networkAdapter.Send<SolutionRequest>(solutionRequestMessage, true))
                         throw new TimeoutException();
 
                     Thread.Sleep(sleepTime);
