@@ -57,8 +57,11 @@ namespace Common
         /// </summary>
         public void StartConnection()
         {
-            client = new TcpClient(serverName, connectionPort);
-            stream = client.GetStream();
+            if(client == null)
+                client = new TcpClient(serverName, connectionPort);
+
+            if(stream == null)
+                stream = client.GetStream();
         }
 
         /// <summary>
@@ -66,8 +69,11 @@ namespace Common
         /// </summary>
         public void CloseConnection()
         {
-            stream.Close();
-            client.Close();
+            if (stream != null)
+                stream.Close();
+
+            if (client != null)
+                client.Close();
         }
 
         /// <summary>
@@ -84,12 +90,10 @@ namespace Common
                     if (!Send(CurrentStatus, true))
                         break;
                     Thread.Sleep(period);
-
                 }
             });
             t.Start();
         }
-
 
         /// <summary>
         /// Generic method sends serialized and encoded message to network stream.
@@ -128,7 +132,6 @@ namespace Common
             }
         }
 
-
         /// <summary>
         /// Uses newtwork stream to wait (read) for a message for a specific lenght (1024 bytes).  Obtained string is validating
         /// and converting to to type T.
@@ -136,7 +139,7 @@ namespace Common
         /// <typeparam name="T"> Type of message class that method returns. </typeparam>
         /// <param name="closeConnection">Indicates whether connections should be recreated and closed</param>
         /// <returns> Deserialized message of type T if stream can be read and if serialization is ok. Null otherwise.</returns>
-        public T Recieve<T>(bool closeConnection) where T : class
+        public T Receive<T>(bool closeConnection) where T : class
         {
             if (closeConnection)
             {
@@ -160,6 +163,7 @@ namespace Common
 
             if (!MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
                 throw new Exception("Message not valid");
+
             var deserialized = MessageSerialization.Deserialize<T>(readMessage);
             Console.WriteLine(deserialized);
 

@@ -3,6 +3,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading;
 using ComputationalClient;
 using Common;
+using CommunicationServer;
+using System.Net;
 
 namespace UnitTests
 {
@@ -32,6 +34,7 @@ namespace UnitTests
             Client cc = new Client("localhost", 12345, "dvrp", 10000, null);
 
             // act
+            
             cc.Stop();
 
             // assert
@@ -46,8 +49,13 @@ namespace UnitTests
             bool condition;
 
             // act
+            Server server = new Server(IPAddress.Any, 12345, new TimeSpan(0,0,10));
+            server.Start();
+
             cc.Start();
             condition = cc.Stop();
+
+            server.Stop();
 
             // assert
             Assert.IsTrue(condition);

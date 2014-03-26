@@ -74,7 +74,7 @@ namespace TaskManager
         {
             try
             {
-                registerResponse = networkAdapter.Recieve<RegisterResponse>(false);
+                registerResponse = networkAdapter.Receive<RegisterResponse>(false);
             }
             catch (Exception)
             {
@@ -89,7 +89,7 @@ namespace TaskManager
         {
             try
             {
-                problem = networkAdapter.Recieve<DivideProblem>(false);
+                problem = networkAdapter.Receive<DivideProblem>(false);
                 if (problem != null) return true;
             }
             catch (Exception)
