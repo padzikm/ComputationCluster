@@ -84,7 +84,9 @@ namespace Common
             {
                 while (true)
                 {
-                    if (!Send(CurrentStatus, true))
+                    client = new TcpClient(serverName, connectionPort);
+                    stream = client.GetStream();
+                    if (!Send(CurrentStatus, false))
                         break;
                     if (recieveHandler())
                         sendhandler();

@@ -82,10 +82,10 @@ namespace TaskManager
         {
             try
             {
-                problem = networkAdapter.Receive<DivideProblem>(true);
+                problem = networkAdapter.Receive<DivideProblem>(false);
                 if (problem != null) return true;
             }
-            catch (Exception)
+            catch (Exception e )
             {
                 //Console.WriteLine(e);
                 return false;
@@ -99,7 +99,7 @@ namespace TaskManager
             {
                 var solution = new Solutions { ProblemType = "DVRP", Id = 1 };
                 //TODO Common data?
-                networkAdapter.Send(solution, true);
+                networkAdapter.Send(solution, false);
             }
             catch (Exception)
             {
