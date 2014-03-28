@@ -8,15 +8,12 @@ namespace ComputationalClient
     public class Client
     {
         private NetworkAdapter networkAdapter;
-        private Thread askForSolutionThread;
         private Thread clientThread;
         private string problemType;
         private ulong solvingTimeout;
         private byte[] data;
         private bool working;
         private const int sleepTime = 30000;
-        private string serverName;
-        private int port;
 
         /// <summary>
         /// Specific constructor for ComputationalClient class. Allows to execute client's correctly. Also creates NetworkAdapter inside. Throws ArgumentNullException when incorrent inputs.
@@ -28,9 +25,6 @@ namespace ComputationalClient
         /// <param name="_data"> Data that is sent to server. </param>
         public Client(string serverName, int port, string _problemType, ulong _solvingTimeout, byte[] _data)
         {
-            this.serverName = serverName;
-            this.port = port;
-
             networkAdapter = new NetworkAdapter(serverName, port);
 
             if(_problemType == null || serverName == null || port < 0)
@@ -71,12 +65,6 @@ namespace ComputationalClient
         {
             try
             {
-                if (askForSolutionThread != null)
-                {
-                    askForSolutionThread.Abort();
-                    askForSolutionThread = null;
-                }
-
                 clientThread.Join();
                 clientThread = null;
                 return true;
@@ -88,7 +76,6 @@ namespace ComputationalClient
             }
         }  
 
-        // ClientWork działa tak, że  TYLKO RAZ wysyła wiadomość do server, że ma do policzenia problem, a w pętli oczekuje na kolejne rozwiązania. Jest to po to, żeby móc otrzymywać częściowe rozwiązania, oraz finalne. Finalne powinno zawierać jakąś informację, że jest finalne (a nie zawiera?), żeby móc skończyć kolejny obieg czekania na rozwiązania.
         private void ClientWork()
         {
             try
@@ -100,20 +87,13 @@ namespace ComputationalClient
 
                 Console.WriteLine("Solve request sent, waiting for solve request response...\n\n");
                 SolveRequestResponse srp = networkAdapter.Receive<SolveRequestResponse>(false);
+
                 networkAdapter.CloseConnection();                
+
                 Console.WriteLine("Solve request appeared. ID of a task is: {0}\n\n", srp.Id);
-                SolutionRequestMessage(srp.Id);
                 
                 while (working)
-                {
-                    //Console.WriteLine("Another thread is asking for solutions, waiting till some solutions show up...\n\n");
-                    Solutions solutions = networkAdapter.Receive<Solutions>(true);
-
-                    //Console.WriteLine("Solutions in da hause -\n id: {0}\n problem type: {1}\n Closing connection...\n\n", solutions.Id, solutions.ProblemType);
-                    Thread.Sleep(1000*60);
-                }
-
-                working = false;
+                    SolutionRequestMessage(srp.Id);
             }
             catch (TimeoutException te)
             {
@@ -144,10 +124,7 @@ namespace ComputationalClient
             finally
             {
                 if (!working)
-                {
-                    networkAdapter.CloseConnection();
-                    Stop();
-                }
+                    Stop(); 
             }
         }
 
@@ -164,27 +141,51 @@ namespace ComputationalClient
 
         private void SolutionRequestMessage(ulong id)
         {
-            askForSolutionThread = new Thread(() =>
+            SolutionRequest solutionRequestMessage = new SolutionRequest() {Id = id};
+
+            networkAdapter.StartConnection();
+
+            networkAdapter.Send<SolutionRequest>(solutionRequestMessage, false);
+            Solutions solutions = networkAdapter.Receive<Solutions>(false);
+
+            networkAdapter.CloseConnection();
+
+            foreach(var e in solutions.Solutions1)
             {
-                NetworkAdapter ntw = new NetworkAdapter(serverName, port);
-
-                while (true)
+                if(e.Type == SolutionsSolutionType.Final)
                 {
-                    SolutionRequest solutionRequestMessage = new SolutionRequest();
-                    solutionRequestMessage.Id = id;
+                    Console.WriteLine(
+                        "Final Solutions in da hause - \n" +
+                        "Id: {0} \n" +
+                        "Problem type: {1} \n" +
+                        "It's computations time: {2}\n" +
+                        "Closing connection... \n\n",
+                        solutions.Id, solutions.ProblemType, e.ComputationsTime);
 
-                    ntw.StartConnection();
-                    if (!ntw.Send<SolutionRequest>(solutionRequestMessage, false))
-                        throw new TimeoutException();
-
-                    Solutions solutions = ntw.Receive<Solutions>(false);
-                    ntw.CloseConnection();
-                    Console.WriteLine("Solutions in da hause -\n id: {0}\n problem type: {1}\n Closing connection...\n\n", solutions.Id, solutions.ProblemType);
-
-                    Thread.Sleep(sleepTime);
+                    working = false;
                 }
-            });
-            askForSolutionThread.Start();
+                else if(e.Type == SolutionsSolutionType.Partial)
+                { 
+                    Console.WriteLine(
+                        "Partial Solutions in da hause - \n" +
+                        "Id: {0} \n" +
+                        "Problem type: {1} \n" +
+                        "It's computations time: {2}\n" +
+                        "Continue to processing... \n\n",
+                        solutions.Id, solutions.ProblemType, e.ComputationsTime);
+                }
+                else
+                {
+                    Console.WriteLine(
+                        "Solutions in da hause - \n" +
+                        "Id: {0} \n" +
+                        "Problem type: {1} \n"+
+                        "It's status: {2}, so still waiting for final or partial solutions... \n\n", 
+                        solutions.Id, solutions.ProblemType, e.Type);
+                }
+            }
+    
+            Thread.Sleep(sleepTime);
         }
     }
 }

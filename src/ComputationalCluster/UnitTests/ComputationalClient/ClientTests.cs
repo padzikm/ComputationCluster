@@ -11,6 +11,9 @@ namespace UnitTests
     [TestClass]
     public class ClientTests
     {
+
+        Server server = new Server(IPAddress.Any, 12345, new TimeSpan(0, 0, 10));
+
         #region Starting and Stoping client's threads
         [TestMethod]
         public void StartWhileClientNotExist()
@@ -49,7 +52,6 @@ namespace UnitTests
             bool condition;
 
             // act
-            Server server = new Server(IPAddress.Any, 12345, new TimeSpan(0,0,10));
             server.Start();
 
             cc.Start();
