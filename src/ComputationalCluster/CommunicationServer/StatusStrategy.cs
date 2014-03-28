@@ -10,6 +10,14 @@ namespace CommunicationServer
 {
     class StatusStrategy : IMessageStrategy
     {
+        /// <summary>
+        /// Keeps alive component, which sent status message
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="message"></param>
+        /// <param name="messageType"></param>
+        /// <param name="timeout"></param>
+        /// <param name="endPoint"></param>
         public void HandleMessage(System.IO.Stream stream, string message, MessageType messageType, TimeSpan timeout, EndPoint endPoint)
         {
             Status msg = MessageSerialization.Deserialize<Status>(message);            

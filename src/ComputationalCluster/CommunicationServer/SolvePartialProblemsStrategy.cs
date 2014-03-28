@@ -9,6 +9,14 @@ namespace CommunicationServer
 {
     class SolvePartialProblemsStrategy : IMessageStrategy
     {
+        /// <summary>
+        /// Registers divided problem into smaller problems from task
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="message"></param>
+        /// <param name="messageType"></param>
+        /// <param name="timout"></param>
+        /// <param name="endPoint"></param>
         public void HandleMessage(System.IO.Stream stream, string message, Common.MessageType messageType, TimeSpan timout, System.Net.EndPoint endPoint)
         {
             SolvePartialProblems partial = MessageSerialization.Deserialize<SolvePartialProblems>(message);

@@ -10,6 +10,14 @@ namespace CommunicationServer
 {
     class SolutionRequestStrategy : IMessageStrategy
     {
+        /// <summary>
+        /// Response for clients solution request
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="message"></param>
+        /// <param name="messageType"></param>
+        /// <param name="timeout"></param>
+        /// <param name="endPoint"></param>
         public void HandleMessage(System.IO.Stream stream, string message, MessageType messageType, TimeSpan timeout, EndPoint endPoint) //TODO: add timeout handling when not finished comupting
         {
             SolutionRequest request = MessageSerialization.Deserialize<SolutionRequest>(message);

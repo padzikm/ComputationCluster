@@ -9,6 +9,14 @@ namespace CommunicationServer
 {
     class SolutionsStrategy : IMessageStrategy
     {
+        /// <summary>
+        /// Registers new solutions from either node or task
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="message"></param>
+        /// <param name="messageType"></param>
+        /// <param name="timout"></param>
+        /// <param name="endPoint"></param>
         public void HandleMessage(System.IO.Stream stream, string message, Common.MessageType messageType, TimeSpan timout, System.Net.EndPoint endPoint)
         {
             Solutions sol = MessageSerialization.Deserialize<Solutions>(message);

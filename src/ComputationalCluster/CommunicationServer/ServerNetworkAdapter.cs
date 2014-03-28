@@ -12,15 +12,21 @@ namespace CommunicationServer
 {
     public class ServerNetworkAdapter
     {
-        public static void Receive(Stream stream, out string message, out MessageType messageType) //TODO: implement this
-        {
-            byte[] buffer = new byte[1024];
+        //public static void Receive(Stream stream, out string message, out MessageType messageType) //TODO: implement this
+        //{
+        //    byte[] buffer = new byte[1024];
 
-            stream.Read(buffer, 0, buffer.Length);
-            message = MessageSerialization.GetString(buffer);            
-            messageType = MessageType.UnknownMessage;
-        }
+        //    stream.Read(buffer, 0, buffer.Length);
+        //    message = MessageSerialization.GetString(buffer);            
+        //    messageType = MessageType.UnknownMessage;
+        //}
 
+        /// <summary>
+        /// Sends message using opened stream
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="stream">Opened steram</param>
+        /// <param name="message">Message to send</param>
         public static void Send<T>(Stream stream, T message) where T : class 
         {
             try
@@ -37,6 +43,12 @@ namespace CommunicationServer
             }
         }
 
+        /// <summary>
+        /// Sends message to component's address defined in endPoint
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="endPoint">Nonopened network connection details</param>
+        /// <param name="message">Message to send</param>
         public static void Send<T>(EndPoint endPoint, T message) where T : class
         {
             try

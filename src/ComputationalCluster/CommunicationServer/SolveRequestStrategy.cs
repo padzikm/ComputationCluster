@@ -10,6 +10,14 @@ namespace CommunicationServer
 {
     class SolveRequestStrategy : IMessageStrategy
     {
+        /// <summary>
+        /// Register new problem from client
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="message"></param>
+        /// <param name="messageType"></param>
+        /// <param name="timeout"></param>
+        /// <param name="endPoint"></param>
         public void HandleMessage(System.IO.Stream stream, string message, MessageType messageType, TimeSpan timeout, EndPoint endPoint)
         {
             SolveRequest request = MessageSerialization.Deserialize<SolveRequest>(message);            

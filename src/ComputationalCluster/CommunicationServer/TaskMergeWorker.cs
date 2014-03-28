@@ -8,6 +8,9 @@ namespace CommunicationServer
 {
     class TaskMergeWorker
     {
+        /// <summary>
+        /// Waits till partial solution shows up and sends it to task (if any is available)
+        /// </summary>
         public static void Work()
         {
             while (true)

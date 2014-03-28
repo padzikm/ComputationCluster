@@ -8,6 +8,9 @@ namespace CommunicationServer
 {
     class NodeWorker
     {
+        /// <summary>
+        /// Waits till partial problem shows up and sends it to client (if any is available)
+        /// </summary>
         public static void Work()
         {
             while (true)

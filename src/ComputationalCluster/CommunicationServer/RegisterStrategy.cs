@@ -10,6 +10,14 @@ namespace CommunicationServer
 {
     class RegisterStrategy : IMessageStrategy
     {
+        /// <summary>
+        /// Register new component in problem instance
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="message"></param>
+        /// <param name="messageType"></param>
+        /// <param name="timout"></param>
+        /// <param name="endPoint"></param>
         public void HandleMessage(System.IO.Stream stream, string message, MessageType messageType, TimeSpan timout, EndPoint endPoint)
         {
             Register msg = MessageSerialization.Deserialize<Register>(message);

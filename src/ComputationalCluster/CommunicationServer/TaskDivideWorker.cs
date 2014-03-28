@@ -8,6 +8,9 @@ namespace CommunicationServer
 {
     class TaskDivideWorker
     {
+        /// <summary>
+        /// Waits till problem to divide shows up and send it to task (if any is available)
+        /// </summary>
         public static void Work()
         {
             while (true)
