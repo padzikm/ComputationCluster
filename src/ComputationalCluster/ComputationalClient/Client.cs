@@ -38,7 +38,7 @@ namespace ComputationalClient
         }
         
         /// <summary>
-        /// This method starts whole Client work. A new thread is created due to not block console. Uses StartConnection method from NetworkAdapter class.
+        /// This method starts whole Client work. A new thread is created due to not block console. 
         /// </summary>
         /// <returns> True if succed, false otherwise. </returns>
         public bool Start()
@@ -48,7 +48,6 @@ namespace ComputationalClient
 
             try
             {
-                networkAdapter.StartConnection();
                 clientThread = new Thread(ClientWork);
                 clientThread.Start();
                 return true;
@@ -72,6 +71,7 @@ namespace ComputationalClient
                     askForSolutionThread.Abort();
                     askForSolutionThread = null;
                 }
+
                 clientThread.Join();
                 clientThread = null;
                 return true;
@@ -88,11 +88,13 @@ namespace ComputationalClient
         {
             try
             {
+                networkAdapter.StartConnection();
+
                 Console.WriteLine("Sending solve request to server.\n\n");
                 SendSolveRequest();
 
                 Console.WriteLine("Solve request sent, waiting for solve request response...\n\n");
-                SolveRequestResponse srp = networkAdapter.Recieve<SolveRequestResponse>(false);
+                SolveRequestResponse srp = networkAdapter.Receive<SolveRequestResponse>(false);
 
                 Console.WriteLine("Solve request appeared. ID of a task is: {0}\n\n", srp.Id);
                 SolutionRequestMessage(srp.Id);
@@ -100,7 +102,7 @@ namespace ComputationalClient
                 while (working)
                 {
                     Console.WriteLine("Another thread is asking for solutions, waiting till some solutions show up...\n\n");
-                    Solutions solutions = networkAdapter.Recieve<Solutions>(false);
+                    Solutions solutions = networkAdapter.Receive<Solutions>(false);
 
                     Console.WriteLine("Solutions in da hause -\n id: {0}\n problem type: {1}\n Closing connection...\n\n", solutions.Id, solutions.ProblemType);
                 }
@@ -137,6 +139,7 @@ namespace ComputationalClient
             {
                 if (!working)
                 {
+                    networkAdapter.CloseConnection();
                     Stop();
                 }
             }
@@ -162,7 +165,7 @@ namespace ComputationalClient
                     SolutionRequest solutionRequestMessage = new SolutionRequest();
                     solutionRequestMessage.Id = id;
 
-                    if (!networkAdapter.Send<SolutionRequest>(solutionRequestMessage, true))
+                    if (!networkAdapter.Send<SolutionRequest>(solutionRequestMessage, false))
                         throw new TimeoutException();
 
                     Thread.Sleep(sleepTime);

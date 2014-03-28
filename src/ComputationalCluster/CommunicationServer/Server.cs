@@ -12,7 +12,7 @@ using System.IO;
 
 namespace CommunicationServer
 {
-    class Server
+    public class Server
     {
         private IPAddress ipAddress;
         private int port;

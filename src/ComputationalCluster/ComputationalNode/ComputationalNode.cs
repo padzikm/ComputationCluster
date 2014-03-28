@@ -163,7 +163,7 @@ namespace ComputationalNode
                 //var partialProblemsMaessage = Recieve<SolvePartialProblems>();
                 //problemId = partialProblemsMaessage.Id;
             }
-            catch(Exception e)
+            catch(Exception)
             {
 
             }
