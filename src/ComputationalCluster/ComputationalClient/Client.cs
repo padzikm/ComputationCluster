@@ -15,6 +15,8 @@ namespace ComputationalClient
         private byte[] data;
         private bool working;
         private const int sleepTime = 30000;
+        private string serverName;
+        private int port;
 
         /// <summary>
         /// Specific constructor for ComputationalClient class. Allows to execute client's correctly. Also creates NetworkAdapter inside. Throws ArgumentNullException when incorrent inputs.
@@ -26,6 +28,9 @@ namespace ComputationalClient
         /// <param name="_data"> Data that is sent to server. </param>
         public Client(string serverName, int port, string _problemType, ulong _solvingTimeout, byte[] _data)
         {
+            this.serverName = serverName;
+            this.port = port;
+
             networkAdapter = new NetworkAdapter(serverName, port);
 
             if(_problemType == null || serverName == null || port < 0)
@@ -95,16 +100,17 @@ namespace ComputationalClient
 
                 Console.WriteLine("Solve request sent, waiting for solve request response...\n\n");
                 SolveRequestResponse srp = networkAdapter.Receive<SolveRequestResponse>(false);
-
+                networkAdapter.CloseConnection();                
                 Console.WriteLine("Solve request appeared. ID of a task is: {0}\n\n", srp.Id);
                 SolutionRequestMessage(srp.Id);
-
+                
                 while (working)
                 {
-                    Console.WriteLine("Another thread is asking for solutions, waiting till some solutions show up...\n\n");
-                    Solutions solutions = networkAdapter.Receive<Solutions>(false);
+                    //Console.WriteLine("Another thread is asking for solutions, waiting till some solutions show up...\n\n");
+                    Solutions solutions = networkAdapter.Receive<Solutions>(true);
 
-                    Console.WriteLine("Solutions in da hause -\n id: {0}\n problem type: {1}\n Closing connection...\n\n", solutions.Id, solutions.ProblemType);
+                    //Console.WriteLine("Solutions in da hause -\n id: {0}\n problem type: {1}\n Closing connection...\n\n", solutions.Id, solutions.ProblemType);
+                    Thread.Sleep(1000*60);
                 }
 
                 working = false;
@@ -160,13 +166,20 @@ namespace ComputationalClient
         {
             askForSolutionThread = new Thread(() =>
             {
+                NetworkAdapter ntw = new NetworkAdapter(serverName, port);
+
                 while (true)
                 {
                     SolutionRequest solutionRequestMessage = new SolutionRequest();
                     solutionRequestMessage.Id = id;
 
-                    if (!networkAdapter.Send<SolutionRequest>(solutionRequestMessage, false))
+                    ntw.StartConnection();
+                    if (!ntw.Send<SolutionRequest>(solutionRequestMessage, false))
                         throw new TimeoutException();
+
+                    Solutions solutions = ntw.Receive<Solutions>(false);
+                    ntw.CloseConnection();
+                    Console.WriteLine("Solutions in da hause -\n id: {0}\n problem type: {1}\n Closing connection...\n\n", solutions.Id, solutions.ProblemType);
 
                     Thread.Sleep(sleepTime);
                 }
