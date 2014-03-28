@@ -21,7 +21,7 @@ namespace CommunicationServer
         {
             SolveRequest request = MessageSerialization.Deserialize<SolveRequest>(message);            
 
-            if (request == null)// || !request.ProblemType.ToLower().Contains("dvrp"))            
+            if (request == null || request.Data == null)// || !request.ProblemType.ToLower().Contains("dvrp"))            
                 return;
             
             DvrpProblem.WaitEvent.WaitOne();

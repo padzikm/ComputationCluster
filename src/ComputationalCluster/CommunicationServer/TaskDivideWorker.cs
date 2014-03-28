@@ -20,7 +20,7 @@ namespace CommunicationServer
                 div.Id = pr.Key;
                 div.ProblemType = pr.Value.ProblemType;
                 div.Data = pr.Value.Data;
-                div.ComputationalNodes = (ulong)DvrpProblem.Nodes.Count;
+                div.ComputationalNodes = (ulong)DvrpProblem.Nodes.Count;                
                 networkAdapter.Send(div);
             }            
         }
