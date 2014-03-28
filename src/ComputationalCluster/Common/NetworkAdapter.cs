@@ -89,7 +89,11 @@ namespace Common
                     if (!Send(CurrentStatus, false))
                         break;
                     if (recieveHandler())
+                    {
+                        //computing delay
+                        Thread.Sleep(15000);
                         sendhandler();
+                    }
                     Thread.Sleep(period);
                 }
             });
@@ -162,11 +166,11 @@ namespace Common
             var readMessage = MessageSerialization.GetString(readBuffer);
             readMessage = readMessage.Replace("\0", string.Empty).Trim();
 
-            if (!MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
-                throw new Exception("Message not valid");
-
+            MessageTypeConverter.ConvertToMessageType(readMessage);
+               // throw new Exception("Message not valid");
+            Console.WriteLine("Received: \n{0}", readMessage);
             var deserialized = MessageSerialization.Deserialize<T>(readMessage);
-            Console.WriteLine("Received: \n{0}", deserialized);
+            
 
             return deserialized;
         }

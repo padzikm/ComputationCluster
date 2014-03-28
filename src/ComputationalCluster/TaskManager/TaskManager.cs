@@ -47,7 +47,8 @@ namespace TaskManager
             }
             networkAdapter.CurrentStatus = new Status {Id = registerResponse.Id, Threads = statusThreads};
 
-            networkAdapter.StartKeepAlive(registerResponse.Timeout.Millisecond, RecieveProblemData, SendSolution);
+            //TODO zero timeout in register response.Timeout?
+            networkAdapter.StartKeepAlive(10000, RecieveProblemData, SendSolution);
 
         }
 
@@ -97,6 +98,7 @@ namespace TaskManager
         {
             try
             {
+                
                 var solution = new Solutions { ProblemType = "DVRP", Id = 1 };
                 //TODO Common data?
                 networkAdapter.Send(solution, false);
