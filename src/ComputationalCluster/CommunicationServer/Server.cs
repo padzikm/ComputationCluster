@@ -18,7 +18,10 @@ namespace CommunicationServer
         private int port;
         private TcpListener listener;
         private bool stop;
-        private Thread currentThread;
+        private Thread currentThread;        
+        private Thread taskDivideThread;
+        private Thread taskMergeThread;
+        private Thread nodeThread;
         private TimeSpan timeout;
         private MessageStrategyFactory strategyFactory;
 
@@ -39,9 +42,15 @@ namespace CommunicationServer
             try
             {
                 currentThread = new Thread(Listen);
+                taskDivideThread = new Thread(TaskDivideWorker.Work);
+                taskMergeThread = new Thread(TaskMergeWorker.Work);
+                nodeThread = new Thread(NodeWorker.Work);
                 listener = new TcpListener(ipAddress, port);
                 listener.Start();
                 currentThread.Start();
+                taskDivideThread.Start();
+                taskMergeThread.Start();
+                nodeThread.Start();
             }
             catch (Exception ex)
             {

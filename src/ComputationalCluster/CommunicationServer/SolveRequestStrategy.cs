@@ -23,7 +23,7 @@ namespace CommunicationServer
             DvrpProblem.ProblemsDivideWaiting.Add(id, true);
             SolveRequestResponse response = new SolveRequestResponse() { Id = id };
             ServerNetworkAdapter.Send(stream, response);
-            DvrpProblem.TaskEvent.Set();            
+            DvrpProblem.TaskMergeEvent.Set();            
             DvrpProblem.WaitEvent.Set();
         }        
     }

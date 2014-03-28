@@ -44,14 +44,21 @@ namespace Common
         {
             if (value == null)
                 return null;
+            try
+            {
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof (T));
+                StringReader stringReader = new StringReader(value);
+                XmlReader reader = XmlReader.Create(stringReader);
 
-            XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
-            StringReader stringReader = new StringReader(value);
-            XmlReader reader = XmlReader.Create(stringReader);
+                T result = (T) xmlSerializer.Deserialize(reader);
 
-            T result = (T)xmlSerializer.Deserialize(reader);
-
-            return result;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
         }
 
         public static byte[] GetBytes(string str)

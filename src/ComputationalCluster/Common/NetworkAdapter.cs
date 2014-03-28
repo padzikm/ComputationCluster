@@ -161,7 +161,7 @@ namespace Common
             if (!MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
                 throw new Exception("Message not valid");
             var deserialized = MessageSerialization.Deserialize<T>(readMessage);
-            Console.WriteLine(deserialized);
+            Console.WriteLine("Received: \n{0}", deserialized);
 
             return deserialized;
         }

@@ -44,6 +44,7 @@
     <Compile Include="DvrpProblem.cs" />
     <Compile Include="IMessageStrategy.cs" />
     <Compile Include="MessageStrategyFactory.cs" />
+    <Compile Include="NodeWorker.cs" />
     <Compile Include="SolvePartialProblemsStrategy.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -54,6 +55,8 @@
     <Compile Include="SolutionsStrategy.cs" />
     <Compile Include="SolveRequestStrategy.cs" />
     <Compile Include="StatusStrategy.cs" />
+    <Compile Include="TaskDivideWorker.cs" />
+    <Compile Include="TaskMergeWorker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

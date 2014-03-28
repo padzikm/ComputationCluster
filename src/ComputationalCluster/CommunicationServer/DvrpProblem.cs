@@ -25,11 +25,12 @@ namespace CommunicationServer
         public static Dictionary<ulong, bool> ProblemsDivideWaiting { get; set; }
         public static Dictionary<ulong, bool> ProblemsComputeWaiting { get; set; }
         public static Dictionary<ulong, bool> ProblemsMergeWaiting { get; set; }
-        public static Dictionary<ulong, List<SolvePartialProblems>> PartialProblems { get; set; }
-        public static Dictionary<ulong, List<SolvePartialProblems>> PartialProblemsComputing { get; set; }
-        public static Dictionary<ulong, List<Solutions>> PartialSolutions { get; set; }
+        public static Dictionary<ulong, List<SolvePartialProblemsPartialProblem>> PartialProblems { get; set; }
+        public static Dictionary<ulong, List<SolvePartialProblemsPartialProblem>> PartialProblemsComputing { get; set; }
+        public static Dictionary<ulong, List<SolutionsSolution>> PartialSolutions { get; set; }
         public static Dictionary<ulong, Solutions> ProblemSolutions { get; set; }
-        public static AutoResetEvent TaskEvent { get; set; }
+        public static AutoResetEvent TaskDivideEvent { get; set; }
+        public static AutoResetEvent TaskMergeEvent { get; set; }
         public static AutoResetEvent NodeEvent { get; set; }
         public static AutoResetEvent WaitEvent { get; set; }
 
@@ -47,11 +48,12 @@ namespace CommunicationServer
             ProblemsDivideWaiting = new Dictionary<ulong, bool>();
             ProblemsComputeWaiting = new Dictionary<ulong, bool>();
             ProblemsMergeWaiting = new Dictionary<ulong, bool>();
-            PartialProblems = new Dictionary<ulong, List<SolvePartialProblems>>();
-            PartialProblemsComputing = new Dictionary<ulong, List<SolvePartialProblems>>();
-            PartialSolutions = new Dictionary<ulong, List<Solutions>>();
+            PartialProblems = new Dictionary<ulong, List<SolvePartialProblemsPartialProblem>>();
+            PartialProblemsComputing = new Dictionary<ulong, List<SolvePartialProblemsPartialProblem>>();
+            PartialSolutions = new Dictionary<ulong, List<SolutionsSolution>>();
             ProblemSolutions = new Dictionary<ulong, Solutions>();
-            TaskEvent = new AutoResetEvent(false);
+            TaskDivideEvent = new AutoResetEvent(false);
+            TaskMergeEvent = new AutoResetEvent(false);
             NodeEvent = new AutoResetEvent(false);
             WaitEvent = new AutoResetEvent(true);
         }

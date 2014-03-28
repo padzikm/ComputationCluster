@@ -29,15 +29,17 @@ namespace CommunicationServer
             else
             {
                 DvrpProblem.Tasks.Add(id, msg);
-                if (DvrpProblem.ProblemsDivideWaiting.Count > 0 || DvrpProblem.ProblemsMergeWaiting.Count > 0)
-                    DvrpProblem.TaskEvent.Set();
+                if (DvrpProblem.ProblemsDivideWaiting.Count > 0)
+                    DvrpProblem.TaskMergeEvent.Set();
+                if (DvrpProblem.ProblemsMergeWaiting.Count > 0)
+                    DvrpProblem.TaskMergeEvent.Set();
             }
 
             DvrpProblem.ComponentsLastStatus.Add(id, DateTime.UtcNow);  
             DvrpProblem.ComponentsAddress.Add(id, endPoint);
 
             RegisterResponse reponse = new RegisterResponse() { Id = id, };
-            ServerNetworkAdapter.Send(stream, reponse);
+            ServerNetworkAdapter.Send(stream, reponse);            
             DvrpProblem.WaitEvent.Set();
         }
     }

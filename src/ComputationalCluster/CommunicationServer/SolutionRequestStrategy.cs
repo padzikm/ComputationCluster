@@ -37,21 +37,21 @@ namespace CommunicationServer
             response.CommonData = problem.Data;
             List<SolutionsSolution> solutionList = new List<SolutionsSolution>();
             if (DvrpProblem.PartialSolutions.ContainsKey(request.Id))
-                foreach (var element in DvrpProblem.PartialSolutions[request.Id])
-                    solutionList.AddRange(element.Solutions1);
+                solutionList.AddRange(DvrpProblem.PartialSolutions[request.Id]);                                            
 
             if (DvrpProblem.PartialProblemsComputing.ContainsKey(request.Id))
-                foreach (var element in DvrpProblem.PartialProblemsComputing[request.Id])
-                    foreach (var pr in element.PartialProblems)
+                foreach (var element in DvrpProblem.PartialProblemsComputing[request.Id])                    
                     {
                         SolutionsSolution sol = new SolutionsSolution();
-                        sol.TaskId = pr.TaskId;
-                        sol.Data = pr.Data;
+                        sol.TaskId = element.TaskId;
+                        sol.Data = element.Data;
                         sol.Type = SolutionsSolutionType.Ongoing;
-                        solutionList.Add(sol);
+                        solutionList.Add(sol);                        
                     }
 
             response.Solutions1 = solutionList.ToArray();
+            if (solutionList.Count == 0)
+                response.Solutions1 = new SolutionsSolution[] {new SolutionsSolution(),};
             ServerNetworkAdapter.Send(stream, response);
             DvrpProblem.WaitEvent.Set();
         }
