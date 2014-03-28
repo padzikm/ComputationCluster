@@ -78,7 +78,7 @@ namespace Common
         /// In newly created thread CurrentStatus are sent due to inform server that component that uses it is alive.
         /// </summary>
         /// <param name="period"> Time at which a message is sent/ </param>
-        public void StartKeepAlive(int period)
+        public void StartKeepAlive(int period, Func<bool> recieveHandler, Action sendhandler)
         {
             var t = new Thread(() =>
             {
@@ -86,6 +86,8 @@ namespace Common
                 {
                     if (!Send(CurrentStatus, true))
                         break;
+                    if (recieveHandler())
+                        sendhandler();
                     Thread.Sleep(period);
                 }
             });
@@ -140,7 +142,7 @@ namespace Common
         {
             if (closeConnection)
             {
-                client = new TcpClient(serverName, connectionPort);
+                client = new TcpClient(serverName, connectionPort) {ReceiveTimeout = 5000};
                 stream = client.GetStream();
             }
 

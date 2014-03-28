@@ -47,14 +47,7 @@ namespace TaskManager
             }
             networkAdapter.CurrentStatus = new Status {Id = registerResponse.Id, Threads = statusThreads};
 
-            networkAdapter.StartKeepAlive(registerResponse.Timeout.Millisecond);
-            isStarted = true;
-
-            while (isStarted)
-            {
-                if(RecieveProblemData())
-                    SendSolution();
-            }
+            networkAdapter.StartKeepAlive(registerResponse.Timeout.Millisecond, RecieveProblemData, SendSolution);
 
         }
 
@@ -89,7 +82,7 @@ namespace TaskManager
         {
             try
             {
-                problem = networkAdapter.Receive<DivideProblem>(false);
+                problem = networkAdapter.Receive<DivideProblem>(true);
                 if (problem != null) return true;
             }
             catch (Exception)
