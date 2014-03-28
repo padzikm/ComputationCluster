@@ -57,10 +57,8 @@ namespace Common
         /// </summary>
         public void StartConnection()
         {
-            if(client == null)
                 client = new TcpClient(serverName, connectionPort);
 
-            if(stream == null)
                 stream = client.GetStream();
         }
 
@@ -86,7 +84,6 @@ namespace Common
             {
                 while (true)
                 {
-
                     if (!Send(CurrentStatus, true))
                         break;
                     Thread.Sleep(period);
