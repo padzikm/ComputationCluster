@@ -9,29 +9,20 @@ namespace CommunicationServer
     class TaskDivideWorker
     {
         /// <summary>
-        /// Waits till problem to divide shows up and send it to task (if any is available)
+        /// Sends problem to task (if any is available)
         /// </summary>
-        public static void Work()
+        public static void Work(ServerNetworkAdapter networkAdapter)
         {
-            while (true)
+            if (DvrpProblem.Problems.Count > 0 && DvrpProblem.Tasks.Count > 0)
             {
-                DvrpProblem.TaskDivideEvent.WaitOne();
-                DvrpProblem.WaitEvent.WaitOne();
-
-                if (DvrpProblem.Problems.Count > 0 && DvrpProblem.Tasks.Count > 0)
-                {
-                    var pr = DvrpProblem.Problems.First();
-                    DivideProblem div = new DivideProblem();
-                    div.Id = pr.Key;
-                    div.ProblemType = pr.Value.ProblemType;
-                    div.Data = pr.Value.Data;
-                    div.ComputationalNodes = (ulong)DvrpProblem.Nodes.Count;
-                    foreach (var task in DvrpProblem.Tasks)                    
-                        ServerNetworkAdapter.Send(DvrpProblem.ComponentsAddress[task.Key], div);                                        
-                }
-
-                DvrpProblem.WaitEvent.Set();
-            }
+                var pr = DvrpProblem.Problems.First();
+                DivideProblem div = new DivideProblem();
+                div.Id = pr.Key;
+                div.ProblemType = pr.Value.ProblemType;
+                div.Data = pr.Value.Data;
+                div.ComputationalNodes = (ulong)DvrpProblem.Nodes.Count;
+                networkAdapter.Send(div);
+            }            
         }
     }
 }

@@ -12,12 +12,11 @@ namespace CommunicationServer
         /// <summary>
         /// Registers divided problem into smaller problems from task
         /// </summary>
-        /// <param name="stream"></param>
+        /// <param name="networkAdapter"></param>
         /// <param name="message"></param>
         /// <param name="messageType"></param>
-        /// <param name="timout"></param>
-        /// <param name="endPoint"></param>
-        public void HandleMessage(System.IO.Stream stream, string message, Common.MessageType messageType, TimeSpan timout, System.Net.EndPoint endPoint)
+        /// <param name="timout"></param>        
+        public void HandleMessage(ServerNetworkAdapter networkAdapter, string message, Common.MessageType messageType, TimeSpan timout)
         {
             SolvePartialProblems partial = MessageSerialization.Deserialize<SolvePartialProblems>(message);
 
@@ -29,8 +28,7 @@ namespace CommunicationServer
             if(!DvrpProblem.PartialProblems.ContainsKey(partial.Id))
                 DvrpProblem.PartialProblems.Add(partial.Id, new List<SolvePartialProblemsPartialProblem>());
             DvrpProblem.PartialProblems[partial.Id].AddRange(partial.PartialProblems);
-            
-            DvrpProblem.NodeEvent.Set();
+                        
             DvrpProblem.WaitEvent.Set();
         }
     }

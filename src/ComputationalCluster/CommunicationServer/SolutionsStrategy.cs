@@ -12,12 +12,11 @@ namespace CommunicationServer
         /// <summary>
         /// Registers new solutions from either node or task
         /// </summary>
-        /// <param name="stream"></param>
+        /// <param name="networkAdapter"></param>
         /// <param name="message"></param>
         /// <param name="messageType"></param>
-        /// <param name="timout"></param>
-        /// <param name="endPoint"></param>
-        public void HandleMessage(System.IO.Stream stream, string message, Common.MessageType messageType, TimeSpan timout, System.Net.EndPoint endPoint)
+        /// <param name="timout"></param>        
+        public void HandleMessage(ServerNetworkAdapter networkAdapter, string message, Common.MessageType messageType, TimeSpan timout)
         {
             Solutions sol = MessageSerialization.Deserialize<Solutions>(message);
 
@@ -36,8 +35,7 @@ namespace CommunicationServer
                 if (!DvrpProblem.PartialSolutions.ContainsKey(sol.Id))
                     DvrpProblem.PartialSolutions.Add(sol.Id, new List<SolutionsSolution>());
 
-                DvrpProblem.PartialSolutions[sol.Id].AddRange(sol.Solutions1);
-                DvrpProblem.TaskMergeEvent.Set();
+                DvrpProblem.PartialSolutions[sol.Id].AddRange(sol.Solutions1);                
             }
             DvrpProblem.WaitEvent.Set();
         }

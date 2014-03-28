@@ -18,10 +18,7 @@ namespace CommunicationServer
         private int port;
         private TcpListener listener;
         private bool stop;
-        private Thread currentThread;        
-        private Thread taskDivideThread;
-        private Thread taskMergeThread;
-        private Thread nodeThread;
+        private Thread currentThread;                
         private TimeSpan timeout;
         private MessageStrategyFactory strategyFactory;
 
@@ -41,16 +38,10 @@ namespace CommunicationServer
 
             try
             {
-                currentThread = new Thread(Listen);
-                taskDivideThread = new Thread(TaskDivideWorker.Work);
-                taskMergeThread = new Thread(TaskMergeWorker.Work);
-                nodeThread = new Thread(NodeWorker.Work);
+                currentThread = new Thread(Listen);                
                 listener = new TcpListener(ipAddress, port);
                 listener.Start();
-                currentThread.Start();
-                taskDivideThread.Start();
-                taskMergeThread.Start();
-                nodeThread.Start();
+                currentThread.Start();                
             }
             catch (Exception ex)
             {
@@ -65,10 +56,7 @@ namespace CommunicationServer
                 listener.Stop(); //TODO: do better
                 stop = true;
                 currentThread.Join();
-                currentThread = null;
-                taskDivideThread.Abort();
-                taskMergeThread.Abort();
-                nodeThread.Abort();
+                currentThread = null;                
             }
             catch (Exception ex)
             {
@@ -96,21 +84,20 @@ namespace CommunicationServer
         private void HandleConnection(object o)
         {
             Socket soc = (Socket)o;
-            Stream stream = new NetworkStream(soc);
-            EndPoint endPoint = soc.RemoteEndPoint;
-
-            string msg = string.Empty;
+            Stream stream = new NetworkStream(soc);                        
 
             try
             {
+                ServerNetworkAdapter networkAdapter = new ServerNetworkAdapter(stream);
                 byte[] buffer = new byte[1024];
-                stream.Read(buffer, 0, buffer.Length);
+                string msg = string.Empty;
+                stream.Read(buffer, 0, buffer.Length);                
                 msg = MessageSerialization.GetString(buffer).Replace("\0", string.Empty).Trim();
                 Console.WriteLine("Odebrano: \n{0}", msg);
                 MessageType msgType = MessageTypeConverter.ConvertToMessageType(msg);
                 IMessageStrategy strategy = strategyFactory.GetMessageStrategy(msgType);
                 if (strategy != null)
-                    strategy.HandleMessage(stream, msg, msgType, timeout, endPoint);
+                    strategy.HandleMessage(networkAdapter, msg, msgType, timeout);
             }
             catch (Exception ex)
             {

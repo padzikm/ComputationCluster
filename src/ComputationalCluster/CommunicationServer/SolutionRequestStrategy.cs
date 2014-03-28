@@ -13,12 +13,11 @@ namespace CommunicationServer
         /// <summary>
         /// Response for clients solution request
         /// </summary>
-        /// <param name="stream"></param>
+        /// <param name="networkAdapter"></param>
         /// <param name="message"></param>
         /// <param name="messageType"></param>
-        /// <param name="timeout"></param>
-        /// <param name="endPoint"></param>
-        public void HandleMessage(System.IO.Stream stream, string message, MessageType messageType, TimeSpan timeout, EndPoint endPoint) //TODO: add timeout handling when not finished comupting
+        /// <param name="timeout"></param>        
+        public void HandleMessage(ServerNetworkAdapter networkAdapter, string message, MessageType messageType, TimeSpan timeout)
         {
             SolutionRequest request = MessageSerialization.Deserialize<SolutionRequest>(message);
 
@@ -36,7 +35,7 @@ namespace CommunicationServer
             {
                 Solutions solution = DvrpProblem.ProblemSolutions[request.Id];
                 DvrpProblem.ProblemSolutions.Remove(request.Id);
-                ServerNetworkAdapter.Send(stream, solution);
+                networkAdapter.Send(solution);
                 DvrpProblem.WaitEvent.Set();
                 return;
             }
@@ -63,7 +62,7 @@ namespace CommunicationServer
             response.Solutions1 = solutionList.ToArray();
             if (solutionList.Count == 0)
                 response.Solutions1 = new SolutionsSolution[] {new SolutionsSolution(),};
-            ServerNetworkAdapter.Send(stream, response);
+            networkAdapter.Send(response);
             DvrpProblem.WaitEvent.Set();
         }
     }

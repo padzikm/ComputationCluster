@@ -15,11 +15,10 @@ namespace CommunicationServer
         /// <summary>
         /// Handle messages from client
         /// </summary>
-        /// <param name="stream">Opened stream</param>
+        /// <param name="networkAdapter">Adapter with opened stream</param>
         /// <param name="message">XML message</param>
         /// <param name="messageType">XML's message type</param>
-        /// <param name="timout">Timeout for keepalive status</param>
-        /// <param name="endPoint">Client's network connection details</param>
-        void HandleMessage(Stream stream, string message, MessageType messageType, TimeSpan timout, EndPoint endPoint);        
+        /// <param name="timout">Timeout for keepalive status</param>        
+        void HandleMessage(ServerNetworkAdapter networkAdapter, string message, MessageType messageType, TimeSpan timout);        
     }
 }

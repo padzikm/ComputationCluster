@@ -13,16 +13,15 @@ namespace CommunicationServer
         /// <summary>
         /// Register new problem from client
         /// </summary>
-        /// <param name="stream"></param>
+        /// <param name="networkAdapter"></param>
         /// <param name="message"></param>
         /// <param name="messageType"></param>
-        /// <param name="timeout"></param>
-        /// <param name="endPoint"></param>
-        public void HandleMessage(System.IO.Stream stream, string message, MessageType messageType, TimeSpan timeout, EndPoint endPoint)
+        /// <param name="timeout"></param>        
+        public void HandleMessage(ServerNetworkAdapter networkAdapter, string message, MessageType messageType, TimeSpan timeout)
         {
             SolveRequest request = MessageSerialization.Deserialize<SolveRequest>(message);            
 
-            if (request == null || !request.ProblemType.ToLower().Contains("dvrp"))            
+            if (request == null)// || !request.ProblemType.ToLower().Contains("dvrp"))            
                 return;
             
             DvrpProblem.WaitEvent.WaitOne();
@@ -30,8 +29,7 @@ namespace CommunicationServer
             DvrpProblem.Problems.Add(id, request);
             DvrpProblem.ProblemsDivideWaiting.Add(id, true);
             SolveRequestResponse response = new SolveRequestResponse() { Id = id };
-            ServerNetworkAdapter.Send(stream, response);
-            DvrpProblem.TaskDivideEvent.Set();            
+            networkAdapter.Send(response);                      
             DvrpProblem.WaitEvent.Set();
         }        
     }

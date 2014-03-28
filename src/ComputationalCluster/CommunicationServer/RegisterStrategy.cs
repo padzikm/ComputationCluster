@@ -13,41 +13,28 @@ namespace CommunicationServer
         /// <summary>
         /// Register new component in problem instance
         /// </summary>
-        /// <param name="stream"></param>
+        /// <param name="networkAdapter"></param>
         /// <param name="message"></param>
         /// <param name="messageType"></param>
-        /// <param name="timout"></param>
-        /// <param name="endPoint"></param>
-        public void HandleMessage(System.IO.Stream stream, string message, MessageType messageType, TimeSpan timout, EndPoint endPoint)
+        /// <param name="timout"></param>        
+        public void HandleMessage(ServerNetworkAdapter networkAdapter, string message, MessageType messageType, TimeSpan timout)
         {
             Register msg = MessageSerialization.Deserialize<Register>(message);
             
-            if (msg == null || msg.SolvableProblems.Where(p => p.ToLower().Contains("dvrp")).Count() == 0)            
+            if (msg == null)// || msg.SolvableProblems.Where(p => p.ToLower().Contains("dvrp")).Count() == 0)            
                 return;
 
             DvrpProblem.WaitEvent.WaitOne();
             ulong id = DvrpProblem.CreateSaveComponentID();
 
-            if (msg.Type == RegisterType.ComputationalNode)
-            {
-                DvrpProblem.Nodes.Add(id, msg);
-                //if (DvrpProblem.PartialProblems.Count > 0)
-                    DvrpProblem.NodeEvent.Set();
-            }
-            else
-            {
-                DvrpProblem.Tasks.Add(id, msg);
-                //if (DvrpProblem.ProblemsDivideWaiting.Count > 0)
-                    DvrpProblem.TaskDivideEvent.Set();
-                //if (DvrpProblem.ProblemsMergeWaiting.Count > 0)
-                    DvrpProblem.TaskMergeEvent.Set();
-            }
+            if (msg.Type == RegisterType.ComputationalNode)            
+                DvrpProblem.Nodes.Add(id, msg);                            
+            else            
+                DvrpProblem.Tasks.Add(id, msg);                                                
 
-            DvrpProblem.ComponentsLastStatus.Add(id, DateTime.UtcNow);  
-            DvrpProblem.ComponentsAddress.Add(id, endPoint);
-
+            DvrpProblem.ComponentsLastStatus.Add(id, DateTime.UtcNow);              
             RegisterResponse reponse = new RegisterResponse() { Id = id, };
-            ServerNetworkAdapter.Send(stream, reponse);            
+            networkAdapter.Send(reponse);            
             DvrpProblem.WaitEvent.Set();
         }
     }
