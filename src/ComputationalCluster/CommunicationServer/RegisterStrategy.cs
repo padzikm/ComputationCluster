@@ -8,7 +8,7 @@ using Common;
 
 namespace CommunicationServer
 {
-    class RegisterStrategy : IMessageStrategy
+    public class RegisterStrategy : IMessageStrategy
     {
         /// <summary>
         /// Register new component in problem instance

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CommunicationServer
 {
-    class TaskMergeWorker
+    public class TaskMergeWorker
     {
         /// <summary>
         /// Sends partial solutions to task (if any is available)

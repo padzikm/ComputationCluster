@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CommunicationServer
 {
-    class TaskDivideWorker
+    public class TaskDivideWorker
     {
         /// <summary>
         /// Sends problem to task (if any is available)

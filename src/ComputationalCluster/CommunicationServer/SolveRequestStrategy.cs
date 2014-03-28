@@ -8,7 +8,7 @@ using Common;
 
 namespace CommunicationServer
 {
-    class SolveRequestStrategy : IMessageStrategy
+    public class SolveRequestStrategy : IMessageStrategy
     {
         /// <summary>
         /// Register new problem from client
