@@ -13,6 +13,9 @@ namespace CommunicationServer
         {
             Solutions sol = MessageSerialization.Deserialize<Solutions>(message);
 
+            if (sol == null)
+                return;
+
             DvrpProblem.WaitEvent.WaitOne();
 
             if (sol.Solutions1.First().Type == SolutionsSolutionType.Final)

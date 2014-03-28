@@ -14,6 +14,9 @@ namespace CommunicationServer
         {
             SolutionRequest request = MessageSerialization.Deserialize<SolutionRequest>(message);
 
+            if (request == null)
+                return;
+
             DvrpProblem.WaitEvent.WaitOne();
 
             if (!DvrpProblem.Problems.ContainsKey(request.Id))

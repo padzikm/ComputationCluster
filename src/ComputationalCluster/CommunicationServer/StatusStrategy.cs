@@ -12,13 +12,12 @@ namespace CommunicationServer
     {
         public void HandleMessage(System.IO.Stream stream, string message, MessageType messageType, TimeSpan timeout, EndPoint endPoint)
         {
-            Status msg = MessageSerialization.Deserialize<Status>(message);
+            Status msg = MessageSerialization.Deserialize<Status>(message);            
 
-            DvrpProblem.WaitEvent.WaitOne();
-
-            if (!DvrpProblem.ComponentsID.Contains(msg.Id))
+            if (msg == null || !DvrpProblem.ComponentsID.Contains(msg.Id))
                 return;
-            
+
+            DvrpProblem.WaitEvent.WaitOne();                        
             DvrpProblem.ComponentsLastStatus[msg.Id] = DateTime.UtcNow;
             DvrpProblem.WaitEvent.Set();
         }

@@ -13,6 +13,9 @@ namespace CommunicationServer
         {
             SolvePartialProblems partial = MessageSerialization.Deserialize<SolvePartialProblems>(message);
 
+            if (partial == null)
+                return;
+
             DvrpProblem.WaitEvent.WaitOne();
 
             if(!DvrpProblem.PartialProblems.ContainsKey(partial.Id))

@@ -14,7 +14,7 @@ namespace CommunicationServer
         {
             Register msg = MessageSerialization.Deserialize<Register>(message);
             
-            if (msg.SolvableProblems.Where(p => p.ToLower().Contains("dvrp")).Count() == 0)            
+            if (msg == null || msg.SolvableProblems.Where(p => p.ToLower().Contains("dvrp")).Count() == 0)            
                 return;
 
             DvrpProblem.WaitEvent.WaitOne();
@@ -23,15 +23,15 @@ namespace CommunicationServer
             if (msg.Type == RegisterType.ComputationalNode)
             {
                 DvrpProblem.Nodes.Add(id, msg);
-                if (DvrpProblem.PartialProblems.Count > 0)
+                //if (DvrpProblem.PartialProblems.Count > 0)
                     DvrpProblem.NodeEvent.Set();
             }
             else
             {
                 DvrpProblem.Tasks.Add(id, msg);
-                if (DvrpProblem.ProblemsDivideWaiting.Count > 0)
-                    DvrpProblem.TaskMergeEvent.Set();
-                if (DvrpProblem.ProblemsMergeWaiting.Count > 0)
+                //if (DvrpProblem.ProblemsDivideWaiting.Count > 0)
+                    DvrpProblem.TaskDivideEvent.Set();
+                //if (DvrpProblem.ProblemsMergeWaiting.Count > 0)
                     DvrpProblem.TaskMergeEvent.Set();
             }
 

@@ -66,6 +66,9 @@ namespace CommunicationServer
                 stop = true;
                 currentThread.Join();
                 currentThread = null;
+                taskDivideThread.Abort();
+                taskMergeThread.Abort();
+                nodeThread.Abort();
             }
             catch (Exception ex)
             {
@@ -79,9 +82,9 @@ namespace CommunicationServer
             {
                 try
                 {
-                    Socket socet = listener.AcceptSocket();
+                    Socket socket = listener.AcceptSocket();
                     Thread thread = new Thread(new ParameterizedThreadStart(HandleConnection));
-                    thread.Start(socet);
+                    thread.Start(socket);
                 }
                 catch (Exception ex)
                 {

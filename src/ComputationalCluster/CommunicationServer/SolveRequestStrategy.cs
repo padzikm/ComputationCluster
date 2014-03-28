@@ -14,7 +14,7 @@ namespace CommunicationServer
         {
             SolveRequest request = MessageSerialization.Deserialize<SolveRequest>(message);            
 
-            if (!request.ProblemType.ToLower().Contains("dvrp"))            
+            if (request == null || !request.ProblemType.ToLower().Contains("dvrp"))            
                 return;
             
             DvrpProblem.WaitEvent.WaitOne();
@@ -23,7 +23,7 @@ namespace CommunicationServer
             DvrpProblem.ProblemsDivideWaiting.Add(id, true);
             SolveRequestResponse response = new SolveRequestResponse() { Id = id };
             ServerNetworkAdapter.Send(stream, response);
-            DvrpProblem.TaskMergeEvent.Set();            
+            DvrpProblem.TaskDivideEvent.Set();            
             DvrpProblem.WaitEvent.Set();
         }        
     }
