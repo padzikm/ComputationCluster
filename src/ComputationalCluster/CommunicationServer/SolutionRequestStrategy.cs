@@ -34,7 +34,7 @@ namespace CommunicationServer
             if (DvrpProblem.ProblemSolutions.ContainsKey(request.Id))
             {
                 Solutions solution = DvrpProblem.ProblemSolutions[request.Id];
-                DvrpProblem.ProblemSolutions.Remove(request.Id);
+                //DvrpProblem.ProblemSolutions.Remove(request.Id);
                 networkAdapter.Send(solution);
                 DvrpProblem.WaitEvent.Set();
                 return;

@@ -11,7 +11,7 @@ namespace UnitTests.CommunicationServer
     public class SolveRequestStrategyTests
     {
         private static Stream stream = null;
-        private static Mock<ServerNetworkAdapter> networkAdapterMock = new Mock<ServerNetworkAdapter>(stream);
+        private Mock<ServerNetworkAdapter> networkAdapterMock = new Mock<ServerNetworkAdapter>(stream);
 
         [TestMethod]
         public void AcceptProblemIfAllFieldsAreDefined()
