@@ -33,7 +33,7 @@ namespace CommunicationServer
                 DvrpProblem.Tasks.Add(id, msg);                                                
 
             DvrpProblem.ComponentsLastStatus.Add(id, DateTime.UtcNow);              
-            RegisterResponse reponse = new RegisterResponse() { Id = id, };
+            RegisterResponse reponse = new RegisterResponse() { Id = id, Timeout = timout.ToString()};
             networkAdapter.Send(reponse);            
             DvrpProblem.WaitEvent.Set();
         }

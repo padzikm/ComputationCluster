@@ -83,7 +83,8 @@ namespace ComputationalNode
 
             networkAdapter.CurrentStatus = new Status { Id = registerResponse.Id, Threads = threads };
 
-            networkAdapter.StartKeepAlive(registerResponse.Timeout.Millisecond);
+            int timeout = int.Parse(registerResponse.Timeout.Substring(6, 2));
+            networkAdapter.StartKeepAlive(timeout * 1000);
 
 
             while (working)

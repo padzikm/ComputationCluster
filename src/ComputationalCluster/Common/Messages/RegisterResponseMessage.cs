@@ -26,7 +26,7 @@ public partial class RegisterResponse {
     
     private ulong idField;
     
-    private System.DateTime timeoutField;
+    private string timeoutField;
     
     /// <uwagi/>
     public ulong Id {
@@ -39,8 +39,8 @@ public partial class RegisterResponse {
     }
     
     /// <uwagi/>
-    [System.Xml.Serialization.XmlElementAttribute(DataType="time")]
-    public System.DateTime Timeout {
+    //[System.Xml.Serialization.XmlElementAttribute(DataType="time")]
+    public string Timeout {
         get {
             return this.timeoutField;
         }

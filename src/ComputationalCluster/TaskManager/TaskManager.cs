@@ -22,7 +22,7 @@ namespace TaskManager
         {
             serverIpAddress = serverIp;
             this.port = port;
-            networkAdapter = new NetworkAdapter(serverIp, port);
+            networkAdapter = new NetworkAdapter("localhost", port);
         }
 
         public void Start()
@@ -47,7 +47,8 @@ namespace TaskManager
             }
             networkAdapter.CurrentStatus = new Status {Id = registerResponse.Id, Threads = statusThreads};
 
-            networkAdapter.StartKeepAlive(registerResponse.Timeout.Millisecond);
+            int timeout = int.Parse(registerResponse.Timeout.Substring(6, 2));
+            networkAdapter.StartKeepAlive(timeout * 1000);
             isStarted = true;
 
             while (isStarted)
