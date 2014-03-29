@@ -1,19 +1,19 @@
 ﻿using System;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Linq;
-using System.Resources;
-using System.Reflection;
 using System.Xml.Serialization;
 
 namespace Common
 {
     public class MessageSerialization
     {
+        /// <summary>
+        /// Serializes specific class (generated from xml respectively) to string including adding header "ucc", and coding utf-8
+        /// </summary>
+        /// <typeparam name="T"> Type of xml generated class. </typeparam>
+        /// <param name="value"> Message to sent - class generated from xml schema. </param>
+        /// <returns> Correct string value adequate to input parameter. </returns>
         public static string Serialize<T>(T value) where T : class 
         {
             if (value == null)
@@ -40,6 +40,12 @@ namespace Common
             }
         }
 
+        /// <summary>
+        /// Deserializes string to specific class (generated from xml respectively)
+        /// </summary>
+        /// <typeparam name="T"> Type of xml generated class. </typeparam>
+        /// <param name="value"> String message to convert. </param>
+        /// <returns> Deserialized string as a specific class adequate to xml respectively. </returns>
         public static T Deserialize<T>(string value) where T : class
         {
             if (value == null)
@@ -61,11 +67,21 @@ namespace Common
             }
         }
 
+        /// <summary>
+        /// Converts string to byte array using utf-8 encoding
+        /// </summary>
+        /// <param name="str"> String to convert. </param>
+        /// <returns> Byte array converted from input string parameter. </returns>
         public static byte[] GetBytes(string str)
         {
             return Encoding.UTF8.GetBytes(str);            
         }
 
+        /// <summary>
+        /// Converts byte array to string using utf-8 encoding
+        /// </summary>
+        /// <param name="bytes"> Byte array to convert. </param>
+        /// <returns> String converted from byte array. </returns>
         public static string GetString(byte[] bytes)
         {
             return Encoding.UTF8.GetString(bytes);            

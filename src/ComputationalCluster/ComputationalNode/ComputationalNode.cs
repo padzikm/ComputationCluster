@@ -14,32 +14,37 @@ namespace ComputationalNode
 {
     class ComputationalNode 
     {
+        private NetworkAdapter networkAdapter;
         private Thread nodeThread;
-        private Thread loopingThread;
-        private DateTime time;
         private StatusThread[] threads;
+        private RegisterResponse registerResponse;
+        private SolvePartialProblems problem;
         private bool working;
-        private ulong id;
-        private ulong problemId;
         private int port;
 
-        public ComputationalNode(int _port)
+        public ComputationalNode(string serverName,int _port)
         {
+            if (serverName == null || _port < 0)
+                throw new ArgumentNullException();
+
             port = _port;
             working = true;
+
+            networkAdapter = new NetworkAdapter(serverName, port);
+       
         }
 
-        public void Start(IPAddress server)
+        public void Start()
         {
 
             if (nodeThread != null)
-                throw new InvalidOperationException("Node is already running!");
+                throw new InvalidOperationException("Node is already running! Wait for partial problem.\n");
 
             try
             {
                 nodeThread = new Thread(NodeWork);
-                //StartConnection(server, port);
                 nodeThread.Start();
+                //nodeThread.Start();
             }
             catch (Exception e)
             {
@@ -49,139 +54,114 @@ namespace ComputationalNode
 
         public void Stop()
         {
+            working = false;
             try
             {
-                if (loopingThread != null)
-                {
-                    loopingThread.Abort();
-                    loopingThread = null;
-                }
-                nodeThread.Abort();
+                if (nodeThread != null)
+                    nodeThread.Abort();
                 nodeThread = null;
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error in node stop: {0}", e.Message);
-            }
-            finally
-            {
-                //CloseConnection();
+                Console.WriteLine("Error in node stop: {0} \n", e.Message);
             }
 
         }
 
         private void NodeWork()
         {
-            try
-            {
-                Register();
-                RegisterResponse();
-                Status();
-            }
-            catch
-            {
+           
+           
+            networkAdapter.StartConnection();
 
-            }
+            Register();
+            RegisterResponse();
+
+            networkAdapter.CloseConnection();
+            
+            initThreade();
+
+            networkAdapter.CurrentStatus = new Status { Id = registerResponse.Id, Threads = threads };
+
+            networkAdapter.StartKeepAlive(registerResponse.Timeout.Millisecond);
+
 
             while (working)
-            {
-                try
+            {                
+                if(PartialProblems())
                 {
-                    PartialProblems();
-                    //TODO solve problem, new thread
-                    Solution();
-                }               
 
-                catch (SocketException se)
-                {
-                    Console.WriteLine("Socket exception appeared. Closing connection. / {0}", se.Message);
-                    working = false;
+                    Solution();
                 }
-                catch (Exception e)
-                {
-                    if (e.Message == "Message not valid")
-                    {
-                        Console.WriteLine(" 'Message not valid' occured - continue processing. / {0}", e.Message);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Unexpected error. Closing connection. / {0}", e.Message);
-                        working = false;
-                    }
-                }
-                finally
-                {
-                    if (!working)
-                    {
-                        nodeThread.Abort();
-                        nodeThread = null;
-                        //CloseConnection();
-                    }
-                }
+               
             }
         }
 
         private void Register()
         {
-            var registerMessage = new Register();
-            registerMessage.Type = RegisterType.ComputationalNode;
-            registerMessage.SolvableProblems = new string[] { "problem A", "problem B" };
-            registerMessage.ParallelThreads = (byte)5;
-            //Send<Register>(registerMessage);
+            var registerMessage = new Register()
+            {
+                Type = RegisterType.ComputationalNode,
+                SolvableProblems = new string[] { "DVRP", "dvrp" },
+                ParallelThreads = (byte)5
+            };
+            networkAdapter.Send(registerMessage, false);
         }
 
         private void RegisterResponse()
-        {           
-            //var registerResponseMessage = Recieve<RegisterResponse>();         
-            //id = registerResponseMessage.Id;
-            //time = registerResponseMessage.Timeout;
-        }
-
-        private void Status()
-        {
-            loopingThread = new Thread(() =>
-                {
-                    while (true)
-                    {
-                        var statusMessage = new Status();
-                        statusMessage.Id = id;
-                        statusMessage.Threads = threads;
-
-                        //if (!Send<Status>(statusMessage))
-                            //throw new Exception("StartKeepAlive");
-
-                        Thread.Sleep(time.Millisecond);
-                    }
-                });
-            loopingThread.Start();
-        }
-
-        private void PartialProblems()
         {
             try
             {
-                //var partialProblemsMaessage = Recieve<SolvePartialProblems>();
-                //problemId = partialProblemsMaessage.Id;
+                registerResponse = networkAdapter.Receive<RegisterResponse>(false);
+                //Console.WriteLine("Receive RegisterResponse");
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Cannot recieve RegisterResponse");
+            }
+            
+        }
+
+        private bool PartialProblems()
+        {
+            try
+            {
+                problem = networkAdapter.Receive<SolvePartialProblems>(true);
+                if (problem != null) return true;
             }
             catch(Exception)
             {
-
+                //Console.WriteLine("Cannot recive SolvePartialProblems");
+                return false;
             }
+            return false;
+
         }
 
         private void Solution()
         {
-            var solutionMessage = new Solutions();
-            solutionMessage.ProblemType = "DVRT";
-            solutionMessage.Id = problemId;
-            //TODO fill message
-            //Send<Solutions>(solutionMessage);
 
+            Thread.Sleep(30000);
+            try
+            {
+                var solution = new Solutions { ProblemType = "DVRP", Id = 1 };
+                networkAdapter.Send(solution, true);
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Cannot send partial solution to server");
+            }
 
         }
 
-
-
-
+        private void initThreade()
+        {
+            threads = new StatusThread[5];
+            foreach (var thread in threads.Select(thread => new StatusThread()))
+            {
+                thread.HowLong = 0;
+                thread.ProblemType = "DVPR";
+            }
+        }
     }
 }

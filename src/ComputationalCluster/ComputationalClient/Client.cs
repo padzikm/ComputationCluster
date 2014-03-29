@@ -2,6 +2,7 @@
 using Common;
 using System.Threading;
 using System.Net.Sockets;
+using System.Collections.Generic;
 
 namespace ComputationalClient
 {
@@ -11,6 +12,7 @@ namespace ComputationalClient
         private Thread clientThread;
         private string problemType;
         private ulong solvingTimeout;
+        private List<byte[]> solutionsList;
         private byte[] data;
         private bool working;
         private const int sleepTime = 30000;
@@ -29,7 +31,8 @@ namespace ComputationalClient
 
             if(_problemType == null || serverName == null || port < 0)
                 throw new ArgumentNullException();
-            
+
+            solutionsList = new List<byte[]>();
             problemType = _problemType;
             solvingTimeout = _solvingTimeout;
             data = _data;
@@ -59,13 +62,14 @@ namespace ComputationalClient
         }
 
         /// <summary>
-        /// Allow to terminate correctly program execution. Manages ClientWork thread and askForSolution thread.
+        /// Allow to terminate correctly program execution. Manages ClientWork thread.
         /// </summary>
         public bool Stop()
         {
             try
             {
-                clientThread.Join();
+                if (clientThread != null)
+                    clientThread.Abort();
                 clientThread = null;
                 return true;
             }
@@ -111,7 +115,7 @@ namespace ComputationalClient
                 {
                     Console.WriteLine(" 'Message not valid' occured - continue processing. / {0}\n\n", e.Message);
                 }
-                else if(e.Message == "NetworkStream unavaiable")
+                else if (e.Message == "NetworkStream unavaiable")
                 {
                     Console.WriteLine(" 'NetworkStream unavaiable' occured - you cannot read from stream - continue processing. / {0}\n\n", e.Message);
                 }
@@ -182,7 +186,13 @@ namespace ComputationalClient
                         "Problem type: {1} \n"+
                         "It's status: {2}, so still waiting for final or partial solutions... \n\n", 
                         solutions.Id, solutions.ProblemType, e.Type);
-                }
+                }                
+
+                if (!solutionsList.Contains(e.Data))
+                    solutionsList.Add(e.Data);
+
+                if (e.TimeoutOccured)
+                    Console.WriteLine("Unfortunately timeout occured. Closing connection \n\n");   
             }
     
             Thread.Sleep(sleepTime);
