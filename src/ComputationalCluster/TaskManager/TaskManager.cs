@@ -38,6 +38,7 @@ namespace TaskManager
             networkAdapter.StartConnection();
             SendRegisterMessage();
             RecieveRegisterResponse();
+            networkAdapter.CloseConnection();
             statusThreads = new StatusThread[5];
             foreach (var statusThread in statusThreads.Select(statusThread => new StatusThread()))
             {
@@ -104,7 +105,12 @@ namespace TaskManager
                         Id = 1,
                         Solutions1 = new[] {new SolutionsSolution {Type = SolutionsSolutionType.Final}}
                     };
-                    networkAdapter.Send(solution, false);
+                    networkAdapter.Send(solution, true);
+                    
+                    networkAdapter.CloseConnection();
+                    Console.WriteLine("Closing...");
+                    Environment.Exit(0);
+                    
                 }
                 else
                 {
@@ -117,7 +123,7 @@ namespace TaskManager
                         SolvingTimeout = 3,
                         SolvingTimeoutSpecified = true
                     };
-                    networkAdapter.Send(partialProblems, false);
+                    networkAdapter.Send(partialProblems, true);
                     Console.WriteLine("SendSolvePartialProblems");
                 }
                 //TODO Common data?
