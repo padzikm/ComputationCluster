@@ -8,7 +8,7 @@ using Common;
 
 namespace CommunicationServer
 {
-    class SolutionRequestStrategy : IMessageStrategy
+    public class SolutionRequestStrategy : IMessageStrategy
     {
         /// <summary>
         /// Response for clients solution request

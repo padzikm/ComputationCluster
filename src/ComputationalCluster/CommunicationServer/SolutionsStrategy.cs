@@ -7,7 +7,7 @@ using Common;
 
 namespace CommunicationServer
 {
-    class SolutionsStrategy : IMessageStrategy
+    public class SolutionsStrategy : IMessageStrategy
     {
         /// <summary>
         /// Registers new solutions from either node or task

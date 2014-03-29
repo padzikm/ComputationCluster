@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CommunicationServer
 {
-    class NodeWorker
+    public class NodeWorker
     {
         /// <summary>
         /// Sends partial problem to client (if any is available)

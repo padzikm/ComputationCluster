@@ -8,7 +8,7 @@ using Common;
 
 namespace CommunicationServer
 {
-    class MessageStrategyFactory
+    public class MessageStrategyFactory
     {
         private static MessageStrategyFactory instance;
         private Dictionary<MessageType, IMessageStrategy> messageStrategies;        

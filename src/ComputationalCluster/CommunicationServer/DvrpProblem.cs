@@ -11,7 +11,7 @@ using Common;
 
 namespace CommunicationServer
 {    
-    static class DvrpProblem
+    public static class DvrpProblem
     {
         public static List<ulong> ComponentsID { get; set; }
         public static List<ulong> ProblemsID { get; set; }        
