@@ -94,6 +94,20 @@ namespace Common
             t.Start();
         }
 
+        public void StartKeepAlive(int period)
+        {
+            var t = new Thread(() =>
+            {
+                while (true)
+                {
+                    if (!Send(CurrentStatus, true))
+                        break;
+                    Thread.Sleep(period);
+                }
+            });
+            t.Start();
+        }
+
         /// <summary>
         /// Generic method sends serialized and encoded message to network stream.
         /// </summary>

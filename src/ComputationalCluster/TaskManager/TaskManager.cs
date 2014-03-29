@@ -47,8 +47,7 @@ namespace TaskManager
             }
             networkAdapter.CurrentStatus = new Status { Id = registerResponse.Id, Threads = statusThreads };
 
-            networkAdapter.StartKeepAlive(10000, RecieveProblemData, SendSolvePartialProblems);
-
+            networkAdapter.StartKeepAlive(10000, RecieveProblemData, TaskMangerResponse);
         }
 
         private void SendRegisterMessage()
@@ -77,22 +76,6 @@ namespace TaskManager
 
         }
 
-        private void SendSolvePartialProblems()
-        {
-            var partialProblems = new SolvePartialProblems
-            {
-                CommonData = new byte[5],
-                Id = problem.Id,
-                ProblemType = "DVRP",
-                PartialProblems = new SolvePartialProblemsPartialProblem[3],
-                SolvingTimeout = 3,
-                SolvingTimeoutSpecified = true
-            };
-            networkAdapter.Send(partialProblems, false);
-            Console.WriteLine("SendSolvePartialProblems");
-
-        }
-
         private bool RecieveProblemData()
         {
             try
@@ -107,34 +90,38 @@ namespace TaskManager
             return false;
         }
 
-        private bool RecieveMergeRequest()
-        {
-            try
-            {
-                //problem = networkAdapter.Receive<Merge>(false);
-                if (problem != null) return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-            return false;
-        }
 
-        private void SendSolution()
+        private void TaskMangerResponse()
         {
             try
             {
                 counter++;
-                Solutions solution;
                 if (counter > 10)
-                    solution = new Solutions { ProblemType = "DVRP", Id = 1, Solutions1 = new[] {new SolutionsSolution{ Type = SolutionsSolutionType.Final} }};
+                {
+                    var solution = new Solutions
+                    {
+                        ProblemType = "DVRP",
+                        Id = 1,
+                        Solutions1 = new[] {new SolutionsSolution {Type = SolutionsSolutionType.Final}}
+                    };
+                    networkAdapter.Send(solution, false);
+                }
                 else
                 {
-                     solution = new Solutions { ProblemType = "DVRP", Id = 1, Solutions1 = new[] {new SolutionsSolution{ Type = SolutionsSolutionType.Partial} }};
+                    var partialProblems = new SolvePartialProblems
+                    {
+                        CommonData = new byte[5],
+                        Id = problem.Id,
+                        ProblemType = "DVRP",
+                        PartialProblems = new SolvePartialProblemsPartialProblem[3],
+                        SolvingTimeout = 3,
+                        SolvingTimeoutSpecified = true
+                    };
+                    networkAdapter.Send(partialProblems, false);
+                    Console.WriteLine("SendSolvePartialProblems");
                 }
                 //TODO Common data?
-                networkAdapter.Send(solution, false);
+                
             }
             catch (Exception)
             {
