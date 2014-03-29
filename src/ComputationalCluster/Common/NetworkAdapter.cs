@@ -22,7 +22,7 @@ namespace Common
         /// <summary>
         /// Property of processing status that is sent to server. Contains actual working threads and ID of a task.
         /// </summary>
-        public Status CurrentStatus { get; set; }
+        public Status CurrentStatus { private get; set; }
 
         /// <summary>
         /// Constructor that takes IPAddress class as first parameter. Stores input data in private variables.
@@ -31,7 +31,7 @@ namespace Common
         /// <param name="connectionPort">Port that server is listening to.</param>
         public NetworkAdapter(IPAddress serverIpAddress, int _connectionPort)
         {
-            if(serverIpAddress.ToString() == null || _connectionPort < 0)
+            if (serverIpAddress.ToString() == null || _connectionPort < 0)
                 throw new ArgumentNullException();
 
             serverName = serverIpAddress.ToString();
@@ -57,9 +57,9 @@ namespace Common
         /// </summary>
         public void StartConnection()
         {
-                client = new TcpClient(serverName, connectionPort);
+            client = new TcpClient(serverName, connectionPort);
 
-                stream = client.GetStream();
+            stream = client.GetStream();
         }
 
         /// <summary>
@@ -75,10 +75,12 @@ namespace Common
         }
 
         /// <summary>
-        /// In newly created thread CurrentStatus are sent due to inform server that component that uses it is alive.
+        /// In newly created thread CurrentStatus is sent due to inform server that component that uses it is alive.
         /// </summary>
-        /// <param name="period"> Time at which a message is sent/ </param>
-        public void StartKeepAlive(int period, Func<bool> recieveHandler, Action sendhandler)
+        /// <param name="period"> Keepalive timeout </param>
+        /// <param name="receiveveHandler">Method handling receive action</param>
+        /// <param name="sendhandler">Method handling send action</param>
+        public void StartKeepAlive(int period, Func<bool> receiveHandler, Action sendhandler)
         {
             var t = new Thread(() =>
             {
@@ -88,12 +90,9 @@ namespace Common
                     stream = client.GetStream();
                     if (!Send(CurrentStatus, false))
                         break;
-                    if (recieveHandler())
-                    {
-                        //computing delay
-                        Thread.Sleep(15000);
+
+                    if (receiveHandler())
                         sendhandler();
-                    }
                     Thread.Sleep(period);
                 }
             });
@@ -148,7 +147,7 @@ namespace Common
         {
             if (closeConnection)
             {
-                client = new TcpClient(serverName, connectionPort) {ReceiveTimeout = 5000};
+                client = new TcpClient(serverName, connectionPort) { ReceiveTimeout = 5000 };
                 stream = client.GetStream();
             }
 
@@ -166,11 +165,11 @@ namespace Common
             var readMessage = MessageSerialization.GetString(readBuffer);
             readMessage = readMessage.Replace("\0", string.Empty).Trim();
 
-            MessageTypeConverter.ConvertToMessageType(readMessage);
-               // throw new Exception("Message not valid");
-            Console.WriteLine("Received: \n{0}", readMessage);
+            if (!MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
+                throw new Exception("Message not valid");
+
             var deserialized = MessageSerialization.Deserialize<T>(readMessage);
-            
+            Console.WriteLine("Received: \n{0}", deserialized);
 
             return deserialized;
         }

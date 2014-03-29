@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Common;
@@ -6,23 +7,23 @@ using System.Net;
 
 namespace TaskManager
 {
-    public class TaskManager 
+    public class TaskManager
     {
         private DivideProblem problem;
         private RegisterResponse registerResponse;
         private StatusThread[] statusThreads;
         private readonly NetworkAdapter networkAdapter;
-        private bool isStarted;
 
-        private readonly IPAddress serverIpAddress;
-        private readonly int port;
-
-
+        //temporaty
+        private static int counter; 
         public TaskManager(IPAddress serverIp, int port)
         {
-            serverIpAddress = serverIp;
-            this.port = port;
             networkAdapter = new NetworkAdapter(serverIp, port);
+        }
+
+        public TaskManager(string serverName, int port)
+        {
+            networkAdapter = new NetworkAdapter(serverName, port);
         }
 
         public void Start()
@@ -33,22 +34,19 @@ namespace TaskManager
 
         private void TaskWork()
         {
-           
             networkAdapter.StartConnection();
             SendRegisterMessage();
             RecieveRegisterResponse();
             statusThreads = new StatusThread[5];
             foreach (var statusThread in statusThreads.Select(statusThread => new StatusThread()))
             {
-
                 statusThread.HowLong = 0;
                 //statusThread.TaskId = registerResponse.Id;
                 statusThread.ProblemType = "DVRP";
             }
-            networkAdapter.CurrentStatus = new Status {Id = registerResponse.Id, Threads = statusThreads};
+            networkAdapter.CurrentStatus = new Status { Id = registerResponse.Id, Threads = statusThreads };
 
-            //TODO zero timeout in register response.Timeout?
-            networkAdapter.StartKeepAlive(10000, RecieveProblemData, SendSolution);
+            networkAdapter.StartKeepAlive(10000, RecieveProblemData, SendSolvePartialProblems);
 
         }
 
@@ -72,10 +70,25 @@ namespace TaskManager
             }
             catch (Exception)
             {
-                
+
                 Console.WriteLine("Cannot recieve RegisterResponse");
             }
-            
+
+        }
+
+        private void SendSolvePartialProblems()
+        {
+            var partialProblems = new SolvePartialProblems
+            {
+                CommonData = new byte[5],
+                Id = problem.Id,
+                ProblemType = "DVRP",
+                PartialProblems = new SolvePartialProblemsPartialProblem[3],
+                SolvingTimeout = 3,
+                SolvingTimeoutSpecified = true
+            };
+            networkAdapter.Send(partialProblems, false);
+            Console.WriteLine("SendSolvePartialProblems");
 
         }
 
@@ -86,9 +99,22 @@ namespace TaskManager
                 problem = networkAdapter.Receive<DivideProblem>(false);
                 if (problem != null) return true;
             }
-            catch (Exception e )
+            catch (Exception)
             {
-                //Console.WriteLine(e);
+                return false;
+            }
+            return false;
+        }
+
+        private bool RecieveMergeRequest()
+        {
+            try
+            {
+                //problem = networkAdapter.Receive<Merge>(false);
+                if (problem != null) return true;
+            }
+            catch (Exception)
+            {
                 return false;
             }
             return false;
@@ -98,8 +124,14 @@ namespace TaskManager
         {
             try
             {
-                
-                var solution = new Solutions { ProblemType = "DVRP", Id = 1 };
+                counter++;
+                Solutions solution;
+                if (counter > 10)
+                    solution = new Solutions { ProblemType = "DVRP", Id = 1, Solutions1 = new[] {new SolutionsSolution{ Type = SolutionsSolutionType.Final} }};
+                else
+                {
+                     solution = new Solutions { ProblemType = "DVRP", Id = 1, Solutions1 = new[] {new SolutionsSolution{ Type = SolutionsSolutionType.Partial} }};
+                }
                 //TODO Common data?
                 networkAdapter.Send(solution, false);
             }
@@ -109,14 +141,6 @@ namespace TaskManager
             }
 
         }
-
-        public void Close()
-        {
-            isStarted = false;
-            //networkAdapter.CloseConnection();
-        }
-
-
 
     }
 }

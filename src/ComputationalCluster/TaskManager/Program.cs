@@ -20,7 +20,6 @@ namespace TaskManager
             while (msg != null && msg.ToLower() != "stop")
                 msg = Console.ReadLine();
 
-            taskManager.Close();
 
             Console.WriteLine("Task manager's work ended. Closing program.");
 
