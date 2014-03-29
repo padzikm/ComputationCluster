@@ -8,7 +8,7 @@ using Common;
 
 namespace CommunicationServer
 {
-    class SolutionRequestStrategy : IMessageStrategy
+    public class SolutionRequestStrategy : IMessageStrategy
     {
         /// <summary>
         /// Response for clients solution request
@@ -34,7 +34,7 @@ namespace CommunicationServer
             if (DvrpProblem.ProblemSolutions.ContainsKey(request.Id))
             {
                 Solutions solution = DvrpProblem.ProblemSolutions[request.Id];
-                DvrpProblem.ProblemSolutions.Remove(request.Id);
+                //DvrpProblem.ProblemSolutions.Remove(request.Id);
                 networkAdapter.Send(solution);
                 DvrpProblem.WaitEvent.Set();
                 return;

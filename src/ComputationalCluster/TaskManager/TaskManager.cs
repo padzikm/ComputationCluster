@@ -14,11 +14,12 @@ namespace TaskManager
         private StatusThread[] statusThreads;
         private readonly NetworkAdapter networkAdapter;
 
-        //temporaty
+        //temporary
         private static int counter; 
         public TaskManager(IPAddress serverIp, int port)
         {
             networkAdapter = new NetworkAdapter(serverIp, port);
+
         }
 
         public TaskManager(string serverName, int port)

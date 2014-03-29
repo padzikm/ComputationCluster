@@ -10,7 +10,7 @@ using Common;
 
 namespace CommunicationServer
 {
-    interface IMessageStrategy
+    public interface IMessageStrategy
     {
         /// <summary>
         /// Handle messages from client

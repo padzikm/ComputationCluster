@@ -7,7 +7,7 @@ using Common;
 
 namespace CommunicationServer
 {
-    class SolvePartialProblemsStrategy : IMessageStrategy
+    public class SolvePartialProblemsStrategy : IMessageStrategy
     {
         /// <summary>
         /// Registers divided problem into smaller problems from task

@@ -6,21 +6,22 @@ using System.Threading.Tasks;
 
 namespace CommunicationServer
 {
-    class TaskDivideWorker
+    public class TaskDivideWorker
     {
         /// <summary>
         /// Sends problem to task (if any is available)
         /// </summary>
         public static void Work(ServerNetworkAdapter networkAdapter)
         {
-            if (DvrpProblem.Problems.Count > 0 && DvrpProblem.Tasks.Count > 0)
+            if (DvrpProblem.ProblemsDivideWaiting.Count > 0 && DvrpProblem.Tasks.Count > 0)
             {
-                var pr = DvrpProblem.Problems.First();
+                var divide = DvrpProblem.ProblemsDivideWaiting.First();
+                var pr = DvrpProblem.Problems[divide.Key];
                 DivideProblem div = new DivideProblem();
-                div.Id = pr.Key;
-                div.ProblemType = pr.Value.ProblemType;
-                div.Data = pr.Value.Data;
-                div.ComputationalNodes = (ulong)DvrpProblem.Nodes.Count;
+                div.Id = divide.Key;
+                div.ProblemType = pr.ProblemType;
+                div.Data = pr.Data;
+                div.ComputationalNodes = (ulong)DvrpProblem.Nodes.Count;                 
                 networkAdapter.Send(div);
             }            
         }

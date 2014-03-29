@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Linq;
-using System.Resources;
 using System.Reflection;
-using System.Xml.Serialization;
 
 
 namespace Common
@@ -36,6 +30,12 @@ namespace Common
             }
         }
 
+        /// <summary>
+        /// Validates enum type of message with correct XDocument of correct message.
+        /// </summary>
+        /// <param name="messageType"> Enum message type to validate. </param>
+        /// <param name="message"> Correct Message to compare with first input parameter. </param>
+        /// <returns> True if message is valid, false otherwise. </returns>
         public static bool IsMessageValid(MessageType messageType, XDocument message)
         {                                              
             List<string> errorList = new List<string>();
@@ -59,6 +59,12 @@ namespace Common
             return isValid;
         }
 
+        /// <summary>
+        /// Validates enum type of message with string to compare.
+        /// </summary>
+        /// <param name="messageType"> Enum message type to validate. </param>
+        /// <param name="message"> Correct string message to compare with first input parameter. </param>
+        /// <returns></returns>
         public static bool IsMessageValid(MessageType messageType, string message)
         {
             try

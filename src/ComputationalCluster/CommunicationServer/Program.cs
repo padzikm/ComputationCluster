@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Net;
+using Common;
 
 namespace CommunicationServer
 {   
     class Program
     {        
         static void Main(string[] args)
-        {                       
-            Server server = new Server(IPAddress.Any, 12345, new TimeSpan(0,0,10));
+        {            
+            Server server = new Server(IPAddress.Any, 12345, new TimeSpan(0,0,30));
 
             string msg = "";
 

@@ -9,7 +9,7 @@ namespace TaskManager
         {
             string msg = "";
             Console.WriteLine("Starting Task Manager");
-            
+
             var taskManager = new TaskManager(IPAddress.Parse("192.168.0.11"), 12345);
 
             Console.WriteLine("Task Manager created. Start working...\n");

@@ -8,7 +8,7 @@ using Common;
 
 namespace CommunicationServer
 {
-    class StatusStrategy : IMessageStrategy
+    public class StatusStrategy : IMessageStrategy
     {
         /// <summary>
         /// Keeps alive component, which sent status message

@@ -8,7 +8,7 @@ using Common;
 
 namespace CommunicationServer
 {
-    class RegisterStrategy : IMessageStrategy
+    public class RegisterStrategy : IMessageStrategy
     {
         /// <summary>
         /// Register new component in problem instance
@@ -21,7 +21,7 @@ namespace CommunicationServer
         {
             Register msg = MessageSerialization.Deserialize<Register>(message);
             
-            if (msg == null)// || msg.SolvableProblems.Where(p => p.ToLower().Contains("dvrp")).Count() == 0)            
+            if (msg == null || msg.SolvableProblems == null)// || msg.SolvableProblems.Where(p => p.ToLower().Contains("dvrp")).Count() == 0)            
                 return;
 
             DvrpProblem.WaitEvent.WaitOne();
@@ -33,7 +33,7 @@ namespace CommunicationServer
                 DvrpProblem.Tasks.Add(id, msg);                                                
 
             DvrpProblem.ComponentsLastStatus.Add(id, DateTime.UtcNow);              
-            RegisterResponse reponse = new RegisterResponse() { Id = id, };
+            RegisterResponse reponse = new RegisterResponse() { Id = id, Timeout = timout.ToString()};
             networkAdapter.Send(reponse);            
             DvrpProblem.WaitEvent.Set();
         }
