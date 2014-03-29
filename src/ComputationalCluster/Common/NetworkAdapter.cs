@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Common
 {
-
     public class NetworkAdapter
     {
         private readonly string serverName;
@@ -28,7 +23,7 @@ namespace Common
         /// Constructor that takes IPAddress class as first parameter. Stores input data in private variables.
         /// </summary>
         /// <param name="serverIpAddress">Specifies IPAddress value of IP which client use to connect to serverName. May be localhost.</param>
-        /// <param name="connectionPort">Port that server is listening to.</param>
+        /// <param name="_connectionPort">Port that server is listening to.</param>
         public NetworkAdapter(IPAddress serverIpAddress, int _connectionPort)
         {
             if(serverIpAddress.ToString() == null || _connectionPort < 0)
@@ -41,8 +36,8 @@ namespace Common
         /// <summary>
         /// Constructor that takes string variable as first parameter. Stores input data in private variables.
         /// </summary>
-        /// <param name="serverName"> Specifies string value of IP which client use to connect to serverName. May be localhost. </param>
-        /// <param name="port"> Port that server is listening to. </param>
+        /// <param name="_serverName"> Specifies string value of IP which client use to connect to serverName. May be localhost. </param>
+        /// <param name="_connectionPort"> Port that server is listening to. </param>
         public NetworkAdapter(string _serverName, int _connectionPort)
         {
             if (_serverName == null || _connectionPort < 0)
@@ -119,7 +114,7 @@ namespace Common
                     client.Close();
                 }
 
-                Console.WriteLine("Sent \n\n{0}\n\n", xml);
+                Console.WriteLine("Sent a message: \n{0}\n\n", xml);
 
                 return true;
             }
@@ -144,7 +139,7 @@ namespace Common
                 stream = client.GetStream();
             }
 
-            if (!stream.CanRead) throw new Exception("NetworkStream unavaiable\n\n");
+            if (!stream.CanRead) throw new Exception("NetworkStream unavaiable");
 
             var readBuffer = new byte[MaxBufferLenght];
             stream.Read(readBuffer, 0, readBuffer.Length);
@@ -162,7 +157,7 @@ namespace Common
                 throw new Exception("Message not valid");
 
             var deserialized = MessageSerialization.Deserialize<T>(readMessage);
-            Console.WriteLine("Received: \n{0}", deserialized);
+            Console.WriteLine("Received a message: \n{0}", deserialized);
 
             return deserialized;
         }

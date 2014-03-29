@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Common
 {
+    /// <summary>
+    /// Enums of messages type present in xml schema.
+    /// </summary>
     public enum MessageType
     {
         RegisterMessage,
@@ -23,6 +22,11 @@ namespace Common
 
     public static class MessageTypeConverter
     {
+        /// <summary>
+        /// Converts string to MessageType enum type
+        /// </summary>
+        /// <param name="message"> String to convert. </param>
+        /// <returns> Enum type MessageType converted from string. </returns>
         public static MessageType ConvertToMessageType(string message)
         {
             try
