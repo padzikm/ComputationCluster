@@ -20,8 +20,12 @@ namespace ComputationalNode
         private RegisterResponse registerResponse;
         private SolvePartialProblems problem;
         private bool working;
-        //private int port;
-
+        
+        /// <summary>
+        /// Specific constructor for ComputationalNode class. Allows to execute node's correctly.
+        /// </summary>
+        /// <param name="serverName">String value of a server address name. </param>
+        /// <param name="port">Port on which server is listening.</param>
         public ComputationalNode(string serverName, int port)
         {
             if (serverName == null || port < 0)
@@ -33,6 +37,11 @@ namespace ComputationalNode
 
         }
 
+        /// <summary>
+        /// Specific constructor for ComputationalNode class. Allows to execute node's correctly.
+        /// </summary>
+        /// <param name="serverIp">IPAdress of a server address name.</param>
+        /// <param name="port">Port on which server is listening.</param>
         public ComputationalNode(IPAddress serverIp, int port)
         {
 
@@ -45,6 +54,9 @@ namespace ComputationalNode
 
         }
 
+        /// <summary>
+        /// This method starts whole Node work. 
+        /// </summary>
         public void Start()
         {
 
@@ -63,6 +75,9 @@ namespace ComputationalNode
             }
         }
 
+        /// <summary>
+        /// Allow to terminate correctly program execution.
+        /// </summary>
         public void Stop()
         {
             working = false;
