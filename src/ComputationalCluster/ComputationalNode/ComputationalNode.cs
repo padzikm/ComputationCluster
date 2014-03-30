@@ -20,17 +20,28 @@ namespace ComputationalNode
         private RegisterResponse registerResponse;
         private SolvePartialProblems problem;
         private bool working;
-        private int port;
+        //private int port;
 
-        public ComputationalNode(string serverName, int _port)
+        public ComputationalNode(string serverName, int port)
         {
-            if (serverName == null || _port < 0)
+            if (serverName == null || port < 0)
                 throw new ArgumentNullException();
 
-            port = _port;
             working = true;
 
             networkAdapter = new NetworkAdapter(serverName, port);
+
+        }
+
+        public ComputationalNode(IPAddress serverIp, int port)
+        {
+
+            if (serverIp == null || port < 0)
+                throw new ArgumentNullException();
+
+            working = true;
+
+            networkAdapter = new NetworkAdapter(serverIp, port);
 
         }
 
@@ -77,14 +88,24 @@ namespace ComputationalNode
             Register();
             RegisterResponse();
 
-            //networkAdapter.CloseConnection();
+            networkAdapter.CloseConnection();
 
             initThreade();
 
             networkAdapter.CurrentStatus = new Status { Id = registerResponse.Id, Threads = threads };
 
-            int timeout = int.Parse(registerResponse.Timeout.Substring(6, 2));
-            networkAdapter.StartKeepAlive(timeout * 1000, PartialProblems, Solution);
+            int timeout = 0;           
+            string[] time= registerResponse.Timeout.Split(':');          
+            timeout += int.Parse(time[2]);
+            timeout += 60 * int.Parse(time[1]);
+            timeout += 3600 * int.Parse(time[0]);
+
+            var handlers = new Dictionary<Func<bool>, Action>
+            {
+                {PartialProblems, Solution},
+            };
+
+            networkAdapter.StartKeepAlive(timeout * 1000, handlers);
            
         }
 
@@ -94,7 +115,7 @@ namespace ComputationalNode
             {
                 Type = RegisterType.ComputationalNode,
                 SolvableProblems = new string[] { "DVRP", "DVRP" },
-                ParallelThreads = (byte)5
+                ParallelThreads = 5
             };
             networkAdapter.Send(registerMessage, false);
         }
@@ -143,8 +164,10 @@ namespace ComputationalNode
                 var solution = new Solutions
                 {
                     ProblemType = "DVRP", 
-                    Id = 2,
-                    Solutions1 = new[] { new SolutionsSolution { Type = SolutionsSolutionType.Partial } }
+                    Id = problem.Id,
+                    Solutions1 = new[] { new SolutionsSolution { Type = SolutionsSolutionType.Partial } },
+                    CommonData = new byte[5],
+                    
                 };
                 networkAdapter.Send(solution, true);
             }
@@ -157,12 +180,10 @@ namespace ComputationalNode
 
         private void initThreade()
         {
-            threads = new StatusThread[5];
-            foreach (var thread in threads.Select(thread => new StatusThread()))
-            {
-                thread.HowLong = 0;
-                thread.ProblemType = "DVPR";
-            }
+            threads = new StatusThread[] { new StatusThread{HowLong = 0, ProblemType = "DVPR", State = StatusThreadState.Busy }};
+
         }
+
+       
     }
 }
