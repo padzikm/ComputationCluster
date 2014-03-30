@@ -116,7 +116,7 @@ namespace TaskManager
                 {
                     ProblemType = "DVRP",
                     Id = 1,
-                    Solutions1 = new[] { new SolutionsSolution { Type = SolutionsSolutionType.Final } }
+                    Solutions1 = new[] { new SolutionsSolution { Type = SolutionsSolutionType.Final, TaskId = registerResponse.Id, Data = new byte[5]} }
                 };
                 networkAdapter.Send(solutionToSend, true);
             }
@@ -132,12 +132,18 @@ namespace TaskManager
         {
             try
             {
+                var solvePartialProblemsPartialProblem = new SolvePartialProblemsPartialProblem[3];
+                for (int i = 0; i < 3; i++)
+                {
+                    solvePartialProblemsPartialProblem[i] = new SolvePartialProblemsPartialProblem {Data = new byte[5], TaskId = registerResponse.Id};
+                }
+
                 var partialProblems = new SolvePartialProblems
                 {
                     CommonData = new byte[5],
                     Id = problem.Id,
                     ProblemType = "DVRP",
-                    PartialProblems = new SolvePartialProblemsPartialProblem[3],
+                    PartialProblems = solvePartialProblemsPartialProblem,
                     SolvingTimeout = 3,
                     SolvingTimeoutSpecified = true
                 };
