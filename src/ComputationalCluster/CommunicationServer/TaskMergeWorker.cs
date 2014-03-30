@@ -13,9 +13,10 @@ namespace CommunicationServer
         /// </summary>
         public static void Work(ServerNetworkAdapter networkAdapter)
         {
-            if (DvrpProblem.PartialSolutions.Count > 0 && DvrpProblem.Tasks.Count > 0)
+            if (DvrpProblem.ProblemsMergeWaiting.Count > 0 && DvrpProblem.Tasks.Count > 0)
             {
-                var request = DvrpProblem.PartialSolutions.First();
+                var tmp = DvrpProblem.ProblemsMergeWaiting.First();
+                var request = DvrpProblem.PartialSolutions.First(p => p.Key == tmp.Key);
                 SolveRequest problem = DvrpProblem.Problems[request.Key];
                 Solutions response = new Solutions();
                 response.Id = request.Key;
@@ -26,7 +27,8 @@ namespace CommunicationServer
                 else
                     response.Solutions1 = new SolutionsSolution[] { new SolutionsSolution(), };
 
-                networkAdapter.Send(response);
+                if (networkAdapter.Send(response))
+                    DvrpProblem.ProblemsMergeWaiting.Remove(request.Key);
             }            
         }
     }

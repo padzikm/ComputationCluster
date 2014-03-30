@@ -64,7 +64,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="XMLSchemas\PartialProblemsMessage.xsd">
+    <EmbeddedResource Include="XMLSchemas\SolvePartialProblemsMessage.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>

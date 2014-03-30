@@ -35,7 +35,8 @@ namespace CommunicationServer
                 if (!DvrpProblem.PartialSolutions.ContainsKey(sol.Id))
                     DvrpProblem.PartialSolutions.Add(sol.Id, new List<SolutionsSolution>());
 
-                DvrpProblem.PartialSolutions[sol.Id].AddRange(sol.Solutions1);                
+                DvrpProblem.PartialSolutions[sol.Id].AddRange(sol.Solutions1);
+                DvrpProblem.ProblemsMergeWaiting.Add(sol.Id, true);
             }
             DvrpProblem.WaitEvent.Set();
         }

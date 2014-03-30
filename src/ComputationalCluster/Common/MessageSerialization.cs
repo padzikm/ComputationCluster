@@ -28,10 +28,14 @@ namespace Common
                 ns.Add("ucc", "http://www.mini.pw.edu.pl/ucc/");
 
                 xmlSerializer.Serialize(stringWriter, value, ns);
-                
-                string serializedXML = stringWriter.ToString();
 
-                return serializedXML.Replace("utf-16", "utf-8");
+                string serializedXML = stringWriter.ToString().Replace("utf-16", "utf-8");
+
+                MessageType msgType = MessageTypeConverter.ConvertToMessageType(serializedXML);
+                if(!MessageValidation.IsMessageValid(msgType, serializedXML))
+                    return null;
+
+                return serializedXML;
             }
             catch(Exception ex)
             {
@@ -52,6 +56,10 @@ namespace Common
                 return null;
             try
             {
+                MessageType msgType = MessageTypeConverter.ConvertToMessageType(value);
+                if (!MessageValidation.IsMessageValid(msgType, value))
+                    return null;
+
                 XmlSerializer xmlSerializer = new XmlSerializer(typeof (T));
                 StringReader stringReader = new StringReader(value);
                 XmlReader reader = XmlReader.Create(stringReader);

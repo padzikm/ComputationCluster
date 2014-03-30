@@ -24,7 +24,7 @@ namespace CommunicationServer
         /// </summary>
         /// <typeparam name="T"></typeparam>        
         /// <param name="message">Message to send</param>
-        public virtual void Send<T>(T message) where T : class 
+        public virtual bool Send<T>(T message) where T : class 
         {
             try
             {
@@ -33,10 +33,12 @@ namespace CommunicationServer
                 stream.Write(data, 0, data.Length);
                 stream.Flush();
                 Console.WriteLine("Wyslano: \n{0}", xml);
+                return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Blad w send: {0}", ex.Message);
+                return false;
             }
         }        
     }
