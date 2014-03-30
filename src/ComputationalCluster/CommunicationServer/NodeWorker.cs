@@ -22,7 +22,12 @@ namespace CommunicationServer
                 msg.ProblemType = DvrpProblem.Problems[pr.Key].ProblemType;
                 msg.SolvingTimeout = DvrpProblem.Problems[pr.Key].SolvingTimeout;
                 msg.SolvingTimeoutSpecified = DvrpProblem.Problems[pr.Key].SolvingTimeoutSpecified;
-                msg.PartialProblems = pr.Value.ToArray();
+                if (pr.Value.Count != 0)
+                    msg.PartialProblems = pr.Value.ToArray();
+                else
+                    msg.PartialProblems = new SolvePartialProblemsPartialProblem[]
+                    {new SolvePartialProblemsPartialProblem() {Data = new byte[1]}};                    
+                
                 networkAdapter.Send(msg);
             }            
         }

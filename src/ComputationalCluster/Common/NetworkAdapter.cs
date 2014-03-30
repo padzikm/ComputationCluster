@@ -176,7 +176,7 @@ namespace Common
 
             var readMessage = MessageSerialization.GetString(readBuffer);
             readMessage = readMessage.Replace("\0", string.Empty).Trim();
-
+            Console.WriteLine("Odebrano: \n{0}", readMessage);
             if (!MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
                 throw new Exception("Message not valid");
 
