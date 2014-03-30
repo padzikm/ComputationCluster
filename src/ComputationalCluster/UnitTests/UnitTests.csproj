@@ -84,10 +84,7 @@
       <Name>TaskManager</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ComputationalNode\" />
-    <Folder Include="TaskManager\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
