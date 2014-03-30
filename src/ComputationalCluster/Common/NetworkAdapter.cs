@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -97,19 +98,31 @@ namespace Common
             t.Start();
         }
 
-        public void StartKeepAlive(int period)
+        public void StartKeepAlive(int period, Dictionary<Func<bool>, Action> sendReceiveHandlers)
         {
             var t = new Thread(() =>
             {
                 while (true)
                 {
-                    if (!Send(CurrentStatus, true))
+                    client = new TcpClient(serverName, connectionPort);
+                    stream = client.GetStream();
+                    if (!Send(CurrentStatus, false))
                         break;
+                    foreach (var handler in sendReceiveHandlers)
+                    {
+                        if (handler.Key())
+                        {
+                            Thread.Sleep(5000);
+                            handler.Value();
+                            break;
+                        }
+                    }
                     Thread.Sleep(period);
                 }
             });
             t.Start();
         }
+
 
         /// <summary>
         /// Generic method sends serialized and encoded message to network stream.
