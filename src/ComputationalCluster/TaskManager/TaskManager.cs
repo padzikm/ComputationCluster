@@ -41,11 +41,9 @@ namespace TaskManager
             RecieveRegisterResponse();
             networkAdapter.CloseConnection();
             statusThreads = new StatusThread[5];
-            foreach (var statusThread in statusThreads.Select(statusThread => new StatusThread()))
+            for (var i = 0; i < 5; i++)
             {
-                statusThread.HowLong = 0;
-                //statusThread.TaskId = registerResponse.Id;
-                statusThread.ProblemType = "DVRP";
+                statusThreads[i] = new StatusThread { State = StatusThreadState.Busy, HowLong = 1000, TaskId = registerResponse.Id, ProblemType = "DVRP" };
             }
             networkAdapter.CurrentStatus = new Status { Id = registerResponse.Id, Threads = statusThreads };
             var handlers = new Dictionary<Func<bool>, Action>
