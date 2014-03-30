@@ -15,8 +15,18 @@ namespace ComputationalClient
         static void Main(string[] args)
         {
             string msg = "";
+            Client client;
 
-            Client client = new Client("localhost", 12345, "dvrp", 100000, new byte[1]);
+            try
+            {
+                var adressIp = IPAddress.Parse(args[0]);
+                client = new Client(adressIp.ToString(), 12345, "dvrp", 100000, new byte[1]);
+            }
+            catch (Exception)
+            {
+                client = new Client("localhost", 12345, "dvrp", 100000, new byte[1]);
+            }
+
 
             Console.WriteLine("Client created. Start working...\n");
             Console.WriteLine("Type 'stop' to stop client.\n");

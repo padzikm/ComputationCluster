@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace TaskManager
 {
@@ -10,7 +11,18 @@ namespace TaskManager
             string msg = "";
             Console.WriteLine("Starting Task Manager");
 
-            var taskManager = new TaskManager("localhost", 12345);
+            TaskManager taskManager;
+
+            try
+            {
+                var adressIp = IPAddress.Parse(args[0]);
+                taskManager = new TaskManager(adressIp, 12345);
+            }
+            catch (Exception)
+            {
+                taskManager = new TaskManager("localhost", 12345);
+            }
+            
 
             Console.WriteLine("Task Manager created. Start working...\n");
             Console.WriteLine("Type 'stop' to stop Task manager.\n");
