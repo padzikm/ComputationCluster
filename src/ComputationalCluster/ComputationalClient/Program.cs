@@ -20,7 +20,8 @@ namespace ComputationalClient
             try
             {
                 var adressIp = IPAddress.Parse(args[0]);
-                client = new Client(adressIp.ToString(), 12345, "dvrp", 100000, new byte[1]);
+                var port = int.Parse(args[1]);
+                client = new Client(adressIp.ToString(), port, "dvrp", 100000, new byte[1]);
             }
             catch (Exception)
             {

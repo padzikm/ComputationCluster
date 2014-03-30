@@ -69,12 +69,12 @@ namespace Common
             if (client != null)
                 client.Close();
         }
-
+       
         /// <summary>
         /// In newly created thread CurrentStatus is sent due to inform server that component that uses it is alive.
         /// </summary>
         /// <param name="period"> Keepalive timeout </param>
-        /// <param name="receiveveHandler">Method handling receive action</param>
+        /// <param name="receiveHandler"> Method handling receive action</param>
         /// <param name="sendhandler">Method handling send action</param>
         public void StartKeepAlive(int period, Func<bool> receiveHandler, Action sendhandler)
         {
@@ -97,7 +97,12 @@ namespace Common
             });
             t.Start();
         }
-
+        /// <summary>
+        ///  In newly created thread CurrentStatus is sent due to inform server that component that uses it is alive.
+        /// </summary>
+        /// <param name="period"> Keepalive timeout </param>
+        /// <param name="sendDivide">method handling divide action</param>
+        /// <param name="sendMerge">method handling merge action</param>
         public void StartKeepAliveTask(int period, Action<ulong> sendDivide, Action<ulong> sendMerge)
         {
             var t = new Thread(() =>
@@ -136,8 +141,6 @@ namespace Common
             });
             t.Start();
         }
-
-
         /// <summary>
         /// Generic method sends serialized and encoded message to network stream.
         /// </summary>

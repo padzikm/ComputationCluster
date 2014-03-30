@@ -16,7 +16,8 @@ namespace TaskManager
             try
             {
                 var adressIp = IPAddress.Parse(args[0]);
-                taskManager = new TaskManager(adressIp, 12345);
+                var port = int.Parse(args[1]);
+                taskManager = new TaskManager(adressIp, port);
             }
             catch (Exception)
             {

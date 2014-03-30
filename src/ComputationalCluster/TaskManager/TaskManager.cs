@@ -16,8 +16,6 @@ namespace TaskManager
         private StatusThread[] statusThreads;
         private readonly NetworkAdapter networkAdapter;
 
-        //temporary
-        private static int counter;
         public TaskManager(IPAddress serverIp, int port)
         {
             networkAdapter = new NetworkAdapter(serverIp, port);
@@ -28,7 +26,9 @@ namespace TaskManager
         {
             networkAdapter = new NetworkAdapter(serverName, port);
         }
-
+        /// <summary>
+        /// Starts new connection between TaskManger and Server
+        /// </summary>
         public void Start()
         {
             var thread = new Thread(TaskWork);
@@ -75,34 +75,6 @@ namespace TaskManager
 
         }
 
-        private bool ReceiveProblemData()
-        {
-            try
-            {
-                problem = networkAdapter.Receive<DivideProblem>(false);
-                if (problem != null) return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-            return false;
-        }
-
-        private bool ReceiveSolutions()
-        {
-            try
-            {
-                solution = networkAdapter.Receive<Solutions>(false);
-                if (solution != null) return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-            return false;
-        }
-
         private void SendFinalSolution(ulong id)
         {
             try
@@ -122,7 +94,6 @@ namespace TaskManager
 
         }
 
-
         private void SendPartialProblems(ulong id)
         {
             try
@@ -136,7 +107,7 @@ namespace TaskManager
                 var partialProblems = new SolvePartialProblems
                 {
                     CommonData = new byte[5],
-                    Id = (ulong) id,
+                    Id = id,
                     ProblemType = "DVRP",
                     PartialProblems = solvePartialProblemsPartialProblem,
                     SolvingTimeout = 3,
