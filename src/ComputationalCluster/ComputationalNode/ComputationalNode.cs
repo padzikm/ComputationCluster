@@ -20,17 +20,28 @@ namespace ComputationalNode
         private RegisterResponse registerResponse;
         private SolvePartialProblems problem;
         private bool working;
-        private int port;
+        //private int port;
 
-        public ComputationalNode(string serverName, int _port)
+        public ComputationalNode(string serverName, int port)
         {
-            if (serverName == null || _port < 0)
+            if (serverName == null || port < 0)
                 throw new ArgumentNullException();
 
-            port = _port;
             working = true;
 
             networkAdapter = new NetworkAdapter(serverName, port);
+
+        }
+
+        public ComputationalNode(IPAddress serverIp, int port)
+        {
+
+            if (serverIp == null || port < 0)
+                throw new ArgumentNullException();
+
+            working = true;
+
+            networkAdapter = new NetworkAdapter(serverIp, port);
 
         }
 
