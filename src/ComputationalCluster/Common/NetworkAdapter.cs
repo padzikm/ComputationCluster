@@ -98,7 +98,7 @@ namespace Common
             t.Start();
         }
 
-        public void StartKeepAlive(int period, Dictionary<Func<bool>, Action> sendReceiveHandlers)
+        public void StartKeepAliveTask(int period, Action<ulong> sendDivide, Action<ulong> sendMerge)
         {
             var t = new Thread(() =>
             {
@@ -108,13 +108,27 @@ namespace Common
                     stream = client.GetStream();
                     if (!Send(CurrentStatus, false))
                         break;
-                    foreach (var handler in sendReceiveHandlers)
+
+                    var readBuffer = new byte[MaxBufferLenght];
+                    stream.Read(readBuffer, 0, readBuffer.Length);
+
+                    var readMessage = MessageSerialization.GetString(readBuffer);
+                    readMessage = readMessage.Replace("\0", string.Empty).Trim();
+                    Console.WriteLine("Odebrano: \n{0}", readMessage);
+
+                    if (MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
                     {
-                        if (handler.Key())
+                        var deserialized = MessageSerialization.Deserialize<DivideProblem>(readMessage);
+
+                        if (deserialized != null)
                         {
-                            Thread.Sleep(5000);
-                            handler.Value();
-                            break;
+                            sendDivide(deserialized.Id);
+                        }
+                        else
+                        {
+                            var deserialized2 = MessageSerialization.Deserialize<Solutions>(readMessage);
+                            if (deserialized2 != null)
+                                sendMerge(deserialized2.Id);
                         }
                     }
                     Thread.Sleep(period);
