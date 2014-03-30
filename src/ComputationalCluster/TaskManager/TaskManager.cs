@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading;
 using Common;
 using System.Net;
@@ -40,18 +41,12 @@ namespace TaskManager
             SendRegisterMessage();
             RecieveRegisterResponse();
             networkAdapter.CloseConnection();
-            statusThreads = new StatusThread[5];
-            for (var i = 0; i < 5; i++)
-            {
-                statusThreads[i] = new StatusThread { State = StatusThreadState.Busy, HowLong = 1000, TaskId = registerResponse.Id, ProblemType = "DVRP" };
-            }
+            statusThreads = new StatusThread[1];
+
+            statusThreads[0] = new StatusThread { State = StatusThreadState.Busy, HowLong = 1000, TaskId = registerResponse.Id, ProblemType = "DVRP" };
             networkAdapter.CurrentStatus = new Status { Id = registerResponse.Id, Threads = statusThreads };
-            var handlers = new Dictionary<Func<bool>, Action>
-            {
-                {ReceiveProblemData, SendPartialProblems},
-                {ReceiveSolutions, SendFinalSolution}
-            };
-            networkAdapter.StartKeepAlive(10000, handlers);
+            int timeout = int.Parse(registerResponse.Timeout.Substring(6, 2));
+            networkAdapter.StartKeepAliveTask(timeout * 1000, SendPartialProblems, SendFinalSolution);
         }
 
         private void SendRegisterMessage()
@@ -108,7 +103,7 @@ namespace TaskManager
             return false;
         }
 
-        private void SendFinalSolution()
+        private void SendFinalSolution(ulong id)
         {
             try
             {
@@ -116,7 +111,7 @@ namespace TaskManager
                 {
                     ProblemType = "DVRP",
                     Id = 1,
-                    Solutions1 = new[] { new SolutionsSolution { Type = SolutionsSolutionType.Final, TaskId = registerResponse.Id, Data = new byte[5]} }
+                    Solutions1 = new[] { new SolutionsSolution { Type = SolutionsSolutionType.Final, TaskId = (ulong) id, Data = new byte[5]} }
                 };
                 networkAdapter.Send(solutionToSend, true);
             }
@@ -128,7 +123,7 @@ namespace TaskManager
         }
 
 
-        private void SendPartialProblems()
+        private void SendPartialProblems(ulong id)
         {
             try
             {
@@ -141,7 +136,7 @@ namespace TaskManager
                 var partialProblems = new SolvePartialProblems
                 {
                     CommonData = new byte[5],
-                    Id = problem.Id,
+                    Id = (ulong) id,
                     ProblemType = "DVRP",
                     PartialProblems = solvePartialProblemsPartialProblem,
                     SolvingTimeout = 3,
@@ -152,7 +147,7 @@ namespace TaskManager
 
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 Console.WriteLine("Cannot send partial problems to server");
             }
