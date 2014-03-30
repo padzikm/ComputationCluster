@@ -29,7 +29,7 @@ namespace CommunicationServer
                 timout = new TimeSpan(hours, minutes, seconds);
             }
 
-            Server server = new Server(IPAddress.Any, 12345, new TimeSpan(0,0,30));
+            Server server = new Server(ipAddress, port, timout);
 
             string msg = "";
 
