@@ -12,9 +12,9 @@ using Common;
 
 namespace ComputationalNode
 {
-    class ComputationalNode 
+    class ComputationalNode
     {
-        private NetworkAdapter networkAdapter;
+        private readonly NetworkAdapter networkAdapter;
         private Thread nodeThread;
         private StatusThread[] threads;
         private RegisterResponse registerResponse;
@@ -22,7 +22,7 @@ namespace ComputationalNode
         private bool working;
         private int port;
 
-        public ComputationalNode(string serverName,int _port)
+        public ComputationalNode(string serverName, int _port)
         {
             if (serverName == null || _port < 0)
                 throw new ArgumentNullException();
@@ -31,7 +31,7 @@ namespace ComputationalNode
             working = true;
 
             networkAdapter = new NetworkAdapter(serverName, port);
-       
+
         }
 
         public void Start()
@@ -70,32 +70,22 @@ namespace ComputationalNode
 
         private void NodeWork()
         {
-           
-           
+
+
             networkAdapter.StartConnection();
 
             Register();
             RegisterResponse();
 
-            networkAdapter.CloseConnection();
-            
+            //networkAdapter.CloseConnection();
+
             initThreade();
 
             networkAdapter.CurrentStatus = new Status { Id = registerResponse.Id, Threads = threads };
 
             int timeout = int.Parse(registerResponse.Timeout.Substring(6, 2));
-            networkAdapter.StartKeepAlive(timeout * 1000);
-
-
-            while (working)
-            {                
-                if(PartialProblems())
-                {
-
-                    Solution();
-                }
-               
-            }
+            networkAdapter.StartKeepAlive(timeout * 1000, PartialProblems, Solution);
+           
         }
 
         private void Register()
@@ -103,7 +93,7 @@ namespace ComputationalNode
             var registerMessage = new Register()
             {
                 Type = RegisterType.ComputationalNode,
-                SolvableProblems = new string[] { "DVRP", "dvrp" },
+                SolvableProblems = new string[] { "DVRP", "DVRP" },
                 ParallelThreads = (byte)5
             };
             networkAdapter.Send(registerMessage, false);
@@ -120,19 +110,24 @@ namespace ComputationalNode
             {
                 Console.WriteLine("Cannot recieve RegisterResponse");
             }
-            
+
         }
 
         private bool PartialProblems()
         {
             try
             {
-                problem = networkAdapter.Receive<SolvePartialProblems>(true);
-                if (problem != null) return true;
+               
+                 problem = networkAdapter.Receive<SolvePartialProblems>(false);
+                if (problem != null)
+                {
+                    Console.WriteLine("Recive SolvePartialProblems");
+                    return true;
+                }
             }
-            catch(Exception)
+            catch (Exception e )
             {
-                //Console.WriteLine("Cannot recive SolvePartialProblems");
+                Console.WriteLine("Cannot recive SolvePartialProblems {0}",e);
                 return false;
             }
             return false;
@@ -142,10 +137,15 @@ namespace ComputationalNode
         private void Solution()
         {
 
-            Thread.Sleep(30000);
+            Thread.Sleep(3000);
             try
             {
-                var solution = new Solutions { ProblemType = "DVRP", Id = 1 };
+                var solution = new Solutions
+                {
+                    ProblemType = "DVRP", 
+                    Id = 2,
+                    Solutions1 = new[] { new SolutionsSolution { Type = SolutionsSolutionType.Partial } }
+                };
                 networkAdapter.Send(solution, true);
             }
             catch (Exception)
