@@ -28,6 +28,8 @@ namespace CommunicationServer
             if(!DvrpProblem.PartialProblems.ContainsKey(partial.Id))
                 DvrpProblem.PartialProblems.Add(partial.Id, new List<SolvePartialProblemsPartialProblem>());
             DvrpProblem.PartialProblems[partial.Id].AddRange(partial.PartialProblems);
+            if(!DvrpProblem.ProblemsComputeWaiting.ContainsKey(partial.Id))
+                DvrpProblem.ProblemsComputeWaiting.Add(partial.Id, true);
                         
             DvrpProblem.WaitEvent.Set();
         }

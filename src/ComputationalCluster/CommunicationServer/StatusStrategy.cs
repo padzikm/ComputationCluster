@@ -35,8 +35,8 @@ namespace CommunicationServer
                 NodeWorker.Work(networkAdapter);
             else if (DvrpProblem.Tasks.ContainsKey(msg.Id))
             {
-                TaskDivideWorker.Work(networkAdapter);
                 TaskMergeWorker.Work(networkAdapter);
+                TaskDivideWorker.Work(networkAdapter);                
             }
             DvrpProblem.WaitEvent.Set();
         }

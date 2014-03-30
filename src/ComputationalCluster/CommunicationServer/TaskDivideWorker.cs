@@ -22,7 +22,8 @@ namespace CommunicationServer
                 div.ProblemType = pr.ProblemType;
                 div.Data = pr.Data;
                 div.ComputationalNodes = (ulong)DvrpProblem.Nodes.Count;                 
-                networkAdapter.Send(div);
+                if(networkAdapter.Send(div))
+                    DvrpProblem.ProblemsDivideWaiting.Remove(divide.Key);
             }            
         }
     }
