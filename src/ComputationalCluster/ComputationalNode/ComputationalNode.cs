@@ -100,12 +100,8 @@ namespace ComputationalNode
             timeout += 60 * int.Parse(time[1]);
             timeout += 3600 * int.Parse(time[0]);
 
-            var handlers = new Dictionary<Func<bool>, Action>
-            {
-                {PartialProblems, Solution},
-            };
+            networkAdapter.StartKeepAlive(timeout * 1000, PartialProblems, Solution);
 
-            networkAdapter.StartKeepAlive(timeout * 1000, handlers);
            
         }
 

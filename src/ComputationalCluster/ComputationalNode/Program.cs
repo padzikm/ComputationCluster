@@ -8,8 +8,17 @@ namespace ComputationalNode
         static void Main(string[] args)
         {
             string msg = "";
+            ComputationalNode node;
+            string ipAddress = "localhost";
+            int port = 12345;
 
-            var node = new ComputationalNode("localhost",12345);
+
+            if (args.Length > 0)
+                ipAddress = args[0];
+            if (args.Length > 1)
+                port = int.Parse(args[1]);
+
+            node = new ComputationalNode(ipAddress, port);
 
             Console.WriteLine("Node created. Start working...\n");
             Console.WriteLine("Type 'stop' to stop node");
