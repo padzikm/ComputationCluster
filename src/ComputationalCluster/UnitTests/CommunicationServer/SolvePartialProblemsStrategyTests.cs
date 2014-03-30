@@ -23,7 +23,8 @@ namespace UnitTests.CommunicationServer
                 Id = 1,
                 PartialProblems =
                     new SolvePartialProblemsPartialProblem[]
-                    {new SolvePartialProblemsPartialProblem() {Data = new byte[1]},}
+                    {new SolvePartialProblemsPartialProblem() {Data = new byte[1]},},
+                    ProblemType = "dvrp",
             };
             string msg = MessageSerialization.Serialize(partialProblems);
             SolvePartialProblemsStrategy solvePartialProblemsStrategy = new SolvePartialProblemsStrategy();

@@ -21,7 +21,8 @@ namespace UnitTests.CommunicationServer
             {
                 Id = 1,
                 CommonData = new byte[1],
-                Solutions1 = new SolutionsSolution[] {new SolutionsSolution() {Type = SolutionsSolutionType.Final},}
+                Solutions1 = new SolutionsSolution[] {new SolutionsSolution() {Type = SolutionsSolutionType.Final,Data = new byte[1]},},
+                ProblemType = "dvrp",
             };
             SolutionsStrategy solutionsStrategy = new SolutionsStrategy();
             string msg = MessageSerialization.Serialize(request);

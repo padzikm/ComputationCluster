@@ -25,7 +25,7 @@ namespace CommunicationServer
                 if (request.Value != null)
                     response.Solutions1 = request.Value.ToArray();
                 else
-                    response.Solutions1 = new SolutionsSolution[] { new SolutionsSolution(), };
+                    response.Solutions1 = new SolutionsSolution[] { new SolutionsSolution(){Data = new byte[1]} };
 
                 if (networkAdapter.Send(response))
                     DvrpProblem.ProblemsMergeWaiting.Remove(request.Key);

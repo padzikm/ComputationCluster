@@ -21,8 +21,8 @@ namespace UnitTests.CommunicationServer
             Register request = new Register()
             {
                 ParallelThreads = 1,
-                SolvableProblems = new string[1],
-                Type = RegisterType.TaskManager
+                SolvableProblems = new string[] {"dvrp"},
+                Type = RegisterType.TaskManager,
             };
             RegisterStrategy registerStrategy = new RegisterStrategy();
             string msg = MessageSerialization.Serialize(request);
