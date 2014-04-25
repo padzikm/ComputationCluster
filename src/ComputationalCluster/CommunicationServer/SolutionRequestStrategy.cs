@@ -34,7 +34,11 @@ namespace CommunicationServer
             if (DvrpProblem.ProblemSolutions.ContainsKey(request.Id))
             {
                 Solutions solution = DvrpProblem.ProblemSolutions[request.Id];
-                //DvrpProblem.ProblemSolutions.Remove(request.Id);
+
+                DvrpProblem.ProblemsID.Remove(request.Id);
+                DvrpProblem.Problems.Remove(request.Id);
+                DvrpProblem.ProblemSolutions.Remove(request.Id);
+
                 networkAdapter.Send(solution);
                 DvrpProblem.WaitEvent.Set();
                 return;
@@ -46,22 +50,26 @@ namespace CommunicationServer
             response.ProblemType = problem.ProblemType;
             response.CommonData = problem.Data;
             List<SolutionsSolution> solutionList = new List<SolutionsSolution>();
-            if (DvrpProblem.PartialSolutions.ContainsKey(request.Id))
-                solutionList.AddRange(DvrpProblem.PartialSolutions[request.Id]);                                            
 
-            if (DvrpProblem.PartialProblemsComputing.ContainsKey(request.Id))
-                foreach (var element in DvrpProblem.PartialProblemsComputing[request.Id])                    
+            if (DvrpProblem.PartialSolutions.ContainsKey(request.Id))
+                solutionList.AddRange(DvrpProblem.PartialSolutions[request.Id]);
+
+            if (DvrpProblem.PartialProblems.ContainsKey(request.Id))
+                foreach (var element in DvrpProblem.PartialProblems[request.Id])
+                    if (element.Value > 0)
                     {
                         SolutionsSolution sol = new SolutionsSolution();
-                        sol.TaskId = element.TaskId;
-                        sol.Data = element.Data;
+                        sol.TaskId = element.Key.TaskId;
+                        sol.Data = element.Key.Data;
                         sol.Type = SolutionsSolutionType.Ongoing;
-                        solutionList.Add(sol);                        
+                        solutionList.Add(sol);
                     }
 
-            response.Solutions1 = solutionList.ToArray();
-            if (solutionList.Count == 0)
-                response.Solutions1 = new SolutionsSolution[] {new SolutionsSolution(),};
+            if (solutionList.Count > 0)
+                response.Solutions1 = solutionList.ToArray();
+            else
+                response.Solutions1 = new SolutionsSolution[] { new SolutionsSolution { Data = new byte[1] } };
+
             networkAdapter.Send(response);
             DvrpProblem.WaitEvent.Set();
         }

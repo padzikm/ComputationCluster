@@ -25,9 +25,9 @@ namespace CommunicationServer
                 return;
             
             DvrpProblem.WaitEvent.WaitOne();
-            ulong id = DvrpProblem.CreateSaveProblemID();
-            DvrpProblem.Problems.Add(id, request);
-            DvrpProblem.ProblemsDivideWaiting.Add(id, true);
+            ulong id = DvrpProblem.CreateProblemID();
+            DvrpProblem.ProblemsID.Add(id);
+            DvrpProblem.Problems.Add(id, request);            
             SolveRequestResponse response = new SolveRequestResponse() { Id = id };
             networkAdapter.Send(response);                      
             DvrpProblem.WaitEvent.Set();

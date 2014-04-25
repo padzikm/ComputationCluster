@@ -21,22 +21,22 @@ namespace CommunicationServer
         {
             Status msg = MessageSerialization.Deserialize<Status>(message);            
 
-            if (msg == null || !DvrpProblem.ComponentsID.Contains(msg.Id))
+            if (msg == null)
                 return;
 
             DvrpProblem.WaitEvent.WaitOne();
-            if (!DvrpProblem.ComponentsLastStatus.ContainsKey(msg.Id))
+            if (!DvrpProblem.ComponentsID.Contains(msg.Id))
             {
                 DvrpProblem.WaitEvent.Set();
                 return;
             }
             DvrpProblem.ComponentsLastStatus[msg.Id] = DateTime.UtcNow;
             if(DvrpProblem.Nodes.ContainsKey(msg.Id))
-                NodeWorker.Work(networkAdapter);
+                NodeWorker.Work(msg.Id, networkAdapter);
             else if (DvrpProblem.Tasks.ContainsKey(msg.Id))
             {
-                TaskMergeWorker.Work(networkAdapter);
-                TaskDivideWorker.Work(networkAdapter);                
+                TaskMergeWorker.Work(msg.Id, networkAdapter);
+                TaskDivideWorker.Work(msg.Id, networkAdapter);                
             }
             DvrpProblem.WaitEvent.Set();
         }

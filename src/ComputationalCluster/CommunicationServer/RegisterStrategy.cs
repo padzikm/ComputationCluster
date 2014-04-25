@@ -25,12 +25,19 @@ namespace CommunicationServer
                 return;
 
             DvrpProblem.WaitEvent.WaitOne();
-            ulong id = DvrpProblem.CreateSaveComponentID();
+            ulong id = DvrpProblem.CreateComponentID();
+            DvrpProblem.ComponentsID.Add(id);
 
-            if (msg.Type == RegisterType.ComputationalNode)            
-                DvrpProblem.Nodes.Add(id, msg);                            
-            else            
-                DvrpProblem.Tasks.Add(id, msg);                                                
+            if (msg.Type == RegisterType.ComputationalNode)
+            {
+                DvrpProblem.Nodes.Add(id, msg);                
+            }
+            else
+            {
+                DvrpProblem.Tasks.Add(id, msg);
+                DvrpProblem.ProblemsDividing.Add(id, new List<ulong>());
+                DvrpProblem.SolutionsMerging.Add(id, new List<ulong>());
+            }
 
             DvrpProblem.ComponentsLastStatus.Add(id, DateTime.UtcNow);              
             RegisterResponse reponse = new RegisterResponse() { Id = id, Timeout = timout.ToString()};

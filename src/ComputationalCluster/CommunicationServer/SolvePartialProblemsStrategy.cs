@@ -20,16 +20,20 @@ namespace CommunicationServer
         {
             SolvePartialProblems partial = MessageSerialization.Deserialize<SolvePartialProblems>(message);
 
-            if (partial == null)
+            if (partial == null || partial.PartialProblems == null)
                 return;
 
             DvrpProblem.WaitEvent.WaitOne();
 
             if(!DvrpProblem.PartialProblems.ContainsKey(partial.Id))
-                DvrpProblem.PartialProblems.Add(partial.Id, new List<SolvePartialProblemsPartialProblem>());
-            DvrpProblem.PartialProblems[partial.Id].AddRange(partial.PartialProblems);
-            if(!DvrpProblem.ProblemsComputeWaiting.ContainsKey(partial.Id))
-                DvrpProblem.ProblemsComputeWaiting.Add(partial.Id, true);
+                DvrpProblem.PartialProblems.Add(partial.Id, new List<KeyValuePair<SolvePartialProblemsPartialProblem, ulong>>());
+            
+            foreach(var partialProblem in partial.PartialProblems)
+                DvrpProblem.PartialProblems[partial.Id].Add(new KeyValuePair<SolvePartialProblemsPartialProblem, ulong>(partialProblem, 0));
+
+            foreach (var list in DvrpProblem.ProblemsDividing.Values)
+                if (list.Remove(partial.Id))
+                    break;
                         
             DvrpProblem.WaitEvent.Set();
         }

@@ -11,25 +11,43 @@ namespace CommunicationServer
         /// <summary>
         /// Sends partial solutions to task (if any is available)
         /// </summary>
-        public static void Work(ServerNetworkAdapter networkAdapter)
+        public static void Work(ulong taskId, ServerNetworkAdapter networkAdapter)
         {
-            if (DvrpProblem.ProblemsMergeWaiting.Count > 0 && DvrpProblem.Tasks.Count > 0)
-            {
-                var tmp = DvrpProblem.ProblemsMergeWaiting.First();
-                var request = DvrpProblem.PartialSolutions.First(p => p.Key == tmp.Key);
-                SolveRequest problem = DvrpProblem.Problems[request.Key];
-                Solutions response = new Solutions();
-                response.Id = request.Key;
-                response.ProblemType = problem.ProblemType;
-                response.CommonData = problem.Data;
-                if (request.Value != null)
-                    response.Solutions1 = request.Value.ToArray();
-                else
-                    response.Solutions1 = new SolutionsSolution[] { new SolutionsSolution(){Data = new byte[1]} };
+            if (DvrpProblem.ProblemsDividing[taskId].Count > 0 || DvrpProblem.SolutionsMerging[taskId].Count > 0)
+                return;
 
-                if (networkAdapter.Send(response))
-                    DvrpProblem.ProblemsMergeWaiting.Remove(request.Key);
-            }            
+            ulong problemId = 0;
+
+            var problems = new List<ulong>(DvrpProblem.ProblemsID);
+
+            foreach (var list in DvrpProblem.ProblemsDividing.Values)
+                foreach (var el in list)
+                    problems.Remove(el);
+
+            foreach (var list in DvrpProblem.SolutionsMerging.Values)
+                foreach (var el in list)
+                    problems.Remove(el);
+
+            foreach (var id in problems)
+                if (!DvrpProblem.PartialProblems.ContainsKey(id) && DvrpProblem.PartialSolutions.ContainsKey(id) && !DvrpProblem.ProblemSolutions.ContainsKey(id))
+                {
+                    problemId = id;
+                    break;
+                }
+
+            if (problemId == 0)
+                return;
+            
+            var partialSolutions = DvrpProblem.PartialSolutions[problemId];
+            SolveRequest problem = DvrpProblem.Problems[problemId];
+            Solutions response = new Solutions();
+            response.Id = problemId;
+            response.ProblemType = problem.ProblemType;
+            response.CommonData = problem.Data;
+            response.Solutions1 = partialSolutions.ToArray();
+
+            if (networkAdapter.Send(response))
+                DvrpProblem.SolutionsMerging[taskId].Add(problemId);
         }
     }
 }

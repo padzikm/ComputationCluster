@@ -11,27 +11,42 @@ namespace CommunicationServer
         /// <summary>
         /// Sends partial problem to client (if any is available)
         /// </summary>
-        public static void Work(ServerNetworkAdapter networkAdapter)
+        public static void Work(ulong nodeId, ServerNetworkAdapter networkAdapter)
         {
-            if (DvrpProblem.ProblemsComputeWaiting.Count > 0 && DvrpProblem.Nodes.Count > 0)
-            {
-                var tmp = DvrpProblem.ProblemsComputeWaiting.First();
-                var pr = DvrpProblem.PartialProblems.First(p => p.Key == tmp.Key);
-                var msg = new SolvePartialProblems();
-                msg.Id = pr.Key;
-                msg.CommonData = DvrpProblem.Problems[pr.Key].Data;
-                msg.ProblemType = DvrpProblem.Problems[pr.Key].ProblemType;
-                msg.SolvingTimeout = DvrpProblem.Problems[pr.Key].SolvingTimeout;
-                msg.SolvingTimeoutSpecified = DvrpProblem.Problems[pr.Key].SolvingTimeoutSpecified;
-                if (pr.Value.Count != 0)
-                    msg.PartialProblems = pr.Value.ToArray();
-                else
-                    msg.PartialProblems = new SolvePartialProblemsPartialProblem[]
-                    {new SolvePartialProblemsPartialProblem() {Data = new byte[1]}};
+            foreach (var list in DvrpProblem.PartialProblems.Values)
+                foreach (var el in list)
+                    if (el.Value == nodeId)
+                        return;
 
-                if (networkAdapter.Send(msg))
-                    DvrpProblem.ProblemsComputeWaiting.Remove(tmp.Key);
-            }            
+            ulong problemId = 0;
+            KeyValuePair<SolvePartialProblemsPartialProblem, ulong> partialProblem = new KeyValuePair<SolvePartialProblemsPartialProblem, ulong>();            
+
+            foreach (var list in DvrpProblem.PartialProblems)
+            {
+                partialProblem = list.Value.FirstOrDefault(p => p.Value == 0);
+                
+                if (partialProblem.Key != null)
+                {
+                    list.Value.Remove(partialProblem);
+                    problemId = list.Key;
+                    break;
+                }
+            }
+
+            if (partialProblem.Key == null)
+                return;
+
+            var msg = new SolvePartialProblems();
+            msg.Id = problemId;
+            msg.CommonData = DvrpProblem.Problems[problemId].Data;
+            msg.ProblemType = DvrpProblem.Problems[problemId].ProblemType;
+            msg.SolvingTimeout = DvrpProblem.Problems[problemId].SolvingTimeout;
+            msg.SolvingTimeoutSpecified = DvrpProblem.Problems[problemId].SolvingTimeoutSpecified;
+
+            msg.PartialProblems = new SolvePartialProblemsPartialProblem[] { partialProblem.Key };
+
+            if (networkAdapter.Send(msg))
+                DvrpProblem.PartialProblems[problemId].Add(new KeyValuePair<SolvePartialProblemsPartialProblem, ulong>(partialProblem.Key, nodeId));                
         }
     }
 }

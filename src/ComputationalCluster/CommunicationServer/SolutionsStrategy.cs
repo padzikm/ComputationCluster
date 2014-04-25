@@ -20,15 +20,25 @@ namespace CommunicationServer
         {
             Solutions sol = MessageSerialization.Deserialize<Solutions>(message);
 
-            if (sol == null)
-                return;
-
             DvrpProblem.WaitEvent.WaitOne();
+
+            if (sol == null || sol.Solutions1 == null || !DvrpProblem.Problems.ContainsKey(sol.Id))
+            {
+                DvrpProblem.WaitEvent.Set();
+                return;
+            }
+
 
             if (sol.Solutions1.First().Type == SolutionsSolutionType.Final)
             {
                 if (!DvrpProblem.ProblemSolutions.ContainsKey(sol.Id))
                     DvrpProblem.ProblemSolutions.Add(sol.Id, sol);
+
+                DvrpProblem.PartialSolutions.Remove(sol.Id);
+
+                foreach (var list in DvrpProblem.SolutionsMerging.Values)
+                    if (list.Remove(sol.Id))
+                        break;
             }
             else
             {
@@ -36,7 +46,12 @@ namespace CommunicationServer
                     DvrpProblem.PartialSolutions.Add(sol.Id, new List<SolutionsSolution>());
 
                 DvrpProblem.PartialSolutions[sol.Id].AddRange(sol.Solutions1);
-                DvrpProblem.ProblemsMergeWaiting.Add(sol.Id, true);
+
+                foreach (var solution in sol.Solutions1)
+                    DvrpProblem.PartialProblems[sol.Id].RemoveAll(p => p.Key.TaskId == solution.TaskId);
+
+                if (DvrpProblem.PartialProblems[sol.Id].Count == 0)
+                    DvrpProblem.PartialProblems.Remove(sol.Id);
             }
             DvrpProblem.WaitEvent.Set();
         }
