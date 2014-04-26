@@ -10,40 +10,18 @@ namespace DvrpUtils
 {
     public static class DataSerialization
     {
-        public static byte[] BinarySerializeObject(object objectToSerialize)
+        public static byte[] GetBytes(string str)
         {
-            if (objectToSerialize == null)
-                throw new ArgumentNullException("objectToSerialize");
-
-            byte[] serializedObject;
-
-            using (MemoryStream stream = new MemoryStream())
-            {
-                BinaryFormatter formatter = new BinaryFormatter();
-                formatter.Serialize(stream, objectToSerialize);
-                serializedObject = stream.ToArray();
-            }
-
-            return serializedObject;
+            byte[] bytes = new byte[str.Length * sizeof(char)];
+            Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+            return bytes;
         }
 
-        public static T BinaryDeserializeObject<T>(byte[] serializedType)
+        public static string GetString(byte[] bytes)
         {
-            if (serializedType == null)
-                throw new ArgumentNullException("serializedType");
-
-            if (serializedType.Length.Equals(0))
-                throw new ArgumentException("serializedType");
-
-            T deserializedObject;
-
-            using (MemoryStream memoryStream = new MemoryStream(serializedType))
-            {
-                BinaryFormatter deserializer = new BinaryFormatter();
-                deserializedObject = (T)deserializer.Deserialize(memoryStream);
-            }
-
-            return deserializedObject;
+            char[] chars = new char[bytes.Length / sizeof(char)];
+            Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
+            return new string(chars);
         }
     }
 }
