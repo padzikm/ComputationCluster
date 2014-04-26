@@ -21,6 +21,7 @@ namespace CommunicationServer
         private Thread currentThread;                
         private TimeSpan timeout;
         private MessageStrategyFactory strategyFactory;
+        private InactiveComponentCollector inactiveComponentCollector;
 
         public Server(IPAddress ipAddress, int port, TimeSpan timeout)
         {
@@ -29,6 +30,7 @@ namespace CommunicationServer
             this.timeout = timeout;
             stop = false;
             strategyFactory = MessageStrategyFactory.Instance;
+            inactiveComponentCollector = new InactiveComponentCollector(timeout, TimeSpan.FromTicks(timeout.Ticks / 2), TimeSpan.FromTicks(timeout.Ticks / 2));
         }
 
         public void Start()
@@ -41,7 +43,8 @@ namespace CommunicationServer
                 currentThread = new Thread(Listen);                
                 listener = new TcpListener(ipAddress, port);
                 listener.Start();
-                currentThread.Start();                
+                currentThread.Start();
+                inactiveComponentCollector.Start();
             }
             catch (Exception ex)
             {
@@ -56,7 +59,8 @@ namespace CommunicationServer
                 listener.Stop(); //TODO: do better
                 stop = true;
                 currentThread.Join();
-                currentThread = null;                
+                currentThread = null;
+                inactiveComponentCollector.Stop();
             }
             catch (Exception ex)
             {

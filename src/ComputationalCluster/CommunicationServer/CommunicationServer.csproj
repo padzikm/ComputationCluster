@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="DvrpProblem.cs" />
     <Compile Include="IMessageStrategy.cs" />
+    <Compile Include="InactiveComponentCollector.cs" />
     <Compile Include="MessageStrategyFactory.cs" />
     <Compile Include="NodeWorker.cs" />
     <Compile Include="SolvePartialProblemsStrategy.cs" />
