@@ -37,13 +37,13 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="UCCTaskSolver">
+    <Reference Include="UCCTaskSolver, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\lib\UCCTaskSolver.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NetworkAdapter.cs" />
-    <Compile Include="DVRPTaskSolver.cs" />
     <Compile Include="MessageSerialization.cs" />
     <Compile Include="Messages\DivideProblemMessage.cs" />
     <Compile Include="Messages\SolvePartialProblemsMessage.cs" />

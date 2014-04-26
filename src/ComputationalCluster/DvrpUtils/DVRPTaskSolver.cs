@@ -1,7 +1,7 @@
 ﻿using System;
 using UCCTaskSolver;
 
-namespace CommunicationProtocolLibrary
+namespace DvrpUtils
 {
     class DVRPTaskSolver : TaskSolver
     {
