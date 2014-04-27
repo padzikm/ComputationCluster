@@ -63,9 +63,24 @@ namespace DvrpUtils
             string partialDataString = DataSerialization.GetString(partialData);
             DVRPParser parser = new DVRPParser();
             ProblemData partialProblemData = parser.Parse(partialDataString);
-            
-            
-            return null;
+
+            ProblemSolution partialProblemSolution = new ProblemSolution();
+
+            Edge[] edges;
+            partialProblemData.Graph.KruskalTSP(out edges);
+
+            Route route = new Route();
+            route.Locations.Add(edges[0].From);
+            route.Locations.Add(edges[0].To);
+
+            for (int i = 1; i < edges.Length - 1; ++i)
+                route.Locations.Add(edges[i].To);
+
+            route.Locations.Add(edges[edges.Length].To);
+            route.RouteID = 1; // brakuje id w modelu problemdata w przypadku gdy jest to partial problemdata
+
+            // solve zwraca byte[] klasy route !!
+            return DataSerialization.GetBytes(route.ToString());
         }
 
         private IEnumerable<IGraph> CreateDummyGraphs(int threadCount, int duration, int vehicles, Depot depot, IEnumerable<Customer> customers)

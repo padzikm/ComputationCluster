@@ -7,6 +7,7 @@ using ASD.Graph;
 using DvrpUtils.ProblemDataModel;
 using System.IO;
 using System.Drawing;
+using DvrpUtils.ProblemSolutionModel;
 
 namespace DvrpUtils.ProblemDataModel
 {
