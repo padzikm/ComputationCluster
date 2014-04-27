@@ -50,7 +50,7 @@
     <Compile Include="DVRPTaskSolver.cs" />
     <Compile Include="ProblemDataModel\Customer.cs" />
     <Compile Include="ProblemDataModel\Depot.cs" />
-    <Compile Include="ProblemDataModel\DVRPParesr.cs" />
+    <Compile Include="ProblemDataModel\DVRPParser.cs" />
     <Compile Include="ProblemDataModel\ProblemData.cs" />
     <Compile Include="ProblemDataModel\Vehicle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

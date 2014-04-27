@@ -60,7 +60,8 @@ namespace DvrpUtils
 
         public override byte[] Solve(byte[] partialData, TimeSpan timeout)
         {
-            throw new NotImplementedException();
+            DataSerialization.GetString(partialData);
+            return null;
         }
 
         private IEnumerable<IGraph> CreateDummyGraphs(int threadCount, int duration, int vehicles, Depot depot, IEnumerable<Customer> customers)

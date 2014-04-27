@@ -10,7 +10,7 @@ using System.Drawing;
 
 namespace DvrpUtils.ProblemDataModel
 {
-    class DVRPParesr
+    public class DVRPParser
     {
         const int MAIN = 1;
         const int DATA = 2;
@@ -26,7 +26,7 @@ namespace DvrpUtils.ProblemDataModel
         bool mIsBeginState = false;
         int mCurrSect = MAIN;
 
-        public ProblemData Parse()
+        public ProblemData Parse(string filename)
         {
 
             int mNumDepots = 1;
