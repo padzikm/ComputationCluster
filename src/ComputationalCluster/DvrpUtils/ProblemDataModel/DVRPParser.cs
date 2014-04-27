@@ -22,9 +22,71 @@ namespace DvrpUtils.ProblemDataModel
         const int DEPOT_TIME_WINDOW = 8;
         const int TIME_AVAIL = 9;
         const int DEPOTS = 10;
+        const int EOF = 11;
+
+        const int ROUTE = 12;
+        const int TOTAL_COST = 13;
+
+        const string defaultFileName = "okul12D.vrp";
 
         bool mIsBeginState = false;
         int mCurrSect = MAIN;
+
+        public ProblemSolution ParseSolution(string filename)
+        {
+            ProblemSolution problemSolution = new ProblemSolution();
+            List<Route> routes = new List<Route>();
+            int totalCost = 0;
+
+            /* example of output (named opt-filename.vrp)
+              VRPSOLUTION 1 - jeśli 1 to solution jest, nie ma w p.p. - narazie nie zaimplementowane
+              ROUTE #1: 13 14 1 22 84
+              ROUTE #2: 2 17 32 2 64
+              ROUTE #3: 5 8 21 27 45
+              ROUTE #4: 63 35 11 36 58
+              TOTAL_COST: 666
+             */
+
+            String line;
+            try
+            {
+                using (StreamReader sr = new StreamReader(defaultFileName))
+                {
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        checkLine(line);
+
+                        switch (mCurrSect)
+                        {
+                            case ROUTE:
+                                Route route = new Route();
+                                var tmpR = line.Split(' ');
+
+                                for (int i = 2; i < tmpR.Length; ++i)
+                                {
+                                    route.Locations.Add(Convert.ToInt16(tmpR[i]));
+                                }
+                                route.RouteID = Convert.ToInt16(tmpR[1][1]);
+                                routes.Add(route);
+                                break;
+                            case TOTAL_COST:
+                                var tmpC = line.Split(' ');
+                                totalCost = Convert.ToInt16(tmpC[1]);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("The file could not be read:" + e.Message);
+            }
+            problemSolution.Routes = ReadRoutes(routes);
+            problemSolution.TotalCost = totalCost;
+            return problemSolution;
+        }
 
         public ProblemData Parse(string filename)
         {
@@ -43,7 +105,7 @@ namespace DvrpUtils.ProblemDataModel
             String line;
             try
             {
-                using (StreamReader sr = new StreamReader("okul12D.vrp"))
+                using (StreamReader sr = new StreamReader(defaultFileName))
                 {
                     while ((line = sr.ReadLine()) != null)
                     {
@@ -296,6 +358,14 @@ namespace DvrpUtils.ProblemDataModel
             }
         }
 
+        IEnumerable<Route> ReadRoutes(List<Route> list)
+        {
+            foreach (var e in list)
+            {
+                yield return e;
+            }
+        }
+
         public void checkLine(String line)
         {
             if (line.CompareTo("DATA_SECTION") == 0)
@@ -348,11 +418,18 @@ namespace DvrpUtils.ProblemDataModel
             {
                 mIsBeginState = true;
                 mCurrSect = TIME_AVAIL;
-
             }
             else if (line.CompareTo("EOF") == 0)
             {
-                mCurrSect = 11;
+                mCurrSect = EOF;
+            }
+            else if (line.CompareTo("ROUTE") == 0)
+            {
+                mCurrSect = ROUTE;
+            }
+            else if (line.CompareTo("TOTAL_COST") == 0)
+            {
+                mCurrSect = TOTAL_COST;
             }
 
         }

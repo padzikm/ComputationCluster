@@ -60,7 +60,11 @@ namespace DvrpUtils
 
         public override byte[] Solve(byte[] partialData, TimeSpan timeout)
         {
-            DataSerialization.GetString(partialData);
+            string partialDataString = DataSerialization.GetString(partialData);
+            DVRPParser parser = new DVRPParser();
+            ProblemData partialProblemData = parser.Parse(partialDataString);
+            
+            
             return null;
         }
 

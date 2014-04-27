@@ -52,6 +52,8 @@
     <Compile Include="ProblemDataModel\Depot.cs" />
     <Compile Include="ProblemDataModel\DVRPParser.cs" />
     <Compile Include="ProblemDataModel\ProblemData.cs" />
+    <Compile Include="ProblemDataModel\ProblemSolution.cs" />
+    <Compile Include="ProblemDataModel\Route.cs" />
     <Compile Include="ProblemDataModel\Vehicle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
