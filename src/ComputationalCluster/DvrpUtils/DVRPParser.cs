@@ -43,7 +43,7 @@ namespace DvrpUtils.ProblemDataModel
             {
                 locs = locs + route.Locations[i] + " ";
             }
-            dataBuilder.AppendLine(String.Format("ROUTE: #{0}: {1}", 1, locs));
+            dataBuilder.AppendLine(String.Format("ROUTE: nr-#{0} cost-#{1}: {2}", route.RouteID, route.Cost, locs));
             dataBuilder.AppendLine("EOF");
             return dataBuilder.ToString();
         }
@@ -58,15 +58,16 @@ namespace DvrpUtils.ProblemDataModel
                 {
                     while ((line = sr.ReadLine()) != null)
                     {
-                        if(line.CompareTo("ROUTE") == 0)
-                        {
-                            var tmpR = line.Split(' ');
+                        var tmpR = line.Split(' ');
 
-                            for (int i = 2; i < tmpR.Length; ++i)
+                        if(tmpR[0].CompareTo("ROUTE") == 0)
+                        {
+                            for (int i = 3; i < tmpR.Length; ++i)
                             {
                                 route.Locations.Add(Convert.ToInt16(tmpR[i]));
                             }
                             route.RouteID = Convert.ToInt16(tmpR[1][1]);
+                            route.Cost = Convert.ToInt16(tmpR[2][1]);
                         }
                     }
                 }

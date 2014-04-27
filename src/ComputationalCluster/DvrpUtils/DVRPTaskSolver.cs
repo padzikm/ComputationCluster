@@ -70,10 +70,7 @@ namespace DvrpUtils
                 var tmpR = el.Split(' ');
                 if (tmpR[0].CompareTo("ROUTE") == 0)
                 {
-                    for (int i = 2; i < tmpR.Length; ++i)
-                    {
-                        final_cost+=Convert.ToInt16(tmpR[i]);
-                    }
+                    final_cost+=Convert.ToInt16(tmpR[2][1]);
                 }
             }
 
@@ -86,13 +83,16 @@ namespace DvrpUtils
             string partialDataString = DataSerialization.GetString(partialData);
             DVRPParser parser = new DVRPParser();
             ProblemData partialProblemData = parser.Parse(partialDataString);
-
+     
             ProblemSolution partialProblemSolution = new ProblemSolution();
 
             Edge[] edges;
             partialProblemData.Graph.KruskalTSP(out edges);
-
+            
             Route route = new Route();
+
+            route.Cost = GetRouteCost(edges);
+
             route.Locations.Add(edges[0].From);
             route.Locations.Add(edges[0].To);
 
@@ -105,6 +105,16 @@ namespace DvrpUtils
             // solve zwraca byte[] klasy route !!
             SolutionsMergingFinished(new EventArgs(), this);
             return DataSerialization.GetBytes(parser.ParseRoute(route));
+        }
+
+        public int GetRouteCost(Edge[] route)
+        {
+            int cost = 0;
+            for (int i = 0; i < route.Length;++i)
+            {
+                cost += (int)Math.Sqrt(route[i].From * route[i].From + route[i].To * route[i].To);
+            }
+            return cost;
         }
 
         private IEnumerable<IGraph> CreateDummyGraphs(int threadCount, int duration, int vehicles, Depot depot, IEnumerable<Customer> customers)
