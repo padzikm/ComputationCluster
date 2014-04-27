@@ -7,8 +7,8 @@ namespace DvrpUtils.ProblemDataModel
     public class Depot
     {
         public int DepotId { get; set; }
-        public DateTime MaxTime { get; set; }
-        public DateTime MinTime { get; set; }
+        public int StartTime { get; set; }
+        public int EndTime { get; set; }
         public Point Location { get; set; }
 
     }

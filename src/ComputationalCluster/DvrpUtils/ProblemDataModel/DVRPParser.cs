@@ -329,8 +329,8 @@ namespace DvrpUtils.ProblemDataModel
                 Console.WriteLine(e.Message);
             }
 
-            nProblemData.Vehicles = ReadVehicles(nVehicle);
-            nProblemData.Depots = ReadDepot(ndepot);
+            nProblemData.Vehicles = nVehicle;
+            nProblemData.Depots = ndepot;
             nProblemData.Customers = ReadCustomers(nCustomer);
             return nProblemData;
 
@@ -430,6 +430,89 @@ namespace DvrpUtils.ProblemDataModel
             else if (line.CompareTo("TOTAL_COST") == 0)
             {
                 mCurrSect = TOTAL_COST;
+            }
+
+        }
+
+        public string Parse(ProblemData problemData)
+        {
+            StringBuilder dataBuilder = new StringBuilder();
+            dataBuilder.AppendLine(String.Format("NAME: {0}", problemData.Name));
+            dataBuilder.AppendLine(String.Format("NUM_DEPOTS: {0}", problemData.Depots.Count()));
+            dataBuilder.AppendLine(String.Format("NUM_CAPACITIES: 1"));
+            dataBuilder.AppendLine(String.Format("NUM_LOCATIONS: {0}", problemData.Customers.Count()));
+            dataBuilder.AppendLine(String.Format("NUM_VEHICLES: {0}", problemData.Vehicles.Count()));
+            //The feet of vehicles is homogeneous
+            dataBuilder.AppendLine(String.Format("CAPACITIES: {0}", problemData.Vehicles.First().Capacity));
+            dataBuilder.AppendLine("DATA_SECTION");
+
+            DemandParse(problemData, ref dataBuilder);
+            DurationParse(problemData, ref dataBuilder);
+            DepotsParse(problemData, ref dataBuilder);
+            LocationParse(problemData, ref dataBuilder);
+            DepotTimeParse(problemData, ref dataBuilder);
+            CustomerTimeParse(problemData, ref dataBuilder);
+
+            dataBuilder.AppendLine("EOF");
+            return dataBuilder.ToString();
+        }
+
+        private void LocationParse(ProblemData problemData, ref StringBuilder dataBuilder)
+        {
+            
+            dataBuilder.AppendLine("LOCATION_COORD_SECTION");
+            foreach (var depot in problemData.Depots)
+            {
+                dataBuilder.AppendLine(String.Format("{0} {1} {2}", depot.DepotId, depot.Location.X, depot.Location.Y));
+            }
+            foreach (var customer in problemData.Customers)
+            {
+                dataBuilder.AppendLine(String.Format("{0} {1} {2}", customer.CustomerId, customer.Location.X,
+                    customer.Location.Y));
+            }
+            
+        }
+        private void DepotsParse(ProblemData problemData, ref StringBuilder dataBuilder)
+        {
+            dataBuilder.AppendLine("DEPOTS");
+            foreach (var depot in problemData.Depots)
+            {
+                dataBuilder.AppendLine(String.Format("{0}", depot.DepotId));
+            }
+            
+        }
+        private void DemandParse(ProblemData problemData, ref StringBuilder dataBuilder)
+        {
+            dataBuilder.AppendLine("DEMAND_SECTION");
+            foreach (var customer in problemData.Customers)
+            {
+                dataBuilder.AppendLine(String.Format("{0} {1}", customer.CustomerId, customer.Size));
+            }
+        }
+        private void DurationParse(ProblemData problemData, ref StringBuilder dataBuilder)
+        {
+            dataBuilder.AppendLine("DEMAND_SECTION");
+            foreach (var customer in problemData.Customers)
+            {
+                dataBuilder.AppendLine(String.Format("{0} {1}", customer.CustomerId, customer.Duration));
+            }
+
+        }
+        private void DepotTimeParse(ProblemData problemData, ref StringBuilder dataBuilder)
+        {
+            dataBuilder.AppendLine("DEPOT_TIME_WINDOW_SECTION");
+            foreach (var depot in problemData.Depots)
+            {
+                dataBuilder.AppendLine(String.Format("{0} {1} {2}", depot.DepotId, depot.StartTime, depot.EndTime));
+            }
+
+        }
+        private void CustomerTimeParse(ProblemData problemData, ref StringBuilder dataBuilder)
+        {
+            dataBuilder.AppendLine("TIME_AVAIL_SECTION");
+            foreach (var customer in problemData.Customers)
+            {
+                dataBuilder.AppendLine(String.Format("{0} {1}", customer.CustomerId, customer.TimeAvailable));
             }
 
         }
