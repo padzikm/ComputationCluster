@@ -7,31 +7,34 @@ using ASD.Graph;
 using DvrpUtils.ProblemDataModel;
 using System.IO;
 using System.Drawing;
-using DvrpUtils.ProblemSolutionModel;
+//using DvrpUtils.ProblemSolutionModel;
 
 namespace DvrpUtils.ProblemDataModel
 {
     public class DVRPParser
     {
-        const int MAIN = 1;
-        const int DATA = 2;
-        const int DEMAND = 3;
-        const int LOCATION_COORD = 4;
-        const int DEPOT_LOCATION = 5;
-        const int VISIT_LOCATION = 6;
-        const int DURATION = 7;
-        const int DEPOT_TIME_WINDOW = 8;
-        const int TIME_AVAIL = 9;
-        const int DEPOTS = 10;
-        const int EOF = 11;
-
-        const int ROUTE = 12;
-        const int TOTAL_COST = 13;
+        enum DataSection
+        {
+            MAIN,
+            DATA,
+            DEMAND,
+            LOCATION_COORD,
+            DEPOT_LOCATION,
+            VISIT_LOCATION,
+            DURATION,
+            DEPOT_TIME_WINDOW,
+            TIME_AVAIL,
+            DEPOTS,
+            EOF,
+            ROUTE,
+            TOTAL_COST
+        }
+       
 
         const string defaultFileName = "okul12D.vrp";
 
         bool mIsBeginState = false;
-        int mCurrSect = MAIN;
+        DataSection mCurrSect = DataSection.MAIN;
 
         public ProblemSolution ParseSolution(string filename)
         {
@@ -59,7 +62,7 @@ namespace DvrpUtils.ProblemDataModel
 
                         switch (mCurrSect)
                         {
-                            case ROUTE:
+                            case DataSection.ROUTE:
                                 Route route = new Route();
                                 var tmpR = line.Split(' ');
 
@@ -70,7 +73,7 @@ namespace DvrpUtils.ProblemDataModel
                                 route.RouteID = Convert.ToInt16(tmpR[1][1]);
                                 routes.Add(route);
                                 break;
-                            case TOTAL_COST:
+                            case DataSection.TOTAL_COST:
                                 var tmpC = line.Split(' ');
                                 totalCost = Convert.ToInt16(tmpC[1]);
                                 break;
@@ -114,7 +117,7 @@ namespace DvrpUtils.ProblemDataModel
 
                         switch (mCurrSect)
                         {
-                            case MAIN:
+                            case DataSection.MAIN:
                                 if (!mIsBeginState)
                                 {
                                     string identifier;
@@ -132,7 +135,6 @@ namespace DvrpUtils.ProblemDataModel
                                     else if (identifier.CompareTo("NUM_VISITS") == 0)
                                     {
                                         mNumVisits = Convert.ToInt16(line.Split(' ').Last());
-
 
                                     }
                                     else if (identifier.CompareTo("NUM_VEHICLES") == 0)
@@ -156,169 +158,36 @@ namespace DvrpUtils.ProblemDataModel
                                         //checkLine(rLine);
                                         //std::cout << "\n Identifier not needed!\n";
                                     }
-                                    Console.WriteLine(line);
                                 }
                                 break;
-                            case DATA:
+                            case DataSection.DATA:
                                 var sum = mNumDepots + mNumVisits;
-                                Console.WriteLine(line);
                                 break;
-                            case DEPOTS:
-                                if (mIsBeginState)
-                                {
-                                    mIsBeginState = false;
-                                }
-                                else
-                                {
-                                    int depot_id;
-
-                                    depot_id = Convert.ToInt16(line.Split(' ').Last());
-                                    Depot nDepot = new Depot();
-                                    nDepot.DepotId = depot_id;
-
-                                    ndepot.Add(nDepot);
-                            
-                                }
-                                Console.WriteLine(line);
+                            case DataSection.DEPOTS:
+                                caseDepots(line, ref ndepot);
                                 break;
-
-                            case DEMAND:
-                                if (mIsBeginState)
-                                {
-                                    mIsBeginState = false;
-                                }
-                                else
-                                {
-                                    int visit_id;
-                                    int visit_demand;
-
-                                    visit_id = Convert.ToInt16(line.Split(' ')[2]);
-                                    visit_demand = Convert.ToInt16(line.Split(' ').Last());
-
-                                    Customer ncustomer = new Customer();
-                                    ncustomer.CustomerId = visit_id;
-                                    ncustomer.StartDate = visit_demand;//TODO: Check Demand
-                                    nCustomer.Add(ncustomer);
-                                  
-                                }
-                                Console.WriteLine(line);
+                            case DataSection.DEMAND:
+                                caseDemand(line, ref nCustomer);
                                 break;
-                            case LOCATION_COORD:
-                                if (mIsBeginState)
-                                {
-                                    mIsBeginState = false;
-                                }
-                                else
-                                {
-
-                                    int location_id;
-                                    int coord_x, coord_y;
-
-                                    var tmp2 = line.Split(' ');
-                                    location_id = Convert.ToInt16(tmp2[2]);
-                                    coord_x = Convert.ToInt16(tmp2[3]);
-                                    coord_y = Convert.ToInt16(tmp2[4]);
-
-                                    nLocation.Add(location_id, new Point(coord_x, coord_y));
-                                 
-                                }
-
-                                Console.WriteLine(line);
+                            case DataSection.LOCATION_COORD:
+                                caseLocationCoord(line, ref nLocation);
                                 break;
-                            case DEPOT_LOCATION:
-                                if (mIsBeginState)
-                                {
-                                    mIsBeginState = false;
-                                }
-                                else
-                                {
-                                    int depot_id;
-                                    int location_id;
-
-                                    depot_id = Convert.ToInt16(line.Split(' ')[2]);
-                                    location_id = Convert.ToInt16(line.Split(' ').Last());
-                                    ndepot.First(d => d.DepotId == depot_id).Location = nLocation[location_id];
-
-                                }
-                                Console.WriteLine(line);
+                            case DataSection.DEPOT_LOCATION:
+                                caseDeptLocation(line, ref ndepot, nLocation);
                                 break;
-                            case VISIT_LOCATION:
-                                if (mIsBeginState)
-                                {
-                                    mIsBeginState = false;
-                                }
-                                else
-                                {
-                                    int visit_id;
-                                    int location_id;
-
-                                    visit_id = Convert.ToInt16(line.Split(' ')[2]);
-                                    location_id = Convert.ToInt16(line.Split(' ').Last());
-                                    nCustomer.First(d => d.CustomerId == visit_id).Location = nLocation[location_id];
-
-                                }
-                                Console.WriteLine(line);
+                            case DataSection.VISIT_LOCATION:
+                                caseVisitLocation(line, ref nCustomer, nLocation);
                                 break;
-                            case DURATION:
-                                if (mIsBeginState)
-                                {
-                                    mIsBeginState = false;
-                                }
-                                else
-                                {
-                                    int visit_id;
-                                    int duration;
-
-                                    visit_id = Convert.ToInt16(line.Split(' ')[2]);
-                                    duration = Convert.ToInt16(line.Split(' ').Last());
-
-                                    nCustomer.First(d => d.CustomerId == visit_id).Duration = duration;
-                                    
-                                }
-                                Console.WriteLine(line);
+                            case DataSection.DURATION:
+                                caseDuration(line, ref nCustomer);
                                 break;
-                            case DEPOT_TIME_WINDOW:
-                                if (mIsBeginState)
-                                {
-                                    mIsBeginState = false;
-                                }
-                                else
-                                {
-
-                                    int depot_id;
-                                    int lower_bound;
-                                    int upper_bound;
-
-                                    var tmp2 = line.Split(' ');
-                                    depot_id = Convert.ToInt16(tmp2[2]);
-                                    lower_bound = Convert.ToInt16(tmp2[3]);
-                                    upper_bound = Convert.ToInt16(tmp2[4]);
-
-                                    // ndepot.First(d=>d.DepotId == depot_id).MinTime=
-                                    //ndepot.First(d => d.DepotId == depot_id).MaxTime =
-                                   //TODO: Set time
-                                }
-                                Console.WriteLine(line);
+                            case DataSection.DEPOT_TIME_WINDOW:
+                                caseDepotTime(line, ref ndepot);
                                 break;
-                            case TIME_AVAIL:
-                                if (mIsBeginState)
-                                {
-                                    mIsBeginState = false;
-                                }
-                                else
-                                {
-                                    int visit_id;
-                                    int avail_time;
-
-                                    visit_id = Convert.ToInt16(line.Split(' ')[2]);
-                                    avail_time = Convert.ToInt16(line.Split(' ').Last());
-                                    nCustomer.First(d => d.CustomerId == visit_id).Duration = avail_time;
-                                  
-                                }
-                                Console.WriteLine(line);
+                            case DataSection.TIME_AVAIL:
+                                caseTimeAvail(line, ref nCustomer);
                                 break;
                             //Add EOFF
-
                         }
                     }
                     //Console.WriteLine(line);
@@ -332,32 +201,150 @@ namespace DvrpUtils.ProblemDataModel
 
             nProblemData.Vehicles = nVehicle;
             nProblemData.Depots = ndepot;
-            nProblemData.Customers = ReadCustomers(nCustomer);
+            nProblemData.Customers = nCustomer;
             return nProblemData;
 
         }
 
-        IEnumerable<Vehicle> ReadVehicles(List<Vehicle> list)
+        private void caseDepots(string line, ref List<Depot> ndepot)
         {
-            foreach (var e in list)
+            if (mIsBeginState)
             {
-                yield return e;
+                mIsBeginState = false;
+            }
+            else
+            {
+
+                int depot_id = Convert.ToInt16(line.Split(' ').Last());
+                Depot nDepot = new Depot();
+                nDepot.DepotId = depot_id;
+
+                ndepot.Add(nDepot);
+
             }
         }
-        IEnumerable<Depot> ReadDepot(List<Depot> list)
+
+        private void caseDemand(string line, ref List<Customer> nCustomer)
         {
-            foreach (var e in list)
+            if (mIsBeginState)
             {
-                yield return e;
+                mIsBeginState = false;
+            }
+            else
+            {
+
+                int visit_id = Convert.ToInt16(line.Split(' ')[2]);
+                int visit_demand = Convert.ToInt16(line.Split(' ').Last());
+
+                Customer ncustomer = new Customer();
+                ncustomer.CustomerId = visit_id;
+                ncustomer.StartDate = visit_demand;
+                nCustomer.Add(ncustomer);
+
             }
         }
-        IEnumerable<Customer> ReadCustomers(List<Customer> list)
+
+        private void caseLocationCoord(string line, ref Dictionary<int, Point> nLocation)
         {
-            foreach (var e in list)
+            if (mIsBeginState)
             {
-                yield return e;
+                mIsBeginState = false;
+            }
+            else
+            {
+
+                var tmp2 = line.Split(' ');
+                int location_id = Convert.ToInt16(tmp2[2]);
+                int coord_x = Convert.ToInt16(tmp2[3]);
+                int coord_y = Convert.ToInt16(tmp2[4]);
+
+                nLocation.Add(location_id, new Point(coord_x, coord_y));
+
             }
         }
+
+        private void caseDeptLocation(string line, ref List<Depot> ndepot, Dictionary<int, Point> nLocation)
+        {
+            if (mIsBeginState)
+            {
+                mIsBeginState = false;
+            }
+            else
+            {
+
+                int depot_id = Convert.ToInt16(line.Split(' ')[2]);
+                int location_id = Convert.ToInt16(line.Split(' ').Last());
+                ndepot.First(d => d.DepotId == depot_id).Location = nLocation[location_id];
+
+            }
+        }
+
+        private void caseVisitLocation(string line, ref List<Customer> nCustomer, Dictionary<int, Point> nLocation)
+        {
+            if (mIsBeginState)
+            {
+                mIsBeginState = false;
+            }
+            else
+            {
+
+                int visit_id = Convert.ToInt16(line.Split(' ')[2]);
+                int location_id = Convert.ToInt16(line.Split(' ').Last());
+                nCustomer.First(d => d.CustomerId == visit_id).Location = nLocation[location_id];
+
+            }
+        }
+
+        private void caseDuration(string line, ref List<Customer> nCustomer)
+        {
+            if (mIsBeginState)
+            {
+                mIsBeginState = false;
+            }
+            else
+            {
+
+                int visit_id = Convert.ToInt16(line.Split(' ')[2]);
+                int duration = Convert.ToInt16(line.Split(' ').Last());
+
+                nCustomer.First(d => d.CustomerId == visit_id).Duration = duration;
+
+            }
+        }
+
+        private void caseDepotTime(string line, ref List<Depot> ndepot)
+        {
+            if (mIsBeginState)
+            {
+                mIsBeginState = false;
+            }
+            else
+            {
+                var tmp2 = line.Split(' ');
+                int depot_id = Convert.ToInt16(tmp2[2]);
+
+                ndepot.First(d => d.DepotId == depot_id).StartTime = Convert.ToInt16(tmp2[3]);
+                ndepot.First(d => d.DepotId == depot_id).EndTime = Convert.ToInt16(tmp2[4]);
+
+            }
+        }
+
+        private void caseTimeAvail(string line, ref List<Customer> nCustomer)
+        {
+            if (mIsBeginState)
+            {
+                mIsBeginState = false;
+            }
+            else
+            {
+
+                int visit_id = Convert.ToInt16(line.Split(' ')[2]);
+                int avail_time = Convert.ToInt16(line.Split(' ').Last());
+                nCustomer.First(d => d.CustomerId == visit_id).Duration = avail_time;
+
+            }
+        }
+
 
         IEnumerable<Route> ReadRoutes(List<Route> list)
         {
@@ -372,65 +359,66 @@ namespace DvrpUtils.ProblemDataModel
             if (line.CompareTo("DATA_SECTION") == 0)
             {
                 mIsBeginState = true;
-                mCurrSect = DATA;
+                mCurrSect = DataSection.DATA;
             }
             else if (line.CompareTo("DEPOTS") == 0)
             {
                 mIsBeginState = true;
-                mCurrSect = DEPOTS;
+                mCurrSect = DataSection.DEPOTS;
             }
             else if (line.CompareTo("DEMAND_SECTION") == 0)
             {
                 mIsBeginState = true;
-                mCurrSect = DEMAND;
+                mCurrSect = DataSection.DEMAND;
 
             }
             else if (line.CompareTo("LOCATION_COORD_SECTION") == 0)
             {
                 mIsBeginState = true;
-                mCurrSect = LOCATION_COORD;
+                mCurrSect = DataSection.LOCATION_COORD;
 
             }
             else if (line.CompareTo("DEPOT_LOCATION_SECTION") == 0)
             {
                 mIsBeginState = true;
-                mCurrSect = DEPOT_LOCATION;
-              
+                mCurrSect = DataSection.DEPOT_LOCATION;
+
             }
             else if (line.CompareTo("VISIT_LOCATION_SECTION") == 0)
             {
                 mIsBeginState = true;
-                mCurrSect = VISIT_LOCATION;
+                mCurrSect = DataSection.VISIT_LOCATION;
 
             }
             else if (line.CompareTo("DURATION_SECTION") == 0)
             {
                 mIsBeginState = true;
-                mCurrSect = DURATION;
+                mCurrSect = DataSection.DURATION;
 
             }
             else if (line.CompareTo("DEPOT_TIME_WINDOW_SECTION") == 0)
             {
                 mIsBeginState = true;
-                mCurrSect = DEPOT_TIME_WINDOW;
+                mCurrSect = DataSection.DEPOT_TIME_WINDOW;
 
             }
             else if (line.CompareTo("TIME_AVAIL_SECTION") == 0)
             {
                 mIsBeginState = true;
-                mCurrSect = TIME_AVAIL;
+                mCurrSect = DataSection.TIME_AVAIL;
+
             }
             else if (line.CompareTo("EOF") == 0)
             {
-                mCurrSect = EOF;
+                mCurrSect = DataSection.EOF;
             }
             else if (line.CompareTo("ROUTE") == 0)
             {
-                mCurrSect = ROUTE;
+                mCurrSect = DataSection.ROUTE;
             }
             else if (line.CompareTo("TOTAL_COST") == 0)
             {
-                mCurrSect = TOTAL_COST;
+                mCurrSect = DataSection.TOTAL_COST;
             }
 
         }
