@@ -7,7 +7,6 @@ using ASD.Graph;
 using DvrpUtils.ProblemDataModel;
 using System.IO;
 using System.Drawing;
-//using DvrpUtils.ProblemSolutionModel;
 
 namespace DvrpUtils.ProblemDataModel
 {
@@ -35,6 +34,49 @@ namespace DvrpUtils.ProblemDataModel
 
         bool mIsBeginState = false;
         DataSection mCurrSect = DataSection.MAIN;
+
+        public string ParseRoute(Route route)
+        {
+            StringBuilder dataBuilder = new StringBuilder();
+            string locs = "";
+            for (int i = 0; i < route.Locations.Count; ++i)
+            {
+                locs = locs + route.Locations[i] + " ";
+            }
+            dataBuilder.AppendLine(String.Format("ROUTE: #{0}: {1}", 1, locs));
+            dataBuilder.AppendLine("EOF");
+            return dataBuilder.ToString();
+        }
+
+        public Route ParseRoute(string r)
+        {
+            Route route = new Route();
+            String line;
+            try
+            {
+                using (StreamReader sr = new StreamReader(defaultFileName))
+                {
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        if(line.CompareTo("ROUTE") == 0)
+                        {
+                            var tmpR = line.Split(' ');
+
+                            for (int i = 2; i < tmpR.Length; ++i)
+                            {
+                                route.Locations.Add(Convert.ToInt16(tmpR[i]));
+                            }
+                            route.RouteID = Convert.ToInt16(tmpR[1][1]);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("The file could not be read:" + e.Message);
+            }
+            return route;
+        }
 
         public ProblemSolution ParseSolution(string filename)
         {
@@ -94,7 +136,6 @@ namespace DvrpUtils.ProblemDataModel
 
         public ProblemData Parse(string filename)
         {
-
             int mNumDepots = 1;
             int mNumVisits = 1;
             int mNumVehicles = 1;
@@ -344,7 +385,6 @@ namespace DvrpUtils.ProblemDataModel
 
             }
         }
-
 
         IEnumerable<Route> ReadRoutes(List<Route> list)
         {

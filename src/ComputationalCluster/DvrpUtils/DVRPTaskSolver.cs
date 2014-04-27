@@ -103,7 +103,8 @@ namespace DvrpUtils
             route.RouteID = 1; // brakuje id w modelu problemdata w przypadku gdy jest to partial problemdata
 
             // solve zwraca byte[] klasy route !!
-            return DataSerialization.GetBytes(route.ToString());
+            SolutionsMergingFinished(new EventArgs(), this);
+            return DataSerialization.GetBytes(parser.ParseRoute(route));
         }
 
         private IEnumerable<IGraph> CreateDummyGraphs(int threadCount, int duration, int vehicles, Depot depot, IEnumerable<Customer> customers)
