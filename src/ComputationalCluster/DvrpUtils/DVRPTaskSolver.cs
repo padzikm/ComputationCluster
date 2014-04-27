@@ -55,7 +55,30 @@ namespace DvrpUtils
 
         public override void MergeSolution(byte[][] solutions)
         {
-            throw new NotImplementedException();
+            List<string> solut = new List<string>();
+            int final_cost = 0;
+            for (int i = 0; i < solutions.GetLength(0); i++)
+            {
+                char[] chars = new char[solutions[i].Length / sizeof(char)];
+                Buffer.BlockCopy(solutions[i], 0, chars, 0, solutions[i].Length);
+                solut.Add(new string(chars));
+
+            }
+
+            foreach (var el in solut)
+            {
+                var tmpR = el.Split(' ');
+                if (tmpR[0].CompareTo("ROUTE") == 0)
+                {
+                    for (int i = 2; i < tmpR.Length; ++i)
+                    {
+                        final_cost+=Convert.ToInt16(tmpR[i]);
+                    }
+                }
+            }
+
+            //TODO: create file
+            if (final_cost != 0) SolutionsMergingFinished(new EventArgs(), this);
         }
 
         public override byte[] Solve(byte[] partialData, TimeSpan timeout)
