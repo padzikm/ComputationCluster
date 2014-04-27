@@ -10,5 +10,7 @@ namespace DvrpUtils.ProblemDataModel
         public int StartDate { get; set; }
         public int Duration { get; set; }
         public Point Location { get; set; }
+        public int Size { get; set; }
+        public int TimeAvailable { get; set; }
     }
 }

@@ -48,7 +48,7 @@ namespace DvrpUtils
             //TODO create file
 
             //TODO serialize to byteArray
-
+            if (ProblemDividingFinished != null) ProblemDividingFinished(new EventArgs(), this);
             return null;
 
         }

@@ -8,6 +8,7 @@ namespace DvrpUtils.ProblemDataModel
     [Serializable]
     public class ProblemData
     {
+        public string Name { get; set; }
         public IEnumerable<Vehicle> Vehicles { get; set; }
         public IEnumerable<Depot> Depots { get; set; }
         public IEnumerable<Customer> Customers { get; set; }
