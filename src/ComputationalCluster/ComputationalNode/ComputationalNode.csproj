@@ -39,6 +39,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="UCCTaskSolver">
+      <HintPath>..\..\..\lib\UCCTaskSolver.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComputationalNode.cs" />
@@ -52,6 +55,10 @@
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{627e7240-1177-4665-971a-9b935261e8da}</Project>
       <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DvrpUtils\DvrpUtils.csproj">
+      <Project>{8e49724f-8d83-4996-b744-fee020c2427b}</Project>
+      <Name>DvrpUtils</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -13,7 +13,7 @@ namespace Common
         private TcpClient client;
         private NetworkStream stream;
 
-        private const int MaxBufferLenght = 1024;
+        private const int MaxBufferLenght = 1024 * 1000;
 
         /// <summary>
         /// Property of processing status that is sent to server. Contains actual working threads and ID of a task.

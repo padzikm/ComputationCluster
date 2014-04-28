@@ -93,7 +93,7 @@ namespace CommunicationServer
             try
             {
                 ServerNetworkAdapter networkAdapter = new ServerNetworkAdapter(stream);
-                byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[1024 * 1000];
                 string msg = string.Empty;
                 stream.Read(buffer, 0, buffer.Length);                
                 msg = MessageSerialization.GetString(buffer).Replace("\0", string.Empty).Trim();
