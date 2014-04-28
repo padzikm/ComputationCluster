@@ -73,7 +73,7 @@ namespace DvrpUtils
                     final_cost+=Convert.ToInt16(tmpR[2][1]);
                 }
             }
-
+            
             //TODO: create file
             
             if (final_cost != 0) SolutionsMergingFinished(new EventArgs(), this);

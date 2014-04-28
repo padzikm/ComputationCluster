@@ -3,6 +3,7 @@ using Common;
 using System.Threading;
 using System.Net.Sockets;
 using System.Collections.Generic;
+using DvrpUtils;
 
 namespace ComputationalClient
 {
@@ -153,7 +154,7 @@ namespace ComputationalClient
             Solutions solutions = networkAdapter.Receive<Solutions>(false);
 
             networkAdapter.CloseConnection();
-
+            
             foreach(var e in solutions.Solutions1)
             {
                 if(e.Type == SolutionsSolutionType.Final)
@@ -167,6 +168,7 @@ namespace ComputationalClient
                         solutions.Id, solutions.ProblemType, e.ComputationsTime);
 
                     working = false;
+                    Console.WriteLine("{0} ", DataSerialization.GetString(solutions.Solutions1[0].Data));
                 }
                 else if(e.Type == SolutionsSolutionType.Partial)
                 { 
