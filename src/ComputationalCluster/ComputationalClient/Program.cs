@@ -13,7 +13,7 @@ namespace ComputationalClient
 {
     class Program
     {
-        static string defaultProblemFile = "okul12D.vrp";
+        static string defaultProblemFile = "E:\\Temp\\DOWNLOAD\\IO\\montemanni\\Dynamisch\\christofides\\c50.vrp";
 
         static void Main(string[] args)
         {
@@ -22,13 +22,13 @@ namespace ComputationalClient
 
             try
             {
-                var adressIp = IPAddress.Parse(args[1]);
-                var port = int.Parse(args[2]);
-                var name = args[3];
-                var timeout = ulong.Parse(args[4]);
-                var problemBytes = GetBytesFromVrp(args[5]);
-
-                client = new Client(adressIp.ToString(), port, name, timeout, problemBytes);
+                var addressIp = args[0];
+                var port = int.Parse(args[1]);
+                var name = args[2];
+                var timeout = ulong.Parse(args[3]);
+                var problemBytes = GetBytesFromVrp(args[4]);
+                //Console.WriteLine(addressIp + " " + port + " " + name + " " + timeout + " " + args[4]);
+                client = new Client(addressIp, port, name, timeout, problemBytes);
             }
             catch (Exception)
             {
