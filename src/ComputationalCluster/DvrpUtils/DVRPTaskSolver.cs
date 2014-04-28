@@ -9,7 +9,7 @@ using UCCTaskSolver;
 
 namespace DvrpUtils
 {
-    class DVRPTaskSolver : TaskSolver
+    public class DVRPTaskSolver : TaskSolver
     {
         public override string Name
         {
@@ -75,6 +75,7 @@ namespace DvrpUtils
             }
 
             //TODO: create file
+            
             if (final_cost != 0) SolutionsMergingFinished(new EventArgs(), this);
         }
 
