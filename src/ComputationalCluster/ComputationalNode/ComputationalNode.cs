@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using Common;
-
+using DvrpUtils;
 namespace ComputationalNode
 {
     class ComputationalNode
@@ -20,7 +19,8 @@ namespace ComputationalNode
         private RegisterResponse registerResponse;
         private SolvePartialProblems problem;
         private bool working;
-        
+        private DVRPTaskSolver solve;
+        private byte[] solutions;
         /// <summary>
         /// Specific constructor for ComputationalNode class. Allows to execute node's correctly.
         /// </summary>
@@ -32,7 +32,7 @@ namespace ComputationalNode
                 throw new ArgumentNullException();
 
             working = true;
-
+            
             networkAdapter = new NetworkAdapter(serverName, port);
 
         }
@@ -153,9 +153,14 @@ namespace ComputationalNode
                  problem = networkAdapter.Receive<SolvePartialProblems>(false);
                 if (problem != null)
                 {
+                    solve = new DVRPTaskSolver(problem.PartialProblems[0].Data);
+                    
+                    solutions = solve.Solve(problem.PartialProblems[0].Data, new TimeSpan(100000) );
                     Console.WriteLine("Recive SolvePartialProblems");
                     return true;
                 }
+                //byte[] solution = Solve(problem, problem.SolvingTimeout);
+
             }
             catch (Exception e )
             {
@@ -170,13 +175,15 @@ namespace ComputationalNode
         {
 
             Thread.Sleep(3000);
+
+
             try
             {
                 var solution = new Solutions
                 {
                     ProblemType = "DVRP", 
                     Id = problem.Id,
-                    Solutions1 = new[] { new SolutionsSolution { Type = SolutionsSolutionType.Partial } },
+                    Solutions1 = new[] { new SolutionsSolution { Type = SolutionsSolutionType.Partial, Data=solutions } },
                     CommonData = new byte[5],
                     
                 };
