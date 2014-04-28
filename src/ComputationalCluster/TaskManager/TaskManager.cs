@@ -15,6 +15,7 @@ namespace TaskManager
         private RegisterResponse registerResponse;
         private StatusThread[] statusThreads;
         private readonly NetworkAdapter networkAdapter;
+        private ulong taskId = 0;
 
         public TaskManager(IPAddress serverIp, int port)
         {
@@ -101,7 +102,7 @@ namespace TaskManager
                 var solvePartialProblemsPartialProblem = new SolvePartialProblemsPartialProblem[3];
                 for (int i = 0; i < 3; i++)
                 {
-                    solvePartialProblemsPartialProblem[i] = new SolvePartialProblemsPartialProblem {Data = new byte[5], TaskId = registerResponse.Id};
+                    solvePartialProblemsPartialProblem[i] = new SolvePartialProblemsPartialProblem {Data = new byte[5], TaskId = ++taskId};
                 }
 
                 var partialProblems = new SolvePartialProblems

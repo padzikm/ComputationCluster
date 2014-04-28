@@ -21,6 +21,7 @@ namespace ComputationalNode
         private bool working;
         private DVRPTaskSolver solve;
         private byte[] solutions;
+        private ulong taskId = 0;
         /// <summary>
         /// Specific constructor for ComputationalNode class. Allows to execute node's correctly.
         /// </summary>
@@ -183,7 +184,7 @@ namespace ComputationalNode
                 {
                     ProblemType = "DVRP", 
                     Id = problem.Id,
-                    Solutions1 = new[] { new SolutionsSolution { Type = SolutionsSolutionType.Partial, Data=solutions } },
+                    Solutions1 = new[] { new SolutionsSolution { Type = SolutionsSolutionType.Partial, Data=solutions, TaskId = ++taskId, TaskIdSpecified = true } },
                     CommonData = new byte[5],
                     
                 };

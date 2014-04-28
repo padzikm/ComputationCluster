@@ -85,15 +85,15 @@ namespace DvrpUtils
             DVRPParser parser = new DVRPParser();
             ProblemData partialProblemData = parser.Parse(partialDataString);
      
-            ProblemSolution partialProblemSolution = new ProblemSolution();
-            var s = partialProblemData.Graph;
-            for (int i = 0; i < s.VerticesCount; ++i)
-            {
-                foreach(var e in s.OutEdges(i))
-                {
+            //ProblemSolution partialProblemSolution = new ProblemSolution();
+            //var s = partialProblemData.Graph;
+            //for (int i = 0; i < s.VerticesCount; ++i)
+            //{
+            //    foreach(var e in s.OutEdges(i))
+            //    {
 
-                }
-            }
+            //    }
+            //}
 
 
             Edge[] edges;
