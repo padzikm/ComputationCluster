@@ -28,7 +28,7 @@ namespace DvrpUtils.ProblemDataModel
             ROUTE,
             TOTAL_COST
         }
-       
+
 
         const string defaultFileName = "okul12D.vrp";
 
@@ -60,7 +60,7 @@ namespace DvrpUtils.ProblemDataModel
                     {
                         var tmpR = line.Split(' ');
 
-                        if(tmpR[0].CompareTo("ROUTE") == 0)
+                        if (tmpR[0].CompareTo("ROUTE") == 0)
                         {
                             for (int i = 3; i < tmpR.Length; ++i)
                             {
@@ -86,7 +86,6 @@ namespace DvrpUtils.ProblemDataModel
             int totalCost = 0;
 
             /* example of output (named opt-filename.vrp)
-              VRPSOLUTION 1 - jeśli 1 to solution jest, nie ma w p.p. - narazie nie zaimplementowane
               ROUTE #1: 13 14 1 22 84
               ROUTE #2: 2 17 32 2 64
               ROUTE #3: 5 8 21 27 45
@@ -135,13 +134,66 @@ namespace DvrpUtils.ProblemDataModel
             return problemSolution;
         }
 
+        static public ProblemSolution ParseSolution(byte[] solution)
+        {
+            ProblemSolution problemSolution = new ProblemSolution();
+            List<Route> routes = new List<Route>();
+            int totalCost = 0;
+
+            /* example of output (named opt-filename.vrp)
+              ROUTE #1: 13 14 1 22 84
+              ROUTE #2: 2 17 32 2 64
+              ROUTE #3: 5 8 21 27 45
+              ROUTE #4: 63 35 11 36 58
+              TOTAL_COST: 666
+             */
+            var str = DataSerialization.GetString(solution);
+            var tmp = str.Split(';');
+
+
+            foreach (var el in tmp)
+            {
+
+
+                switch (el.Split(' ').First())
+                {
+                    case "ROUTE":
+                        Route route = new Route();
+                        route.Locations = new List<int>();
+                        var tmpR = el.Split(' ');
+
+                        for (int i = 2; i < tmpR.Length - 1; ++i)
+                        {
+                            route.Locations.Add(Convert.ToInt16(tmpR[i]));
+                        }
+                        var d = tmpR[1].Split('#');
+                        route.RouteID = Convert.ToInt16(tmpR[1].Split('#').Last().Split(':').First());
+                        route.Cost = Convert.ToInt16(tmpR[tmpR.Length - 1]);
+                        routes.Add(route);
+                        break;
+                    case "TOTAL_COST:":
+                        var tmpC = el.Split(' ');
+                        totalCost = Convert.ToInt16(tmpC[1]);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+
+            problemSolution.Routes = routes;
+            problemSolution.TotalCost = totalCost;
+            return problemSolution;
+        }
+
+
         public ProblemData Parse(string filename)
         {
             int mNumDepots = 1;
             int mNumVisits = 1;
             int mNumVehicles = 1;
             int mMaxCapacity = 999;
-  
+
             ProblemData nProblemData = new ProblemData();
             List<Depot> ndepot = new List<Depot>();
             List<Customer> nCustomer = new List<Customer>();
@@ -265,7 +317,6 @@ namespace DvrpUtils.ProblemDataModel
 
             }
         }
-
         private void caseDemand(string line, ref List<Customer> nCustomer)
         {
             if (mIsBeginState)
@@ -285,7 +336,6 @@ namespace DvrpUtils.ProblemDataModel
 
             }
         }
-
         private void caseLocationCoord(string line, ref Dictionary<int, Point> nLocation)
         {
             if (mIsBeginState)
@@ -304,7 +354,6 @@ namespace DvrpUtils.ProblemDataModel
 
             }
         }
-
         private void caseDeptLocation(string line, ref List<Depot> ndepot, Dictionary<int, Point> nLocation)
         {
             if (mIsBeginState)
@@ -320,7 +369,6 @@ namespace DvrpUtils.ProblemDataModel
 
             }
         }
-
         private void caseVisitLocation(string line, ref List<Customer> nCustomer, Dictionary<int, Point> nLocation)
         {
             if (mIsBeginState)
@@ -336,7 +384,6 @@ namespace DvrpUtils.ProblemDataModel
 
             }
         }
-
         private void caseDuration(string line, ref List<Customer> nCustomer)
         {
             if (mIsBeginState)
@@ -353,7 +400,6 @@ namespace DvrpUtils.ProblemDataModel
 
             }
         }
-
         private void caseDepotTime(string line, ref List<Depot> ndepot)
         {
             if (mIsBeginState)
@@ -370,7 +416,6 @@ namespace DvrpUtils.ProblemDataModel
 
             }
         }
-
         private void caseTimeAvail(string line, ref List<Customer> nCustomer)
         {
             if (mIsBeginState)
@@ -453,11 +498,11 @@ namespace DvrpUtils.ProblemDataModel
             {
                 mCurrSect = DataSection.EOF;
             }
-            else if (line.CompareTo("ROUTE") == 0)
+            else if (line.Split(' ').First().CompareTo("ROUTE") == 0)
             {
                 mCurrSect = DataSection.ROUTE;
             }
-            else if (line.CompareTo("TOTAL_COST") == 0)
+            else if (line.Split(' ').First().CompareTo("TOTAL_COST") == 0)
             {
                 mCurrSect = DataSection.TOTAL_COST;
             }
@@ -489,7 +534,7 @@ namespace DvrpUtils.ProblemDataModel
 
         private void LocationParse(ProblemData problemData, ref StringBuilder dataBuilder)
         {
-            
+
             dataBuilder.AppendLine("LOCATION_COORD_SECTION");
             foreach (var depot in problemData.Depots)
             {
@@ -500,7 +545,7 @@ namespace DvrpUtils.ProblemDataModel
                 dataBuilder.AppendLine(String.Format("{0} {1} {2}", customer.CustomerId, customer.Location.X,
                     customer.Location.Y));
             }
-            
+
         }
         private void DepotsParse(ProblemData problemData, ref StringBuilder dataBuilder)
         {
@@ -509,7 +554,7 @@ namespace DvrpUtils.ProblemDataModel
             {
                 dataBuilder.AppendLine(String.Format("{0}", depot.DepotId));
             }
-            
+
         }
         private void DemandParse(ProblemData problemData, ref StringBuilder dataBuilder)
         {

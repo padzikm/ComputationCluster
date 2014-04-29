@@ -116,11 +116,12 @@ namespace Common
 
                     var readBuffer = new byte[MaxBufferLenght];
                     stream.Read(readBuffer, 0, readBuffer.Length);
-
+                    
                     var readMessage = MessageSerialization.GetString(readBuffer);
+                    
                     readMessage = readMessage.Replace("\0", string.Empty).Trim();
                     Console.WriteLine("Odebrano: \n{0}", readMessage);
-
+                    
                     if (MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
                     {
                         var deserialized = MessageSerialization.Deserialize<DivideProblem>(readMessage);
@@ -136,8 +137,9 @@ namespace Common
                                 sendMerge(deserialized2.Id);
                         }
                     }
-                    Thread.Sleep(period);
                 }
+                Thread.Sleep(period);
+                
             });
             t.Start();
         }
@@ -207,13 +209,18 @@ namespace Common
             var readMessage = MessageSerialization.GetString(readBuffer);
             readMessage = readMessage.Replace("\0", string.Empty).Trim();
             Console.WriteLine("Odebrano: \n{0}", readMessage);
-            if (!MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
-                throw new Exception("Message not valid");
+            if (readMessage != "")
+            {
+                if (!MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
+                    throw new Exception("Message not valid");
 
-            var deserialized = MessageSerialization.Deserialize<T>(readMessage);
-            Console.WriteLine("Received a message: \n{0}", deserialized);
+                var deserialized = MessageSerialization.Deserialize<T>(readMessage);
+                Console.WriteLine("Received a message: \n{0}", deserialized);
 
-            return deserialized;
+                return deserialized;
+            }
+            else
+                return null;
         }
     }
 }

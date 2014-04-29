@@ -56,26 +56,39 @@ namespace DvrpUtils
         public override void MergeSolution(byte[][] solutions)
         {
             List<string> solut = new List<string>();
+            string final_string = "";
             int final_cost = 0;
+
             for (int i = 0; i < solutions.GetLength(0); i++)
             {
-                char[] chars = new char[solutions[i].Length / sizeof(char)];
-                Buffer.BlockCopy(solutions[i], 0, chars, 0, solutions[i].Length);
-                solut.Add(new string(chars));
+                solut.Add(DataSerialization.GetString(solutions[i]));
 
             }
 
             foreach (var el in solut)
             {
                 var tmpR = el.Split(' ');
-                if (tmpR[0].CompareTo("ROUTE") == 0)
+                final_cost += Convert.ToInt16(tmpR[tmpR.Length - 1]);
+
+            }
+
+            solut.Add(String.Format("TOTAL_COST: {0}", final_cost));
+
+            for (int i = 0; i < solut.Count; i++)
+            {
+                if (i != solut.Count - 1)
                 {
-                    final_cost+=Convert.ToInt16(tmpR[2][1]);
+                    final_string += solut[i] + ";";
+                }
+                else
+                {
+                    final_string += solut[i];
                 }
             }
-            
-            //TODO: create file
-            
+            //wynikowy string:
+            //ROUTE #1: 1 2 3 55;ROUTE #2: 2 3 4 66;TOTAL_COST: 777
+            //ostatnia liczba w ROUTE to koasz dla danej drogi
+            Solution = DataSerialization.GetBytes(final_string);
             if (final_cost != 0) SolutionsMergingFinished(new EventArgs(), this);
         }
 
@@ -84,7 +97,7 @@ namespace DvrpUtils
             string partialDataString = DataSerialization.GetString(partialData);
             DVRPParser parser = new DVRPParser();
             ProblemData partialProblemData = parser.Parse(partialDataString);
-     
+
             //ProblemSolution partialProblemSolution = new ProblemSolution();
             //var s = partialProblemData.Graph;
             //for (int i = 0; i < s.VerticesCount; ++i)
@@ -98,7 +111,7 @@ namespace DvrpUtils
 
             Edge[] edges;
             partialProblemData.Graph.KruskalTSP(out edges);
-            
+
             Route route = new Route();
 
             route.Cost = GetRouteCost(edges);
@@ -120,7 +133,7 @@ namespace DvrpUtils
         public int GetRouteCost(Edge[] route)
         {
             int cost = 0;
-            for (int i = 0; i < route.Length;++i)
+            for (int i = 0; i < route.Length; ++i)
             {
                 cost += (int)Math.Sqrt(route[i].From * route[i].From + route[i].To * route[i].To);
             }
@@ -168,6 +181,6 @@ namespace DvrpUtils
             }
             return graphs;
         }
-        
+
     }
 }
