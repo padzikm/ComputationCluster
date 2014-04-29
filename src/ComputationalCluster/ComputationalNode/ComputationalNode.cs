@@ -111,12 +111,12 @@ namespace ComputationalNode
             networkAdapter.CurrentStatus = new Status { Id = registerResponse.Id, Threads = threads };
 
             int timeout = 0;           
-            string[] time= registerResponse.Timeout.Split(':');          
-            timeout += int.Parse(time[2]);
-            timeout += 60 * int.Parse(time[1]);
-            timeout += 3600 * int.Parse(time[0]);
+            //string[] time= registerResponse.Timeout.Split(':');          
+            //timeout += int.Parse(time[2]);
+            //timeout += 60 * int.Parse(time[1]);
+            //timeout += 3600 * int.Parse(time[0]);
 
-            networkAdapter.StartKeepAlive(timeout * 1000, PartialProblems, Solution);
+            networkAdapter.StartKeepAlive(30* 1000, PartialProblems, Solution);
 
            
         }
