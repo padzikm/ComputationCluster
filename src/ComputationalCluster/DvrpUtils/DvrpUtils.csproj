@@ -46,8 +46,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Algorithms.cs" />
     <Compile Include="DataSerialization.cs" />
     <Compile Include="DVRPTaskSolver.cs" />
+    <Compile Include="Point.cs" />
     <Compile Include="ProblemDataModel\Customer.cs" />
     <Compile Include="ProblemDataModel\Depot.cs" />
     <Compile Include="DVRPParser.cs" />

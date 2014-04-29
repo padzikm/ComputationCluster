@@ -84,7 +84,7 @@ namespace DvrpUtils
             string partialDataString = DataSerialization.GetString(partialData);
             DVRPParser parser = new DVRPParser();
             ProblemData partialProblemData = parser.Parse(partialDataString);
-     
+            //partialProblemData.
             //ProblemSolution partialProblemSolution = new ProblemSolution();
             //var s = partialProblemData.Graph;
             //for (int i = 0; i < s.VerticesCount; ++i)
