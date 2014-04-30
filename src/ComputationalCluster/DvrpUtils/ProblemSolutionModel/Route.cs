@@ -10,7 +10,7 @@ namespace DvrpUtils.ProblemDataModel
     public class Route
     {
         public int RouteID { get; set; }
-        public int Cost { get; set; }
+        public double Cost { get; set; }
         public List<int> Locations { get; set; }
     }
 }

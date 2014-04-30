@@ -92,54 +92,30 @@ namespace DvrpUtils
             if (final_cost != 0) SolutionsMergingFinished(new EventArgs(), this);
         }
 
+        //algorytm trp.run(..) dziala, testowalem dla tego najmniejszego pliku okulewicza, tak jakbym szukal tsp dla wszystkich tych nodow
         public override byte[] Solve(byte[] partialData, TimeSpan timeout)
         {
             string partialDataString = DataSerialization.GetString(partialData);
             DVRPParser parser = new DVRPParser();
             ProblemData partialProblemData = parser.Parse(partialDataString);
 
-            //ProblemSolution partialProblemSolution = new ProblemSolution();
-            //var s = partialProblemData.Graph;
-            //for (int i = 0; i < s.VerticesCount; ++i)
-            //{
-            //    foreach(var e in s.OutEdges(i))
-            //    {
-
-            //    }
-            //}
-
-
-            Edge[] edges;
-            partialProblemData.Graph.KruskalTSP(out edges);
-
+            List<int> path = partialProblemData.Path;
+            List<Point> points = partialProblemData.Locations as List<Point>;
+     
+            Algorithms tsp = new Algorithms(points);
+            tsp.Run(ref path);
+            double min_cost = tsp.RouteDistance(path);
+           
             Route route = new Route();
+            route.RouteID = partialProblemData.VehicleID;
+            route.Cost = min_cost;
+            route.Locations = path;
 
-            route.Cost = GetRouteCost(edges);
-
-            route.Locations.Add(edges[0].From);
-            route.Locations.Add(edges[0].To);
-
-            for (int i = 1; i < edges.Length - 1; ++i)
-                route.Locations.Add(edges[i].To);
-
-            route.Locations.Add(edges[edges.Length].To);
-            route.RouteID = 1; // brakuje id w modelu problemdata w przypadku gdy jest to partial problemdata
-
-            // solve zwraca byte[] klasy route !!
             SolutionsMergingFinished(new EventArgs(), this);
             return DataSerialization.GetBytes(parser.ParseRoute(route));
         }
 
-        public int GetRouteCost(Edge[] route)
-        {
-            int cost = 0;
-            for (int i = 0; i < route.Length; ++i)
-            {
-                cost += (int)Math.Sqrt(route[i].From * route[i].From + route[i].To * route[i].To);
-            }
-            return cost;
-        }
-
+        //dzielenie jutro ogarniemy (tj sroda), zwracana bedzie lista intow oraz lista pointow odpowiednich numerowo do listy intow
         private IEnumerable<IGraph> CreateDummyGraphs(int threadCount, int duration, int vehicles, Depot depot, IEnumerable<Customer> customers)
         {
             var customerList = customers as IList<Customer> ?? customers.ToList();

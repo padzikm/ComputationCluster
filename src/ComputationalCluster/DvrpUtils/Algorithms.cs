@@ -6,56 +6,126 @@ using System.Threading.Tasks;
 
 namespace DvrpUtils
 {
-    class Algorithms
+    public class Algorithms
     {
+        public Dictionary<Tuple<int, int>, double> Distances = new Dictionary<Tuple<int, int>, double>();
+
+        public List<Point> Points = new List<Point>();
+
+        public void WriteLinePoint(List<Point> list)
+        {
+            foreach (var e in list)
+            {
+                Console.WriteLine("(" + e.X + "," + e.Y + ")");
+            }
+        }
+
+        public void WriteLineInt(List<int> list)
+        {
+            string l = "LISTA: ";
+            foreach (var e in list)
+            {
+                l = l + e + " ";
+            }
+            Console.WriteLine(l);
+        }
+
+        public Algorithms(List<Point> _points)
+        {
+            Points = _points;
+            Points.Add(_points[0]);
+            ComputeDistances();
+        }
+
+        public void Run(ref List<int> points)
+        {
+            WriteLineInt(points);
+            List<int> temp = PreProcessing(points);
+            WriteLineInt(temp);
+            TwoOpt(ref temp);
+            WriteLineInt(temp);
+            points = temp;
+        }
+
+        public void ComputeDistances()
+        {
+            for (int i = 0; i < Points.Count; ++i)
+            {
+                for (int j = 0; j < Points.Count; ++j)
+                {
+                    Tuple<int, int> point = new Tuple<int, int>(i, j);
+                    Distances.Add(point, EuclideanDistance(Points[i], Points[j]));
+                }
+            }
+        }
+
+        public double GetDistance(int i, int j)
+        {
+            return Distances[new Tuple<int, int>(i, j)];
+        }
+
         public double EuclideanDistance(Point p, Point q)
         {
             return Math.Sqrt(Math.Pow(p.X - q.X, 2) + Math.Pow(p.Y - q.Y, 2));
         }
 
-        public double RouteDistance(List<Point> points)
+        public double RouteDistance(List<int> points)
         {
-	        double dist = 0.0;
+            double dist = 0.0;
 
             int size = points.Count;
 
-	        for ( int i = 0; i < size - 1; i++ )
-                dist += EuclideanDistance(points[i], points[i + 1]);
+            for (int i = 0; i < size - 1; i++)
+                dist += GetDistance(points[i], points[i + 1]);
 
-            dist += EuclideanDistance(points[size], points[0]);
+            dist += GetDistance(size - 1, 0);
 
-	        return dist;
+            return dist;
         }
 
-        void Swap(ref List<Point> list, int i, int j)
+        public void Swap(ref List<int> list, int i, int j)
         {
             var temp = list[i];
             list[i] = list[j];
             list[j] = temp;
         }
 
-        void DoTwoOpt(Point p1, Point p2, Point p3, Point p4, ref List<Point> points)
+        public void DoTwoOpt(int p1, int p2, int p3, int p4, ref List<int> points)
         {
-	        if ( p3 == p1 || p3 == p2 || p4 == p1 || p4 == p2 ) return;
+            if (p3 == p1 || p3 == p2 || p4 == p1 || p4 == p2) return;
 
-            int p1old = points.IndexOf(p1);
-            int p2old = points.IndexOf(p2);
-            int p3old = points.IndexOf(p3);
-            int p4old = points.IndexOf(p4);
+            int p1old = points[p1];
+            int p2old = points[p2];
+            int p3old = points[p3];
+            int p4old = points[p4];
 
-	        double old_distance = RouteDistance(points);	
-	
+            double old_distance = RouteDistance(points);
+
             Swap(ref points, p2old, p3old);
 
-            double new_distance = RouteDistance(points);	
+            double new_distance = RouteDistance(points);
 
-	        if ( new_distance > old_distance )
-	        {
+            if (new_distance > old_distance)
+            {
                 Swap(ref points, p3old, p2old);
-	        }	
+            }
         }
 
-       void TwoOpt(ref List<Point> points)
+        public List<int> PreProcessing(List<int> points)
+        {
+            List<int> prePath = new List<int>();
+            prePath.Add(points[0]);
+            int node = 0;
+
+            while (points.Count != prePath.Count)
+            {
+                node = GetNearestNeighbour(node, points, prePath);
+                prePath.Add(node);
+            }
+            return prePath;
+        }
+
+        public void TwoOpt(ref List<int> points)
         {
             points.Add(points[0]);
             int size = points.Count;
@@ -64,10 +134,10 @@ namespace DvrpUtils
             {
                 for (int j = i + 2; j < size - 1; j++)
                 {
-                    Point p1 = points[i];
-                    Point p2 = points[i + 1];
-                    Point p3 = points[j];
-                    Point p4 = points[j + 1];
+                    int p1 = points[i];
+                    int p2 = points[i + 1];
+                    int p3 = points[j];
+                    int p4 = points[j + 1];
 
                     DoTwoOpt(p1, p2, p3, p4, ref points);
                 }
@@ -75,26 +145,25 @@ namespace DvrpUtils
             points.RemoveAt(points.Count - 1);
         }
 
-        int GetNearestNeighbour(Point p, List<Point> list)
+        public int GetNearestNeighbour(int i, List<int> list, List<int> added)
         {
-	        int node = 0;
+            int node = 0;
+            double min_dist = 99999999;
 
-	        double min_dist = 99999999;
+            foreach (var e in list)
+            {
+                if (added.Contains(e)) continue;
 
-	         foreach(var e in list)
-	         {
-		         if ( list.IndexOf(e) == node ) continue;
+                double dist = GetDistance(e, i);
 
-                 double dist = EuclideanDistance(p, e);
-		
-		         if ( dist < min_dist )
-		         {
-			        node = list.IndexOf(e);
-			        min_dist = dist;
-		         }
-	         }
-    
-	        return node;
+                if (dist < min_dist)
+                {
+                    node = e;
+                    min_dist = dist;
+                }
+            }
+
+            return node;
         }
     }
 }
