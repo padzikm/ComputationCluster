@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Algorithms.cs" />
     <Compile Include="DataSerialization.cs" />
+    <Compile Include="Distances.cs" />
     <Compile Include="DVRPTaskSolver.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="ProblemDataModel\Customer.cs" />

@@ -99,17 +99,29 @@ namespace DvrpUtils
             DVRPParser parser = new DVRPParser();
             ProblemData partialProblemData = parser.Parse(partialDataString);
 
-            List<int> path = partialProblemData.Path;
-            List<Point> points = partialProblemData.Locations as List<Point>;
-     
-            Algorithms tsp = new Algorithms(points);
-            tsp.Run(ref path);
-            double min_cost = tsp.RouteDistance(path);
+            List<Dictionary<int, Point>> Paths = partialProblemData.Paths as List<Dictionary<int, Point>>;
+
+            Algorithms tsp = new Algorithms(Paths.Count);
+
+            double min_cost = 9999999;
+            List<int> best_path = new List<int>();
+            List<int> tmp;
+
+            for (int i = 0; i < Paths.Count; ++i)
+            {
+                tmp = Paths[i].Keys.ToList();
+                double cost = tsp.Run(ref tmp, i);
+                if (cost < min_cost)
+                {
+                    min_cost = cost;
+                    best_path = tmp;
+                }
+            }
            
             Route route = new Route();
             route.RouteID = partialProblemData.VehicleID;
             route.Cost = min_cost;
-            route.Locations = path;
+            route.Locations = best_path;
 
             SolutionsMergingFinished(new EventArgs(), this);
             return DataSerialization.GetBytes(parser.ParseRoute(route));
