@@ -33,14 +33,14 @@ namespace ComputationalClient
             
             try
             {
-                //addressIp = args[0];
-                //port = int.Parse(args[1]);
-                //name = args[2];
-                //timeout = ulong.Parse(args[3]);
-                //pathToFile = args[4];
-                //problemBytes = GetBytesFromVrp(pathToFile);
+                addressIp = args[0];
+                port = int.Parse(args[1]);
+                name = args[2];
+                timeout = ulong.Parse(args[3]);
+                pathToFile = args[4];
+                problemBytes = GetBytesFromVrp(pathToFile);
                 //Console.WriteLine(addressIp + " " + port + " " + name + " " + timeout + " " + args[4]);
-                ReadData();
+                //ReadData();
                 client = new Client(addressIp, port, name, timeout, problemBytes);
             }
             catch (Exception)
