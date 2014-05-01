@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using DvrpUtils.ProblemDataModel;
 using UCCTaskSolver;
+using System.Timers;
 
 namespace DvrpUtils
 {
@@ -24,15 +25,22 @@ namespace DvrpUtils
 
         private static readonly double cutOff = 0.5;
 
+        private DVRPParser Parser;
 
-        public DVRPTaskSolver(byte[] problemData) : base(problemData)
-        {
+        private Timer timer;
+
+        public DVRPTaskSolver(byte[] problemData) : base(problemData) 
+        { 
+            Parser = new DVRPParser();
+            timer = new Timer(1000);
+            State = TaskSolverState.Idle;
         }
 
         public override byte[][] DivideProblem(int threadCount)
         {
-            DVRPParser parser = new DVRPParser();
-            var problem = parser.Parse(DataSerialization.GetString(_problemData));
+            State = TaskSolverState.Dividing;
+
+            var problem = Parser.Parse(DataSerialization.GetString(_problemData));
 
             var customersSet = Partitioning.GetAllPartitions(problem.Customers.ToArray()).ToList();
             var problemsToSend = new List<List<ProblemData>>();
@@ -69,7 +77,6 @@ namespace DvrpUtils
                     //TODO more depots?
                     if (capacity > 0 && vehicleCount > 0)
                     {
-
                         data.VehicleID = vehicleCount;
                         datas.Add(data);
                         vehicleCount--;
@@ -87,12 +94,15 @@ namespace DvrpUtils
             }
             
             if (ProblemDividingFinished != null) ProblemDividingFinished(new EventArgs(), this);
-            return serializedProblems.ToArray();
 
+            return serializedProblems.ToArray();
         }
 
+        // TODO: czy jest na 100% poprawnie? 
         public override void MergeSolution(byte[][] solutions)
         {
+            State = TaskSolverState.Merging;
+
             List<string> solut = new List<string>();
             string final_string = "";
             int final_cost = 0;
@@ -100,14 +110,12 @@ namespace DvrpUtils
             for (int i = 0; i < solutions.GetLength(0); i++)
             {
                 solut.Add(DataSerialization.GetString(solutions[i]));
-
             }
 
             foreach (var el in solut)
             {
                 var tmpR = el.Split(' ');
                 final_cost += Convert.ToInt16(tmpR[tmpR.Length - 1]);
-
             }
 
             solut.Add(String.Format("TOTAL_COST: {0}", final_cost));
@@ -123,33 +131,52 @@ namespace DvrpUtils
                     final_string += solut[i];
                 }
             }
+
             //wynikowy string:
             //ROUTE #1: 1 2 3 55;ROUTE #2: 2 3 4 66;TOTAL_COST: 777
             //ostatnia liczba w ROUTE to koasz dla danej drogi
+
             Solution = DataSerialization.GetBytes(final_string);
+
             if (final_cost != 0) SolutionsMergingFinished(new EventArgs(), this);
         }
 
         public override byte[] Solve(byte[] partialData, TimeSpan timeout)
         {
+            State = TaskSolverState.Solving;
+
+            double timeout_ms = 0;
+            timeout_ms += timeout.Milliseconds;
+            timeout_ms += 1000 * timeout.Seconds;
+            timeout_ms += 1000 * 60 * timeout.Minutes;
+
             string partialDataString = DataSerialization.GetString(partialData);
-            DVRPParser parser = new DVRPParser();
-            ProblemData partialProblemData = parser.Parse(partialDataString);
+            ProblemData partialProblemData = Parser.Parse(partialDataString);
  
             Dictionary<int, Point> Path = partialProblemData.Path as Dictionary<int, Point>;
             List<int> path = partialProblemData.Path.Values as List<int>;
 
-            Algorithms tsp = new Algorithms(Path.Values.ToList());
-            
-            double min_cost = tsp.Run(ref path);
-           
-            Route route = new Route();
-            route.RouteID = partialProblemData.VehicleID;
-            route.Cost = min_cost;
-            route.Locations = path;
+            Algorithms tsp = new Algorithms(Path.Values.ToList(), timeout_ms);
 
-            SolutionsMergingFinished(new EventArgs(), this);
-            return DataSerialization.GetBytes(parser.ParseRoute(route));
+            try
+            {
+                double min_cost = tsp.Run(ref path);
+                Route route = new Route();
+                route.RouteID = partialProblemData.VehicleID;
+                route.Cost = min_cost;
+                route.Locations = path;
+
+                if (ProblemSolvingFinished != null) ProblemSolvingFinished(new EventArgs(), this);
+
+                return DataSerialization.GetBytes(Parser.ParseRoute(route));
+            }
+            catch(TimeoutException t)
+            {
+                State = TaskSolverState.Solving;
+                ErrorOccured(this, new UnhandledExceptionEventArgs(t, true));
+
+                return null;
+            }
         }
 
     }
