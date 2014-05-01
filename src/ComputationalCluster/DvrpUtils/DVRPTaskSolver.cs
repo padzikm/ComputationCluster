@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using ASD.Graph;
 using DvrpUtils.ProblemDataModel;
 using UCCTaskSolver;
 
@@ -24,32 +22,74 @@ namespace DvrpUtils
 
         public override event TaskSolver.ComputationsFinishedEventHandler SolutionsMergingFinished;
 
-        public DVRPTaskSolver(byte[] problemData) : base(problemData) { }
+        private static readonly double cutOff = 0.5;
+
+
+        public DVRPTaskSolver(byte[] problemData) : base(problemData)
+        {
+        }
 
         public override byte[][] DivideProblem(int threadCount)
         {
-            //TODO remove temp data
-            int duration = 20;
-            int vehicles = 15;
-            var customers = new List<Customer>
+            DVRPParser parser = new DVRPParser();
+            var problem = parser.Parse(DataSerialization.GetString(_problemData));
+
+            var customersSet = Partitioning.GetAllPartitions(problem.Customers.ToArray()).ToList();
+            var problemsToSend = new List<List<ProblemData>>();
+
+            //TODO more depots?
+            double cutOffTime = problem.Depots.First().EndTime * cutOff;
+            //each problem
+            for (int i = 0; i < customersSet.Count; i++)
             {
-                new Customer{CustomerId = 1, Location = new Point(84, -93), StartDate = 615},
-                new Customer{CustomerId = 2, Location = new Point(92, -93), StartDate = 222},
-                new Customer{CustomerId = 3, Location = new Point(84, -93), StartDate = 433},
-                new Customer{CustomerId = 4, Location = new Point(84, -93), StartDate = 343},
-                new Customer{CustomerId = 5, Location = new Point(84, -93), StartDate = 342}
-            };
-            customers = customers.OrderBy(customer => customer.StartDate).ToList();
-            var depot = new Depot { DepotId = 0, Location = new Point(0, 0) };
+                List<ProblemData> datas = new List<ProblemData>();
+                int vehicleCount = problem.Vehicles.Count();
+                //each set
+                for (int j = 0; j < customersSet[i].Length; j++)
+                {
+                    var data = new ProblemData{Depots = problem.Depots};
+                    var locations = new List<Point>();
+                    var path = new List<int>();
+                    int capacity = problem.Capacity;
 
-            //TODO pass only problem instance
-            var graphs = CreateDummyGraphs(threadCount, duration, vehicles, depot, customers);
+                    foreach (var depot in problem.Depots)
+                    {
+                        locations.Add(depot.Location);
+                        path.Add(depot.DepotId);
+                    }
+                    for (int k = 0; k < customersSet[i][j].Length; k++)
+                    {
+                        var customer = customersSet[i][j][k];
+                        if (customer.TimeAvailable > cutOffTime)
+                            customer.TimeAvailable = 0;
 
-            //TODO create file
+                        capacity += customer.Size;
+                        locations.Add(customer.Location);
+                        path.Add(customer.CustomerId);
+                    }
+                    //TODO more depots?
+                    if (capacity > 0 && vehicleCount > 0)
+                    {
+                        data.Locations = locations;
+                        data.Path = path;
+                        data.VehicleID = vehicleCount;
+                        datas.Add(data);
+                        vehicleCount--;
+                    }
+                    if (vehicleCount < 0) break;
+                }
+                if (vehicleCount >= 0)
+                    problemsToSend.Add(datas);
+            }
 
-            //TODO serialize to byteArray
+            var serializedProblems = new List<byte[]>();
+            foreach (var problems in problemsToSend)
+            {
+                serializedProblems.AddRange(problems.Select(DataSerialization.BinarySerializeObject));
+            }
+            
             if (ProblemDividingFinished != null) ProblemDividingFinished(new EventArgs(), this);
-            return null;
+            return serializedProblems.ToArray();
 
         }
 
@@ -92,7 +132,6 @@ namespace DvrpUtils
             if (final_cost != 0) SolutionsMergingFinished(new EventArgs(), this);
         }
 
-        //algorytm trp.run(..) dziala, testowalem dla tego najmniejszego pliku okulewicza, tak jakbym szukal tsp dla wszystkich tych nodow
         public override byte[] Solve(byte[] partialData, TimeSpan timeout)
         {
             string partialDataString = DataSerialization.GetString(partialData);
@@ -114,49 +153,7 @@ namespace DvrpUtils
             SolutionsMergingFinished(new EventArgs(), this);
             return DataSerialization.GetBytes(parser.ParseRoute(route));
         }
-
-        //dzielenie jutro ogarniemy (tj sroda), zwracana bedzie lista intow oraz lista pointow odpowiednich numerowo do listy intow
-        private IEnumerable<IGraph> CreateDummyGraphs(int threadCount, int duration, int vehicles, Depot depot, IEnumerable<Customer> customers)
-        {
-            var customerList = customers as IList<Customer> ?? customers.ToList();
-            int givenCustomers = customerList.Count() / threadCount;
-            int currentCustomer = 0;
-            var graphs = new List<IGraph>();
-            for (int k = 0; k < threadCount; k++)
-            {
-                IGraph graph = new AdjacencyListsGraph(false, givenCustomers);
-
-                for (int i = currentCustomer; i < currentCustomer + givenCustomers; i++)
-                    for (int j = 0; j < currentCustomer + givenCustomers; j++)
-                    {
-                        if (i != j)
-                        {
-
-                            var distance =
-                                (int)
-                                    Math.Sqrt((customerList[i].Location.X - customerList[i].Location.Y) *
-                                              (customerList[i].Location.X - customerList[i].Location.Y)
-                                              +
-                                              (customerList[j].Location.X - customerList[j].Location.Y) *
-                                              customerList[j].Location.X - customerList[j].Location.Y);
-                            graph.AddEdge(i + 1, j + 1, distance);
-                        }
-                    }
-                for (int i = currentCustomer; i < currentCustomer + givenCustomers; i++)
-                {
-                    var distance =
-                        (int)
-                            Math.Sqrt((customerList[i].Location.X - customerList[i].Location.Y) *
-                                      (customerList[i].Location.X - customerList[i].Location.Y)
-                                      + (depot.Location.X - depot.Location.Y) * (depot.Location.X - depot.Location.Y));
-                    graph.AddEdge(i + 1, 0, distance);
-                }
-
-                currentCustomer += givenCustomers;
-                graphs.Add(graph);
-            }
-            return graphs;
-        }
+        
 
     }
 }

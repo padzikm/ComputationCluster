@@ -23,5 +23,42 @@ namespace DvrpUtils
             Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
             return new string(chars);
         }
+
+        public static byte[] BinarySerializeObject(object objectToSerialize)
+        {
+            if (objectToSerialize == null)
+                throw new ArgumentNullException("objectToSerialize");
+
+            byte[] serializedObject;
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(stream, objectToSerialize);
+                serializedObject = stream.ToArray();
+            }
+
+            return serializedObject;
+        }
+
+        public static T BinaryDeserializeObject<T>(byte[] serializedType)
+        {
+            if (serializedType == null)
+                throw new ArgumentNullException("serializedType");
+
+            if (serializedType.Length.Equals(0))
+                throw new ArgumentException("serializedType");
+
+            T deserializedObject;
+
+            using (MemoryStream memoryStream = new MemoryStream(serializedType))
+            {
+                BinaryFormatter deserializer = new BinaryFormatter();
+                deserializedObject = (T)deserializer.Deserialize(memoryStream);
+            }
+
+            return deserializedObject;
+        }
+
     }
 }

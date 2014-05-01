@@ -5,6 +5,8 @@ using System.Net.Sockets;
 using System.Threading;
 using Common;
 using System.Net;
+using DvrpUtils;
+using UCCTaskSolver;
 
 namespace TaskManager
 {
@@ -16,6 +18,7 @@ namespace TaskManager
         private StatusThread[] statusThreads;
         private readonly NetworkAdapter networkAdapter;
         private ulong taskId = 0;
+        private TaskSolver taskSolver; 
 
         public TaskManager(IPAddress serverIp, int port)
         {
@@ -99,10 +102,12 @@ namespace TaskManager
         {
             try
             {
-                var solvePartialProblemsPartialProblem = new SolvePartialProblemsPartialProblem[3];
+                taskSolver = new DVRPTaskSolver(problem.Data);
+                var dividedProblems = taskSolver.DivideProblem((int) problem.ComputationalNodes);
+                var solvePartialProblemsPartialProblem = new SolvePartialProblemsPartialProblem[dividedProblems.Length];
                 for (int i = 0; i < 3; i++)
                 {
-                    solvePartialProblemsPartialProblem[i] = new SolvePartialProblemsPartialProblem {Data = new byte[5], TaskId = ++taskId};
+                    solvePartialProblemsPartialProblem[i] = new SolvePartialProblemsPartialProblem {Data = dividedProblems[i], TaskId = ++taskId};
                 }
 
                 var partialProblems = new SolvePartialProblems
