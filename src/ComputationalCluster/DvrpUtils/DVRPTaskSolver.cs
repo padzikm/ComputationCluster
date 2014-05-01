@@ -47,7 +47,7 @@ namespace DvrpUtils
                 //each set
                 for (int j = 0; j < customersSet[i].Length; j++)
                 {
-                    var data = new ProblemData{Depots = problem.Depots};
+                    var data = new ProblemData{Depots = problem.Depots, Path = new Dictionary<int, Point>()};
                     var locations = new List<Point>();
                     var path = new List<int>();
                     int capacity = problem.Capacity;
@@ -64,14 +64,12 @@ namespace DvrpUtils
                             customer.TimeAvailable = 0;
 
                         capacity += customer.Size;
-                        locations.Add(customer.Location);
-                        path.Add(customer.CustomerId);
+                        problem.Path.Add(customer.CustomerId, customer.Location);
                     }
                     //TODO more depots?
                     if (capacity > 0 && vehicleCount > 0)
                     {
-                        data.Locations = locations;
-                        data.Path = path;
+
                         data.VehicleID = vehicleCount;
                         datas.Add(data);
                         vehicleCount--;
@@ -137,13 +135,13 @@ namespace DvrpUtils
             string partialDataString = DataSerialization.GetString(partialData);
             DVRPParser parser = new DVRPParser();
             ProblemData partialProblemData = parser.Parse(partialDataString);
+ 
+            Dictionary<int, Point> Path = partialProblemData.Path as Dictionary<int, Point>;
+            List<int> path = partialProblemData.Path.Values as List<int>;
 
-            List<int> path = partialProblemData.Path;
-            List<Point> points = partialProblemData.Locations as List<Point>;
-     
-            Algorithms tsp = new Algorithms(points);
-            tsp.Run(ref path);
-            double min_cost = tsp.RouteDistance(path);
+            Algorithms tsp = new Algorithms(Path.Values.ToList());
+            
+            double min_cost = tsp.Run(ref path);
            
             Route route = new Route();
             route.RouteID = partialProblemData.VehicleID;
@@ -153,7 +151,6 @@ namespace DvrpUtils
             SolutionsMergingFinished(new EventArgs(), this);
             return DataSerialization.GetBytes(parser.ParseRoute(route));
         }
-        
 
     }
 }

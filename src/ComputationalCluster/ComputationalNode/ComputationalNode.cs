@@ -106,7 +106,7 @@ namespace ComputationalNode
 
             networkAdapter.CloseConnection();
 
-            initThreade();
+            initThread();
 
             networkAdapter.CurrentStatus = new Status { Id = registerResponse.Id, Threads = threads };
 
@@ -117,8 +117,6 @@ namespace ComputationalNode
             //timeout += 3600 * int.Parse(time[0]);
 
             networkAdapter.StartKeepAlive(30* 1000, PartialProblems, Solution);
-
-           
         }
 
         private void Register()
@@ -137,21 +135,18 @@ namespace ComputationalNode
             try
             {
                 registerResponse = networkAdapter.Receive<RegisterResponse>(false);
-                //Console.WriteLine("Receive RegisterResponse");
             }
             catch (Exception)
             {
                 Console.WriteLine("Cannot recieve RegisterResponse");
             }
-
         }
 
         private bool PartialProblems()
         {
             try
             {
-               
-                 problem = networkAdapter.Receive<SolvePartialProblems>(false);
+                problem = networkAdapter.Receive<SolvePartialProblems>(false);
                 if (problem != null)
                 {
                     solve = new DVRPTaskSolver(problem.PartialProblems[0].Data);
@@ -174,10 +169,7 @@ namespace ComputationalNode
 
         private void Solution()
         {
-
             Thread.Sleep(3000);
-
-
             try
             {
                 var solution = new Solutions
@@ -194,15 +186,11 @@ namespace ComputationalNode
             {
                 Console.WriteLine("Cannot send partial solution to server");
             }
-
         }
 
-        private void initThreade()
+        private void initThread()
         {
-            threads = new StatusThread[] { new StatusThread{HowLong = 0, ProblemType = "DVPR", State = StatusThreadState.Busy }};
-
+            threads = new StatusThread[] { new StatusThread { HowLong = 0, ProblemType = "DVPR", State = StatusThreadState.Busy } };
         }
-
-       
     }
 }
