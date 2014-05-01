@@ -43,7 +43,7 @@ namespace DvrpUtils
             var depot = new Depot { DepotId = 0, Location = new Point(0, 0) };
 
             //TODO pass only problem instance
-            var graphs = CreateDummyGraphs(threadCount, duration, vehicles, depot, customers);
+            //var graphs = CreateDummyGraphs(threadCount, duration, vehicles, depot, customers);
 
             //TODO create file
 
@@ -92,83 +92,26 @@ namespace DvrpUtils
             if (final_cost != 0) SolutionsMergingFinished(new EventArgs(), this);
         }
 
-        //algorytm trp.run(..) dziala, testowalem dla tego najmniejszego pliku okulewicza, tak jakbym szukal tsp dla wszystkich tych nodow
         public override byte[] Solve(byte[] partialData, TimeSpan timeout)
         {
             string partialDataString = DataSerialization.GetString(partialData);
             DVRPParser parser = new DVRPParser();
             ProblemData partialProblemData = parser.Parse(partialDataString);
+ 
+            Dictionary<int, Point> Path = partialProblemData.Path as Dictionary<int, Point>;
+            List<int> path = partialProblemData.Path.Values as List<int>;
 
-            List<Dictionary<int, Point>> Paths = partialProblemData.Paths as List<Dictionary<int, Point>>;
-
-            Algorithms tsp = new Algorithms(Paths.Count);
-
-            double min_cost = double.MaxValue;
-            List<int> best_path = new List<int>();
-            List<int> tmp;
-
-            for (int i = 0; i < Paths.Count; ++i)
-            {
-                tmp = Paths[i].Keys.ToList();
-                double cost = tsp.Run(ref tmp, i);
-                if (cost < min_cost)
-                {
-                    min_cost = cost;
-                    best_path = tmp;
-                }
-            }
+            Algorithms tsp = new Algorithms(Path.Values.ToList());
+            
+            double min_cost = tsp.Run(ref path);
            
             Route route = new Route();
             route.RouteID = partialProblemData.VehicleID;
             route.Cost = min_cost;
-            route.Locations = best_path;
+            route.Locations = path;
 
             SolutionsMergingFinished(new EventArgs(), this);
             return DataSerialization.GetBytes(parser.ParseRoute(route));
         }
-
-        //dzielenie jutro ogarniemy (tj sroda), zwracana bedzie lista intow oraz lista pointow odpowiednich numerowo do listy intow
-        private IEnumerable<IGraph> CreateDummyGraphs(int threadCount, int duration, int vehicles, Depot depot, IEnumerable<Customer> customers)
-        {
-            var customerList = customers as IList<Customer> ?? customers.ToList();
-            int givenCustomers = customerList.Count() / threadCount;
-            int currentCustomer = 0;
-            var graphs = new List<IGraph>();
-            for (int k = 0; k < threadCount; k++)
-            {
-                IGraph graph = new AdjacencyListsGraph(false, givenCustomers);
-
-                for (int i = currentCustomer; i < currentCustomer + givenCustomers; i++)
-                    for (int j = 0; j < currentCustomer + givenCustomers; j++)
-                    {
-                        if (i != j)
-                        {
-
-                            var distance =
-                                (int)
-                                    Math.Sqrt((customerList[i].Location.X - customerList[i].Location.Y) *
-                                              (customerList[i].Location.X - customerList[i].Location.Y)
-                                              +
-                                              (customerList[j].Location.X - customerList[j].Location.Y) *
-                                              customerList[j].Location.X - customerList[j].Location.Y);
-                            graph.AddEdge(i + 1, j + 1, distance);
-                        }
-                    }
-                for (int i = currentCustomer; i < currentCustomer + givenCustomers; i++)
-                {
-                    var distance =
-                        (int)
-                            Math.Sqrt((customerList[i].Location.X - customerList[i].Location.Y) *
-                                      (customerList[i].Location.X - customerList[i].Location.Y)
-                                      + (depot.Location.X - depot.Location.Y) * (depot.Location.X - depot.Location.Y));
-                    graph.AddEdge(i + 1, 0, distance);
-                }
-
-                currentCustomer += givenCustomers;
-                graphs.Add(graph);
-            }
-            return graphs;
-        }
-
     }
 }

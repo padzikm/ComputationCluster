@@ -22,6 +22,6 @@ namespace DvrpUtils.ProblemDataModel
         public IEnumerable<Depot> Depots { get; set; }
 
         // 0 - depot, 1-m - customer
-        public IDictionary<int, Point> Paths { get; set; }
+        public IDictionary<int, Point> Path { get; set; }
     }
 }

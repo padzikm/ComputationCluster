@@ -8,9 +8,11 @@ namespace DvrpUtils
 {
     public class Algorithms
     {
-        Distances[] Dist;
+        Dictionary<Tuple<int, int>, double> Distances = new Dictionary<Tuple<int, int>, double>();
 
-        public void WriteLinePoint(List<Point> list)
+        List<Point> Points;
+
+        private void WriteLinePoint(List<Point> list)
         {
             foreach (var e in list)
             {
@@ -18,7 +20,7 @@ namespace DvrpUtils
             }
         }
 
-        public void WriteLineInt(List<int> list)
+        private void WriteLineInt(List<int> list)
         {
             string l = "LISTA: ";
             foreach (var e in list)
@@ -28,41 +30,71 @@ namespace DvrpUtils
             Console.WriteLine(l);
         }
 
-        public Algorithms(int _size)
+        public Algorithms(List<Point> points)
         {
-            Dist = new Distances[_size];//(_points);
+            Points = points;
+            Points.Add(points[0]);
+            ComputeDistances();
         }
 
-        public double Run(ref List<int> points, int nr)
+        public double Run(ref List<int> points)
         {
             WriteLineInt(points);
-            List<int> temp = PreProcessing(points, nr);
+            List<int> temp = PreProcessing(points);
             WriteLineInt(temp);
-            TwoOpt(ref temp, nr);
+            TwoOpt(ref temp);
             WriteLineInt(temp);
             points = temp;
-            return Dist[nr].RouteDistance(points);
+            return RouteDistance(points);
         }
-        
 
-        public double GetDistance(int i, int j, int nr)
+        private void ComputeDistances()
         {
-            return Dist[nr].GetDistance(i, j);
+            for (int i = 0; i < Points.Count; ++i)
+            {
+                for (int j = i; j < Points.Count; ++j)
+                {
+                    Tuple<int, int> point = new Tuple<int, int>(i, j);
+                    double actualDist = EuclideanDistance(Points[i], Points[j]);
+                    Distances.Add(point, actualDist);
+                    if (i != j)
+                        Distances.Add(point, actualDist);
+                }
+            }
         }
 
-        public double RouteDistance(List<int> points, int nr)
+        private double EuclideanDistance(Point p, Point q)
         {
-            return Dist[nr].RouteDistance(points);
+            return Math.Sqrt(Math.Pow(p.X - q.X, 2) + Math.Pow(p.Y - q.Y, 2));
         }
 
-        public void Swap(ref List<int> list, int i, int j)
+        private double GetDistance(int i, int j)
+        {
+            return Distances[new Tuple<int, int>(i, j)];
+        }
+
+        private double RouteDistance(List<int> points)
+        {
+            double dist = 0.0;
+
+            int size = points.Count;
+
+            for (int i = 0; i < size - 1; i++)
+                dist += GetDistance(points[i], points[i + 1]);
+
+            dist += GetDistance(size - 1, 0);
+
+            return dist;
+        }
+
+        private void Swap(ref List<int> list, int i, int j)
         {
             var temp = list[i];
             list[i] = list[j];
             list[j] = temp;
         }
 
-        public void DoTwoOpt(int p1, int p2, int p3, int p4, ref List<int> points, int nr)
+        private void DoTwoOpt(int p1, int p2, int p3, int p4, ref List<int> points)
         {
             if (p3 == p1 || p3 == p2 || p4 == p1 || p4 == p2) return;
 
@@ -71,11 +103,11 @@ namespace DvrpUtils
             int p3old = points[p3];
             int p4old = points[p4];
 
-            double old_distance = Dist[nr].RouteDistance(points);
+            double old_distance = RouteDistance(points);
 
             Swap(ref points, p2old, p3old);
 
-            double new_distance = Dist[nr].RouteDistance(points);
+            double new_distance = RouteDistance(points);
 
             if (new_distance > old_distance)
             {
@@ -83,7 +115,7 @@ namespace DvrpUtils
             }
         }
 
-        public List<int> PreProcessing(List<int> points, int nr)
+        private List<int> PreProcessing(List<int> points)
         {
             List<int> prePath = new List<int>();
             prePath.Add(points[0]);
@@ -91,13 +123,13 @@ namespace DvrpUtils
 
             while (points.Count != prePath.Count)
             {
-                node = GetNearestNeighbour(node, points, prePath, nr);
+                node = GetNearestNeighbour(node, points, prePath);
                 prePath.Add(node);
             }
             return prePath;
         }
 
-        public void TwoOpt(ref List<int> points, int nr)
+        private void TwoOpt(ref List<int> points)
         {
             points.Add(points[0]);
             int size = points.Count;
@@ -111,13 +143,13 @@ namespace DvrpUtils
                     int p3 = points[j];
                     int p4 = points[j + 1];
 
-                    DoTwoOpt(p1, p2, p3, p4, ref points, nr);
+                    DoTwoOpt(p1, p2, p3, p4, ref points);
                 }
             }
             points.RemoveAt(points.Count - 1);
         }
 
-        public int GetNearestNeighbour(int i, List<int> list, List<int> added, int nr)
+        private int GetNearestNeighbour(int i, List<int> list, List<int> added)
         {
             int node = 0;
             double min_dist = 99999999;
@@ -126,7 +158,7 @@ namespace DvrpUtils
             {
                 if (added.Contains(e)) continue;
 
-                double dist = Dist[nr].GetDistance(e, i);
+                double dist = GetDistance(e, i);
 
                 if (dist < min_dist)
                 {
