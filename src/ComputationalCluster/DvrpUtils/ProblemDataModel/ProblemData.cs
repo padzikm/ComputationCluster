@@ -10,16 +10,45 @@ namespace DvrpUtils.ProblemDataModel
         public int VehicleID { get; set; }
 
         [NonSerialized]
-        public string Name { get; set; }
-
+        private int capacity;
         [NonSerialized]
-        public IEnumerable<Customer> Customers { get; set; }
-
+        private string name;
         [NonSerialized]
-        public IEnumerable<Vehicle> Vehicles { get; set; }
-
+        private IEnumerable<Customer> customers;
         [NonSerialized]
-        public IEnumerable<Depot> Depots { get; set; }
+        private IEnumerable<Vehicle> vehicles;
+        [NonSerialized]
+        private IEnumerable<Depot> depots;
+
+        public int Capacity
+        {
+            get { return capacity; }
+            set { capacity = value; }
+        }
+
+        public IEnumerable<Customer> Customers
+        {
+            get { return customers; }
+            set { customers = value; }
+        }
+
+        public IEnumerable<Vehicle> Vehicles
+        {
+            get { return vehicles; }
+            set { vehicles = value; }
+        }
+
+        public IEnumerable<Depot> Depots
+        {
+            get { return depots; }
+            set { depots = value; }
+        }
+
+        public string Name
+        {
+            get { return name; }
+            set { name = value; }
+        }
 
         // 0 - depot, 1-m - customer
         public IDictionary<int, Point> Path { get; set; }
