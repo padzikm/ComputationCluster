@@ -7,6 +7,7 @@ using DvrpUtils;
 
 namespace ComputationalClient
 {
+
     public class Client
     {
         private NetworkAdapter networkAdapter;
