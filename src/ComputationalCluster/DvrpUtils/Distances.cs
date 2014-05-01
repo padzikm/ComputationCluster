@@ -19,15 +19,17 @@ namespace DvrpUtils
             ComputeDistances();
         }
 
-        //TO DO: liczyc tylko polowe wartosci, reszta jest znana
         private void ComputeDistances()
         {
             for (int i = 0; i < Points.Count; ++i)
             {
-                for (int j = 0; j < Points.Count; ++j)
+                for (int j = i; j < Points.Count; ++j)
                 {
                     Tuple<int, int> point = new Tuple<int, int>(i, j);
-                    Distances.Add(point, EuclideanDistance(Points[i], Points[j]));
+                    double actualDist = EuclideanDistance(Points[i], Points[j]);
+                    Distances.Add(point, actualDist);
+                    if(i!=j)
+                        Distances.Add(point, actualDist);
                 }
             }
         }

@@ -19,10 +19,10 @@ namespace CommunicationServer
         public void HandleMessage(ServerNetworkAdapter networkAdapter, string message, Common.MessageType messageType, TimeSpan timout)
         {
             SolvePartialProblems partial = MessageSerialization.Deserialize<SolvePartialProblems>(message);
-
+            
             if (partial == null || partial.PartialProblems == null)
                 return;
-
+            
             DvrpProblem.WaitEvent.WaitOne();
 
             if(!DvrpProblem.PartialProblems.ContainsKey(partial.Id))

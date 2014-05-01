@@ -103,7 +103,7 @@ namespace DvrpUtils
 
             Algorithms tsp = new Algorithms(Paths.Count);
 
-            double min_cost = 9999999;
+            double min_cost = double.MaxValue;
             List<int> best_path = new List<int>();
             List<int> tmp;
 
