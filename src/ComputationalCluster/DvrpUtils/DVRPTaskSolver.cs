@@ -25,9 +25,11 @@ namespace DvrpUtils
         public override event TaskSolver.ComputationsFinishedEventHandler SolutionsMergingFinished;
 
         public DVRPTaskSolver(byte[] problemData) : base(problemData) { }
-
+        
         public override byte[][] DivideProblem(int threadCount)
         {
+            State = TaskSolverState.Dividing;
+
             //TODO remove temp data
             int duration = 20;
             int vehicles = 15;
@@ -50,11 +52,13 @@ namespace DvrpUtils
             //TODO serialize to byteArray
             if (ProblemDividingFinished != null) ProblemDividingFinished(new EventArgs(), this);
             return null;
-
+            
         }
 
         public override void MergeSolution(byte[][] solutions)
         {
+            State = TaskSolverState.Merging;
+
             List<string> solut = new List<string>();
             string final_string = "";
             int final_cost = 0;
@@ -94,6 +98,8 @@ namespace DvrpUtils
 
         public override byte[] Solve(byte[] partialData, TimeSpan timeout)
         {
+            State = TaskSolverState.Solving;
+
             string partialDataString = DataSerialization.GetString(partialData);
             DVRPParser parser = new DVRPParser();
             ProblemData partialProblemData = parser.Parse(partialDataString);
