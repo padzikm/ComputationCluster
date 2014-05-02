@@ -15,7 +15,9 @@ namespace ComputationalClient
 {
     class Program
     {
+
         //static String message = "Problem sent successfully.\nComputation is in progress... Press ENTER to check a problem status.";
+
 
         static string addressIp;
         static int port;

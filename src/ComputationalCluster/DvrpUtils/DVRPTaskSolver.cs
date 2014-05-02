@@ -39,12 +39,13 @@ namespace DvrpUtils
 
             var problem = Parser.Parse(DataSerialization.GetString(_problemData));
 
-            var customersSet = Partitioning.GetAllPartitions(problem.Customers.ToArray()).ToList();
+            var customersSet = Partitioning.Partition(problem.Customers.ToList());
             var problemsToSend = new List<ProblemData>();
 
             //TODO more depots?
             double cutOffTime = problem.Depots.First().EndTime * cutOff;
             //each problem set
+            int partitions = 0;
             foreach (var set in customersSet)
             {
                 List<ProblemData> datas = new List<ProblemData>();
@@ -68,7 +69,7 @@ namespace DvrpUtils
                             customer.TimeAvailable = 0;
 
                         capacity += customer.Demand;
-                        problem.Path.Add(customer.CustomerId, customer.Location);
+                        data.Path.Add(customer.CustomerId, customer.Location);
                     }
                     //TODO more depots?
                     if (capacity > 0 && vehicleCount > 0)
@@ -77,10 +78,18 @@ namespace DvrpUtils
                         datas.Add(data);
                         vehicleCount--;
                     }
+                    else
+                    {
+                        vehicleCount = -1;
+                        break;
+                    }
                     if (vehicleCount < 0) break;
                 }
                 if (vehicleCount >= 0)
-                    problemsToSend.Concat(datas);
+                {
+                    problemsToSend.AddRange(datas);
+                    partitions++;
+                }
             }
 
             var serializedProblems = new List<byte[]>();
