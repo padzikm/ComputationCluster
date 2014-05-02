@@ -111,7 +111,8 @@ namespace ComputationalNode
             timeout += int.Parse(time[2]);
             timeout += 60 * int.Parse(time[1]);
             timeout += 3600 * int.Parse(time[0]);
-            Console.WriteLine(timeout * 1000);
+            timeout *= 1000;
+            Console.WriteLine(timeout);
             networkAdapter.StartKeepAlive(timeout, PartialProblems, Solution);
         }
 
@@ -213,11 +214,7 @@ namespace ComputationalNode
             {
                 threads[i] = new StatusThread
                 {
-                    //ProblemInstanceIdSpecified = true, 
-                    //ProblemInstanceId = problem.Id, 
                     HowLong = 0, 
-                    //ProblemType = problem.ProblemType, 
-                    ProblemType = "DVRP",
                     State = StatusThreadState.Idle 
                 };
             }        
