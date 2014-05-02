@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DvrpUtils
 {
+    [Serializable]
     public class Point
     {
         private double x;

@@ -17,7 +17,7 @@ namespace ComputationalClient
         static String message = "Problem sent successfully.\nComputation is in progress... Press ENTER to check a problem status.";
 
         //static string defaultProblemFile = "../../../../../doc/SampleProblems/okul12D.vrp";
-        static string defaultProblemFile = "C:\\Users\\Kamil\\Documents\\GitHub\\ComputationCluster\\doc\\SampleProblems\\okul12D.vrp";
+        static string defaultProblemFile = "D:\\Dropbox\\Projects\\ComputationCluster\\doc\\SampleProblems\\okul12D.vrp";
 
         static string addressIp;
         static int port;

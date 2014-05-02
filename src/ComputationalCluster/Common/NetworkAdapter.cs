@@ -197,7 +197,7 @@ namespace Common
         {
             if (closeConnection)
             {
-                client = new TcpClient(serverName, connectionPort) { ReceiveTimeout = 5000 };
+                client = new TcpClient(serverName, connectionPort);
                 stream = client.GetStream();
             }
 
