@@ -13,8 +13,6 @@ namespace DvrpUtils
 
         List<Point> Points;
 
-        Timer timer;
-
         private void WriteLinePoint(List<Point> list)
         {
             foreach (var e in list)
@@ -38,32 +36,16 @@ namespace DvrpUtils
             Points = points;
             Points.Add(points[0]);
             ComputeDistances();
-
-            Timer timer = new Timer()
-            {
-                Interval = timeout,
-                Enabled = true,
-            };
-            timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-        }
-
-        private void OnTimedEvent(object source, ElapsedEventArgs e)
-        {
-            throw new TimeoutException();
         }
 
         public double Run(ref List<int> points)
         {
-            timer.Start();
-
-            WriteLineInt(points);
+            //WriteLineInt(points);
             List<int> temp = PreProcessing(points);
-            WriteLineInt(temp);
+            //WriteLineInt(temp);
             TwoOpt(ref temp);
-            WriteLineInt(temp);
+            //WriteLineInt(temp);
             points = temp;
-
-            timer.Stop();
 
             return RouteDistance(points);
         }

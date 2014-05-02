@@ -9,15 +9,15 @@ using System.Threading.Tasks;
 using Common;
 using DvrpUtils;
 using System.Threading;
+using System.Resources;
 
 namespace ComputationalClient
 {
     class Program
     {
-        static String message = "Problem sent successfully.\nComputation is in progress... Press ENTER to check a problem status.";
 
-        //static string defaultProblemFile = "../../../../../doc/SampleProblems/okul12D.vrp";
-        static string defaultProblemFile = "D:\\Dropbox\\Projects\\ComputationCluster\\doc\\SampleProblems\\okul12D.vrp";
+        //static String message = "Problem sent successfully.\nComputation is in progress... Press ENTER to check a problem status.";
+
 
         static string addressIp;
         static int port;
@@ -25,20 +25,20 @@ namespace ComputationalClient
         static ulong timeout;
         static string pathToFile;
         static byte[] problemBytes;
+        static string defaultProblemFile = Common.Properties.Resources.okul12D;
 
         static void Main(string[] args)
         {
             string msg = "";
             Client client;
-            //bool connected = false;
-            
+
             try
             {
                 addressIp = args[0];
                 port = int.Parse(args[1]);
                 name = args[2];
                 timeout = ulong.Parse(args[3]);
-                pathToFile = "";//args[4];
+                pathToFile = args[4];
                 problemBytes = GetBytesFromVrp(pathToFile);
                 //Console.WriteLine(addressIp + " " + port + " " + name + " " + timeout + " " + args[4]);
                 //ReadData();
@@ -46,15 +46,17 @@ namespace ComputationalClient
             }
             catch (Exception)
             {
-                Console.WriteLine("Couldn't work with program parameters. Default one used.");
-                client = new Client("localhost", 12345, "dvrp", 100000, GetBytesFromVrp(defaultProblemFile));
+                Console.WriteLine("Couldn't work with program parameters. Default one used: okul12D.vrp");
+                client = new Client("localhost", 12345, "DVRP", 100000, GetBytesFromVrp(defaultProblemFile));
             }
+
+            client.Start();
 
             //while (connected == false)
             //{
                 //try
                 //{
-                    client.Start();
+                    //client.Start();
                     //Thread.Sleep(6000);
                     //connected = true;
                 //}
