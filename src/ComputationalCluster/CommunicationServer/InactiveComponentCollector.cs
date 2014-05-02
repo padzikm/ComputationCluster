@@ -26,8 +26,8 @@ namespace CommunicationServer
             if(currentThread != null)
                 throw new InvalidOperationException("Collector is already running!");
 
-            currentThread = new Thread(Work);
-            currentThread.Start();
+            //currentThread = new Thread(Work);
+            //currentThread.Start();
         }
 
         public void Stop()
