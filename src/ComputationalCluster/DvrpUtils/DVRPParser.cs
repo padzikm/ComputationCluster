@@ -328,7 +328,7 @@ namespace DvrpUtils.ProblemDataModel
 
                 Customer ncustomer = new Customer();
                 ncustomer.CustomerId = visit_id;
-                ncustomer.StartDate = visit_demand;
+                ncustomer.Demand = visit_demand;
                 nCustomer.Add(ncustomer);
             }
         }
