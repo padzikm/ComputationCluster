@@ -11,8 +11,6 @@ namespace DvrpUtils
     {
         Dictionary<Tuple<int, int>, double> Distances = new Dictionary<Tuple<int, int>, double>();
 
-        List<Point> Points;
-
         private void WriteLinePoint(List<Point> list)
         {
             foreach (var e in list)
@@ -33,9 +31,8 @@ namespace DvrpUtils
 
         public Algorithms(List<Point> points, double timeout)
         {
-            Points = points;
-            Points.Add(points[0]);
-            ComputeDistances();
+            points.Add(points[0]);
+            ComputeDistances(points);
         }
 
         public double Run(ref List<int> points)
@@ -50,7 +47,7 @@ namespace DvrpUtils
             return RouteDistance(points);
         }
 
-        private void ComputeDistances()
+        private void ComputeDistances(List<Point> Points)
         {
             for (int i = 0; i < Points.Count; ++i)
             {
@@ -59,6 +56,7 @@ namespace DvrpUtils
                     Tuple<int, int> point = new Tuple<int, int>(i, j);
                     double actualDist = EuclideanDistance(Points[i], Points[j]);
                     Distances.Add(point, actualDist);
+
                     if (i != j)
                         Distances.Add(point, actualDist);
                 }
@@ -154,7 +152,7 @@ namespace DvrpUtils
         private int GetNearestNeighbour(int i, List<int> list, List<int> added)
         {
             int node = 0;
-            double min_dist = 99999999;
+            double min_dist = double.MaxValue;
 
             foreach (var e in list)
             {
