@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using DvrpUtils.ProblemDataModel;
 using UCCTaskSolver;
-using System.Timers;
+using System.Threading;
 
 namespace DvrpUtils
 {
@@ -27,12 +27,9 @@ namespace DvrpUtils
 
         private DVRPParser Parser;
 
-        private Timer timer;
-
         public DVRPTaskSolver(byte[] problemData) : base(problemData) 
         { 
             Parser = new DVRPParser();
-            timer = new Timer(1000);
             State = TaskSolverState.Idle;
         }
 
@@ -146,7 +143,7 @@ namespace DvrpUtils
         {
             State = TaskSolverState.Solving;
 
-            double timeoutMs = 0;
+            int timeoutMs = 0;
             timeoutMs += timeout.Milliseconds;
             timeoutMs += 1000 * timeout.Seconds;
             timeoutMs += 1000 * 60 * timeout.Minutes;
@@ -155,13 +152,18 @@ namespace DvrpUtils
  
             Dictionary<int, Point> dictionaryPath = partialProblemData.Path as Dictionary<int, Point>;
             if (dictionaryPath == null) throw new ArgumentNullException("partialData");
-            var path = partialProblemData.Path.Keys.ToList(); 
-
-            Algorithms tsp = new Algorithms(dictionaryPath.Values.ToList(), timeoutMs);
+            var path = partialProblemData.Path.Keys.ToList();
 
             try
             {
-                double minCost = tsp.Run(ref path);
+                double minCost = 0;
+   
+                Compute(() =>
+                    {
+                        Algorithms tsp = new Algorithms(dictionaryPath.Values.ToList(), timeoutMs); 
+                        minCost = tsp.Run(ref path);                  
+                    }, timeoutMs);
+
                 Route route = new Route {RouteID = partialProblemData.VehicleID, Cost = minCost, Locations = path};
 
                 Console.WriteLine(minCost);
@@ -172,12 +174,26 @@ namespace DvrpUtils
             }
             catch(TimeoutException t)
             {
-                State = TaskSolverState.Solving;
+                State = TaskSolverState.Error | TaskSolverState.Idle;
                 ErrorOccured(this, new UnhandledExceptionEventArgs(t, true));
 
                 return null;
             }
         }
 
+        private void Compute(Action action, int timeout)
+        {
+            ManualResetEvent evt = new ManualResetEvent(false);
+            AsyncCallback cb = delegate { evt.Set(); };
+            IAsyncResult result = action.BeginInvoke(cb, null);
+            if (evt.WaitOne(timeout))
+            {
+                action.EndInvoke(result);
+            }
+            else
+            {
+                throw new TimeoutException();
+            }
+        }
     }
 }
