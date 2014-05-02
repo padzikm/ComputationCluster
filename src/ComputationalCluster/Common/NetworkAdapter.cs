@@ -82,6 +82,7 @@ namespace Common
             {
                 while (true)
                 {
+                    Thread.Sleep(period);
                     client = new TcpClient(serverName, connectionPort);
                     stream = client.GetStream();
                     if (!Send(CurrentStatus, false))
@@ -113,6 +114,8 @@ namespace Common
                     stream = client.GetStream();
                     if (!Send(CurrentStatus, false))
                         break;
+
+                    Thread.Sleep(period);
 
                     var readBuffer = new byte[MaxBufferLenght];
                     stream.Read(readBuffer, 0, readBuffer.Length);
