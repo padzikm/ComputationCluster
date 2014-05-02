@@ -51,7 +51,7 @@ namespace DvrpUtils
             foreach (var set in customersSet)
             {
                 List<ProblemData> datas = new List<ProblemData>();
-                int vehicleCount = problem.Vehicles.Count();
+                int vehicleCount = problem.VehiclesCount;
                 //each subSet
                 foreach (var subSet in set)
                 {
@@ -97,47 +97,48 @@ namespace DvrpUtils
             return serializedProblems.ToArray();
         }
 
-        // TODO: czy jest na 100% poprawnie? 
+        // TODO: czy jest na 100% poprawnie? zamiast uzywac += string uzywac StringBuilder
         public override void MergeSolution(byte[][] solutions)
         {
             State = TaskSolverState.Merging;
 
-            List<string> solut = new List<string>();
-            string final_string = "";
-            int final_cost = 0;
+            List<Route> solut = new List<Route>();
+            string finalCostString = "";
+            string finalString = "";
+            double finalCost = 0;
 
             for (int i = 0; i < solutions.GetLength(0); i++)
             {
-                solut.Add(DataSerialization.GetString(solutions[i]));
+                solut.Add(DataSerialization.BinaryDeserializeObject<Route>(solutions[i]));
             }
 
             foreach (var el in solut)
             {
-                var tmpR = el.Split(' ');
-                final_cost += Convert.ToInt16(tmpR[tmpR.Length - 1]);
+                finalCost += el.Cost;
             }
 
-            solut.Add(String.Format("TOTAL_COST: {0}", final_cost));
+            finalCostString = String.Format("TOTAL_COST: {0}\n", finalCost);
 
             for (int i = 0; i < solut.Count; i++)
             {
-                if (i != solut.Count - 1)
+                finalString += "ROUTE: ";
+                foreach(var e in solut[i].Locations)
                 {
-                    final_string += solut[i] + ";";
+                    finalString += e.ToString() + " ";
                 }
-                else
-                {
-                    final_string += solut[i];
-                }
+                finalString += "\n";
             }
+            finalString += finalCostString;
 
             //wynikowy string:
-            //ROUTE #1: 1 2 3 55;ROUTE #2: 2 3 4 66;TOTAL_COST: 777
-            //ostatnia liczba w ROUTE to koasz dla danej drogi
+            //ROUTE: 1 2 3 55
+            //ROUTE: 2 3 4 66
+            //TOTAL_COST: 777
+            //ostatnia liczba w ROUTE to koszt dla danej drogi
 
-            Solution = DataSerialization.GetBytes(final_string);
+            Solution = DataSerialization.GetBytes(finalString);
 
-            if (final_cost != 0) SolutionsMergingFinished(new EventArgs(), this);
+            if (finalCost != 0) SolutionsMergingFinished(new EventArgs(), this);
         }
 
         public override byte[] Solve(byte[] partialData, TimeSpan timeout)
@@ -164,7 +165,7 @@ namespace DvrpUtils
 
                 if (ProblemSolvingFinished != null) ProblemSolvingFinished(new EventArgs(), this);
 
-                return DataSerialization.GetBytes(Parser.ParseRoute(route));
+                return DataSerialization.BinarySerializeObject(route);
             }
             catch(TimeoutException t)
             {

@@ -165,8 +165,9 @@ namespace ComputationalClient
                         "Id: {0} \n" +
                         "Problem type: {1} \n" +
                         "It's computations time: {2}\n" +
+                        "\nSolution: {3}\n\n" +
                         "Closing connection... \n\n",
-                        solutions.Id, solutions.ProblemType, e.ComputationsTime);
+                        solutions.Id, solutions.ProblemType, e.ComputationsTime, DataSerialization.GetString(e.Data));
 
                     working = false;
                     Console.WriteLine("{0} ", DataSerialization.GetString(solutions.Solutions1[0].Data));

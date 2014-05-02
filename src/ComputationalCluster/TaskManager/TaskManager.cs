@@ -128,8 +128,6 @@ namespace TaskManager
                 };
                 networkAdapter.Send(partialProblems, true);
                 Console.WriteLine("SendSolvePartialProblems");
-
-
             }
             catch (Exception e)
             {

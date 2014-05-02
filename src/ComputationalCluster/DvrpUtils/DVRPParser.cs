@@ -26,166 +26,165 @@ namespace DvrpUtils.ProblemDataModel
             DEPOTS,
             EOF,
             ROUTE,
-            TOTAL_COST,
-            VRPTEST
+            TOTAL_COST
         }
 
 
-        const string defaultFileName = "okul12D.vrp";
+        //const string defaultFileName = "okul12D.vrp";
 
         bool mIsBeginState = false;
         DataSection mCurrSect = DataSection.MAIN;
 
-        public string ParseRoute(Route route)
-        {
-            StringBuilder dataBuilder = new StringBuilder();
-            string locs = "";
-            for (int i = 0; i < route.Locations.Count; ++i)
-            {
-                locs = locs + route.Locations[i] + " ";
-            }
-            dataBuilder.AppendLine(String.Format("ROUTE: nr-#{0} cost-#{1}: {2}", route.RouteID, route.Cost, locs));
-            dataBuilder.AppendLine("EOF");
-            return dataBuilder.ToString();
-        }
+        //public string ParseRoute(Route route)
+        //{
+        //    StringBuilder dataBuilder = new StringBuilder();
+        //    string locs = "";
+        //    for (int i = 0; i < route.Locations.Count; ++i)
+        //    {
+        //        locs = locs + route.Locations[i] + " ";
+        //    }
+        //    dataBuilder.AppendLine(String.Format("ROUTE: nr-#{0} cost-#{1}: {2}", route.RouteID, route.Cost, locs));
+        //    dataBuilder.AppendLine("EOF");
+        //    return dataBuilder.ToString();
+        //}
 
-        public Route ParseRoute(string r)
-        {
-            Route route = new Route();
-            String line;
-            try
-            {
-                using (StreamReader sr = new StreamReader(defaultFileName))
-                {
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        var tmpR = line.Split(' ');
+        //public Route ParseRoute(string r)
+        //{
+        //    Route route = new Route();
+        //    String line;
+        //    try
+        //    {
+        //        using (StreamReader sr = new StreamReader(defaultFileName))
+        //        {
+        //            while ((line = sr.ReadLine()) != null)
+        //            {
+        //                var tmpR = line.Split(' ');
 
-                        if (tmpR[0].CompareTo("ROUTE") == 0)
-                        {
-                            for (int i = 3; i < tmpR.Length; ++i)
-                            {
-                                route.Locations.Add(Convert.ToInt16(tmpR[i]));
-                            }
-                            route.RouteID = Convert.ToInt16(tmpR[1][1]);
-                            route.Cost = Convert.ToInt16(tmpR[2][1]);
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("The file could not be read:" + e.Message);
-            }
-            return route;
-        }
+        //                if (tmpR[0].CompareTo("ROUTE") == 0)
+        //                {
+        //                    for (int i = 3; i < tmpR.Length; ++i)
+        //                    {
+        //                        route.Locations.Add(Convert.ToInt16(tmpR[i]));
+        //                    }
+        //                    route.RouteID = Convert.ToInt16(tmpR[1][1]);
+        //                    route.Cost = Convert.ToInt16(tmpR[2][1]);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine("The file could not be read:" + e.Message);
+        //    }
+        //    return route;
+        //}
 
-        public ProblemSolution ParseSolution(string filename)
-        {
-            ProblemSolution problemSolution = new ProblemSolution();
-            List<Route> routes = new List<Route>();
-            int totalCost = 0;
+        //public ProblemSolution ParseSolution(string filename)
+        //{
+        //    ProblemSolution problemSolution = new ProblemSolution();
+        //    List<Route> routes = new List<Route>();
+        //    int totalCost = 0;
 
-            /* example of output (named opt-filename.vrp)
-              ROUTE #1: 13 14 1 22 84
-              ROUTE #2: 2 17 32 2 64
-              ROUTE #3: 5 8 21 27 45
-              ROUTE #4: 63 35 11 36 58
-              TOTAL_COST: 666
-             */
+        //    /* example of output (named opt-filename.vrp)
+        //      ROUTE #1: 13 14 1 22 84
+        //      ROUTE #2: 2 17 32 2 64
+        //      ROUTE #3: 5 8 21 27 45
+        //      ROUTE #4: 63 35 11 36 58
+        //      TOTAL_COST: 666
+        //     */
 
-            String line;
-            try
-            {
-                using (StreamReader sr = new StreamReader(defaultFileName))
-                {
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        checkLine(line);
+        //    String line;
+        //    try
+        //    {
+        //        using (StreamReader sr = new StreamReader(defaultFileName))
+        //        {
+        //            while ((line = sr.ReadLine()) != null)
+        //            {
+        //                checkLine(line);
 
-                        switch (mCurrSect)
-                        {
-                            case DataSection.ROUTE:
-                                Route route = new Route();
-                                var tmpR = line.Split(' ');
+        //                switch (mCurrSect)
+        //                {
+        //                    case DataSection.ROUTE:
+        //                        Route route = new Route();
+        //                        var tmpR = line.Split(' ');
 
-                                for (int i = 2; i < tmpR.Length; ++i)
-                                {
-                                    route.Locations.Add(Convert.ToInt16(tmpR[i]));
-                                }
-                                route.RouteID = Convert.ToInt16(tmpR[1][1]);
-                                routes.Add(route);
-                                break;
-                            case DataSection.TOTAL_COST:
-                                var tmpC = line.Split(' ');
-                                totalCost = Convert.ToInt16(tmpC[1]);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("The file could not be read:" + e.Message);
-            }
-            problemSolution.Routes = ReadRoutes(routes);
-            problemSolution.TotalCost = totalCost;
-            return problemSolution;
-        }
+        //                        for (int i = 2; i < tmpR.Length; ++i)
+        //                        {
+        //                            route.Locations.Add(Convert.ToInt16(tmpR[i]));
+        //                        }
+        //                        route.RouteID = Convert.ToInt16(tmpR[1][1]);
+        //                        routes.Add(route);
+        //                        break;
+        //                    case DataSection.TOTAL_COST:
+        //                        var tmpC = line.Split(' ');
+        //                        totalCost = Convert.ToInt16(tmpC[1]);
+        //                        break;
+        //                    default:
+        //                        break;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine("The file could not be read:" + e.Message);
+        //    }
+        //    problemSolution.Routes = ReadRoutes(routes);
+        //    problemSolution.TotalCost = totalCost;
+        //    return problemSolution;
+        //}
 
-        static public ProblemSolution ParseSolution(byte[] solution)
-        {
-            ProblemSolution problemSolution = new ProblemSolution();
-            List<Route> routes = new List<Route>();
-            int totalCost = 0;
+        //static public ProblemSolution ParseSolution(byte[] solution)
+        //{
+        //    ProblemSolution problemSolution = new ProblemSolution();
+        //    List<Route> routes = new List<Route>();
+        //    int totalCost = 0;
 
-            /* example of output (named opt-filename.vrp)
-              ROUTE #1: 13 14 1 22 84
-              ROUTE #2: 2 17 32 2 64
-              ROUTE #3: 5 8 21 27 45
-              ROUTE #4: 63 35 11 36 58
-              TOTAL_COST: 666
-             */
-            var str = DataSerialization.GetString(solution);
-            var tmp = str.Split(';');
-
-
-            foreach (var el in tmp)
-            {
+        //    /* example of output (named opt-filename.vrp)
+        //      ROUTE #1: 13 14 1 22 84
+        //      ROUTE #2: 2 17 32 2 64
+        //      ROUTE #3: 5 8 21 27 45
+        //      ROUTE #4: 63 35 11 36 58
+        //      TOTAL_COST: 666
+        //     */
+        //    var str = DataSerialization.GetString(solution);
+        //    var tmp = str.Split(';');
 
 
-                switch (el.Split(' ').First())
-                {
-                    case "ROUTE":
-                        Route route = new Route();
-                        route.Locations = new List<int>();
-                        var tmpR = el.Split(' ');
-
-                        for (int i = 2; i < tmpR.Length - 1; ++i)
-                        {
-                            route.Locations.Add(Convert.ToInt16(tmpR[i]));
-                        }
-                        var d = tmpR[1].Split('#');
-                        route.RouteID = Convert.ToInt16(tmpR[1].Split('#').Last().Split(':').First());
-                        route.Cost = Convert.ToInt16(tmpR[tmpR.Length - 1]);
-                        routes.Add(route);
-                        break;
-                    case "TOTAL_COST:":
-                        var tmpC = el.Split(' ');
-                        totalCost = Convert.ToInt16(tmpC[1]);
-                        break;
-                    default:
-                        break;
-                }
-            }
+        //    foreach (var el in tmp)
+        //    {
 
 
-            problemSolution.Routes = routes;
-            problemSolution.TotalCost = totalCost;
-            return problemSolution;
-        }
+        //        switch (el.Split(' ').First())
+        //        {
+        //            case "ROUTE":
+        //                Route route = new Route();
+        //                route.Locations = new List<int>();
+        //                var tmpR = el.Split(' ');
+
+        //                for (int i = 2; i < tmpR.Length - 1; ++i)
+        //                {
+        //                    route.Locations.Add(Convert.ToInt16(tmpR[i]));
+        //                }
+        //                var d = tmpR[1].Split('#');
+        //                route.RouteID = Convert.ToInt16(tmpR[1].Split('#').Last().Split(':').First());
+        //                route.Cost = Convert.ToInt16(tmpR[tmpR.Length - 1]);
+        //                routes.Add(route);
+        //                break;
+        //            case "TOTAL_COST:":
+        //                var tmpC = el.Split(' ');
+        //                totalCost = Convert.ToInt16(tmpC[1]);
+        //                break;
+        //            default:
+        //                break;
+        //        }
+        //    }
+
+
+        //    problemSolution.Routes = routes;
+        //    problemSolution.TotalCost = totalCost;
+        //    return problemSolution;
+        //}
 
 
         public ProblemData Parse(string fileContent)
@@ -199,7 +198,6 @@ namespace DvrpUtils.ProblemDataModel
             List<Depot> ndepot = new List<Depot>();
             List<Customer> nCustomer = new List<Customer>();
             Dictionary<int, Point> nLocation = new Dictionary<int, Point>();
-            List<Vehicle> nVehicle = new List<Vehicle>();
 
             string line;
             try
@@ -210,6 +208,8 @@ namespace DvrpUtils.ProblemDataModel
                     {
                         checkLine(line);
 
+                        if (line.Contains("COMMENT"))
+                            continue;
                         switch (mCurrSect)
                         {
                             case DataSection.MAIN:
@@ -240,18 +240,15 @@ namespace DvrpUtils.ProblemDataModel
                                     else if (identifier.CompareTo("CAPACITIES") == 0)
                                     {
                                         mMaxCapacity = Convert.ToInt16(line.Split(' ').Last());
-                                        for (int i = 1; i <= mNumVehicles; i++)
-                                        {
-                                            var tmp = new Vehicle();
-                                            tmp.VehicleId = i;
-                                            tmp.MaxCapacity = mMaxCapacity;
-                                            nVehicle.Add(tmp);
-                                        }
+                                        nProblemData.Capacity = mMaxCapacity;
+                                    }
+                                    else if (line.Split(' ').First().CompareTo("VRPTEST") == 0)
+                                    {
+                                        nProblemData.Name = line.Split(' ')[1];
                                     }
                                     else
                                     {
-                                        //checkLine(rLine);
-                                        //std::cout << "\n Identifier not needed!\n";
+                                        // Niepotrzebne linie
                                     }
                                 }
                                 break;
@@ -282,13 +279,13 @@ namespace DvrpUtils.ProblemDataModel
                             case DataSection.TIME_AVAIL:
                                 caseTimeAvail(line, ref nCustomer);
                                 break;
-                            case DataSection.VRPTEST:
-                                nProblemData.Name = line;
+                            case DataSection.EOF:
                                 break;
-                            //Add EOFF
+                            default:
+                                // Niepotrzebne linie
+                                break;
                         }
                     }
-                    //Console.WriteLine(line);
                 }
             }
             catch (Exception e)
@@ -297,11 +294,10 @@ namespace DvrpUtils.ProblemDataModel
                 Console.WriteLine(e.Message);
             }
 
-            nProblemData.Vehicles = nVehicle;
+            nProblemData.VehiclesCount = mNumVehicles;
             nProblemData.Depots = ndepot;
             nProblemData.Customers = nCustomer;
             return nProblemData;
-
         }
 
         private void caseDepots(string line, ref List<Depot> ndepot)
@@ -312,13 +308,11 @@ namespace DvrpUtils.ProblemDataModel
             }
             else
             {
-
                 int depot_id = Convert.ToInt16(line.Split(' ').Last());
                 Depot nDepot = new Depot();
                 nDepot.DepotId = depot_id;
 
                 ndepot.Add(nDepot);
-
             }
         }
         private void caseDemand(string line, ref List<Customer> nCustomer)
@@ -329,7 +323,6 @@ namespace DvrpUtils.ProblemDataModel
             }
             else
             {
-
                 int visit_id = Convert.ToInt16(line.Split(' ')[2]);
                 int visit_demand = Convert.ToInt16(line.Split(' ').Last());
 
@@ -337,7 +330,6 @@ namespace DvrpUtils.ProblemDataModel
                 ncustomer.CustomerId = visit_id;
                 ncustomer.StartDate = visit_demand;
                 nCustomer.Add(ncustomer);
-
             }
         }
         private void caseLocationCoord(string line, ref Dictionary<int, Point> nLocation)
@@ -348,14 +340,12 @@ namespace DvrpUtils.ProblemDataModel
             }
             else
             {
-
                 var tmp2 = line.Split(' ');
                 int location_id = Convert.ToInt16(tmp2[2]);
                 int coord_x = Convert.ToInt16(tmp2[3]);
                 int coord_y = Convert.ToInt16(tmp2[4]);
 
                 nLocation.Add(location_id, new Point(coord_x, coord_y));
-
             }
         }
         private void caseDeptLocation(string line, ref List<Depot> ndepot, Dictionary<int, Point> nLocation)
@@ -366,11 +356,10 @@ namespace DvrpUtils.ProblemDataModel
             }
             else
             {
-
                 int depot_id = Convert.ToInt16(line.Split(' ')[2]);
                 int location_id = Convert.ToInt16(line.Split(' ').Last());
-                ndepot.First(d => d.DepotId == depot_id).Location = nLocation[location_id];
 
+                ndepot.First(d => d.DepotId == depot_id).Location = nLocation[location_id];
             }
         }
         private void caseVisitLocation(string line, ref List<Customer> nCustomer, Dictionary<int, Point> nLocation)
@@ -381,11 +370,9 @@ namespace DvrpUtils.ProblemDataModel
             }
             else
             {
-
                 int visit_id = Convert.ToInt16(line.Split(' ')[2]);
                 int location_id = Convert.ToInt16(line.Split(' ').Last());
                 nCustomer.First(d => d.CustomerId == visit_id).Location = nLocation[location_id];
-
             }
         }
         private void caseDuration(string line, ref List<Customer> nCustomer)
@@ -396,14 +383,13 @@ namespace DvrpUtils.ProblemDataModel
             }
             else
             {
-
                 int visit_id = Convert.ToInt16(line.Split(' ')[2]);
                 int duration = Convert.ToInt16(line.Split(' ').Last());
 
                 nCustomer.First(d => d.CustomerId == visit_id).Duration = duration;
-
             }
         }
+
         private void caseDepotTime(string line, ref List<Depot> ndepot)
         {
             if (mIsBeginState)
@@ -417,9 +403,9 @@ namespace DvrpUtils.ProblemDataModel
 
                 ndepot.First(d => d.DepotId == depot_id).StartTime = Convert.ToInt16(tmp2[3]);
                 ndepot.First(d => d.DepotId == depot_id).EndTime = Convert.ToInt16(tmp2[4]);
-
             }
         }
+
         private void caseTimeAvail(string line, ref List<Customer> nCustomer)
         {
             if (mIsBeginState)
@@ -428,11 +414,10 @@ namespace DvrpUtils.ProblemDataModel
             }
             else
             {
-
                 int visit_id = Convert.ToInt16(line.Split(' ')[2]);
                 int avail_time = Convert.ToInt16(line.Split(' ').Last());
-                nCustomer.First(d => d.CustomerId == visit_id).Duration = avail_time;
 
+                nCustomer.First(d => d.CustomerId == visit_id).TimeAvailable = avail_time;
             }
         }
 
@@ -502,101 +487,6 @@ namespace DvrpUtils.ProblemDataModel
             {
                 mCurrSect = DataSection.EOF;
             }
-            else if (line.Split(' ').First().CompareTo("ROUTE") == 0)
-            {
-                mCurrSect = DataSection.ROUTE;
-            }
-            else if (line.Split(' ').First().CompareTo("TOTAL_COST") == 0)
-            {
-                mCurrSect = DataSection.TOTAL_COST;
-            }
-            else if (line.Split(' ').First().CompareTo("VRPTEST") == 0)
-            {
-                mCurrSect = DataSection.VRPTEST;
-            }
-        }
-
-        public string Parse(ProblemData problemData)
-        {
-            StringBuilder dataBuilder = new StringBuilder();
-            dataBuilder.AppendLine(String.Format("NAME: {0}", problemData.Name));
-            dataBuilder.AppendLine(String.Format("NUM_DEPOTS: {0}", problemData.Depots.Count()));
-            dataBuilder.AppendLine(String.Format("NUM_CAPACITIES: 1"));
-            dataBuilder.AppendLine(String.Format("NUM_LOCATIONS: {0}", problemData.Customers.Count()));
-            dataBuilder.AppendLine(String.Format("NUM_VEHICLES: {0}", problemData.Vehicles.Count()));
-            //The feet of vehicles is homogeneous
-            dataBuilder.AppendLine(String.Format("CAPACITIES: {0}", problemData.Vehicles.First().Capacity));
-            dataBuilder.AppendLine("DATA_SECTION");
-
-            DemandParse(problemData, ref dataBuilder);
-            DurationParse(problemData, ref dataBuilder);
-            DepotsParse(problemData, ref dataBuilder);
-            LocationParse(problemData, ref dataBuilder);
-            DepotTimeParse(problemData, ref dataBuilder);
-            CustomerTimeParse(problemData, ref dataBuilder);
-
-            dataBuilder.AppendLine("EOF");
-            return dataBuilder.ToString();
-        }
-
-        private void LocationParse(ProblemData problemData, ref StringBuilder dataBuilder)
-        {
-
-            dataBuilder.AppendLine("LOCATION_COORD_SECTION");
-            foreach (var depot in problemData.Depots)
-            {
-                dataBuilder.AppendLine(String.Format("{0} {1} {2}", depot.DepotId, depot.Location.X, depot.Location.Y));
-            }
-            foreach (var customer in problemData.Customers)
-            {
-                dataBuilder.AppendLine(String.Format("{0} {1} {2}", customer.CustomerId, customer.Location.X,
-                    customer.Location.Y));
-            }
-
-        }
-        private void DepotsParse(ProblemData problemData, ref StringBuilder dataBuilder)
-        {
-            dataBuilder.AppendLine("DEPOTS");
-            foreach (var depot in problemData.Depots)
-            {
-                dataBuilder.AppendLine(String.Format("{0}", depot.DepotId));
-            }
-
-        }
-        private void DemandParse(ProblemData problemData, ref StringBuilder dataBuilder)
-        {
-            dataBuilder.AppendLine("DEMAND_SECTION");
-            foreach (var customer in problemData.Customers)
-            {
-                dataBuilder.AppendLine(String.Format("{0} {1}", customer.CustomerId, customer.Size));
-            }
-        }
-        private void DurationParse(ProblemData problemData, ref StringBuilder dataBuilder)
-        {
-            dataBuilder.AppendLine("DEMAND_SECTION");
-            foreach (var customer in problemData.Customers)
-            {
-                dataBuilder.AppendLine(String.Format("{0} {1}", customer.CustomerId, customer.Duration));
-            }
-
-        }
-        private void DepotTimeParse(ProblemData problemData, ref StringBuilder dataBuilder)
-        {
-            dataBuilder.AppendLine("DEPOT_TIME_WINDOW_SECTION");
-            foreach (var depot in problemData.Depots)
-            {
-                dataBuilder.AppendLine(String.Format("{0} {1} {2}", depot.DepotId, depot.StartTime, depot.EndTime));
-            }
-
-        }
-        private void CustomerTimeParse(ProblemData problemData, ref StringBuilder dataBuilder)
-        {
-            dataBuilder.AppendLine("TIME_AVAIL_SECTION");
-            foreach (var customer in problemData.Customers)
-            {
-                dataBuilder.AppendLine(String.Format("{0} {1}", customer.CustomerId, customer.TimeAvailable));
-            }
-
         }
     }
 }

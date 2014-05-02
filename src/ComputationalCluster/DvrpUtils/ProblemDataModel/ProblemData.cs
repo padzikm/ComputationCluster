@@ -16,7 +16,7 @@ namespace DvrpUtils.ProblemDataModel
         [NonSerialized]
         private IEnumerable<Customer> customers;
         [NonSerialized]
-        private IEnumerable<Vehicle> vehicles;
+        private int vehiclesCount;
         [NonSerialized]
         private IEnumerable<Depot> depots;
 
@@ -32,10 +32,10 @@ namespace DvrpUtils.ProblemDataModel
             set { customers = value; }
         }
 
-        public IEnumerable<Vehicle> Vehicles
+        public int VehiclesCount
         {
-            get { return vehicles; }
-            set { vehicles = value; }
+            get { return vehiclesCount; }
+            set { vehiclesCount = value; }
         }
 
         public IEnumerable<Depot> Depots
