@@ -70,7 +70,7 @@ namespace DvrpUtils
                         if (customer.TimeAvailable > cutOffTime)
                             customer.TimeAvailable = 0;
 
-                        capacity += customer.Size;
+                        capacity += customer.Demand;
                         problem.Path.Add(customer.CustomerId, customer.Location);
                     }
                     //TODO more depots?
