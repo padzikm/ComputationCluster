@@ -82,6 +82,7 @@ namespace Common
             {
                 while (true)
                 {
+                    Thread.Sleep(period);
                     client = new TcpClient(serverName, connectionPort);
                     stream = client.GetStream();
                     if (!Send(CurrentStatus, false))
