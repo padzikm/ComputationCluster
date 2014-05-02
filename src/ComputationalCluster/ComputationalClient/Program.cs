@@ -16,7 +16,8 @@ namespace ComputationalClient
     {
         static String message = "Problem sent successfully.\nComputation is in progress... Press ENTER to check a problem status.";
 
-        static string defaultProblemFile = "../../../../../doc/SampleProblems/okul12D.vrp";
+        //static string defaultProblemFile = "../../../../../doc/SampleProblems/okul12D.vrp";
+        static string defaultProblemFile = "C:\\Users\\Kamil\\Documents\\GitHub\\ComputationCluster\\doc\\SampleProblems\\okul12D.vrp";
 
         static string addressIp;
         static int port;
@@ -37,7 +38,7 @@ namespace ComputationalClient
                 port = int.Parse(args[1]);
                 name = args[2];
                 timeout = ulong.Parse(args[3]);
-                pathToFile = args[4];
+                pathToFile = "";//args[4];
                 problemBytes = GetBytesFromVrp(pathToFile);
                 //Console.WriteLine(addressIp + " " + port + " " + name + " " + timeout + " " + args[4]);
                 //ReadData();
@@ -97,6 +98,7 @@ namespace ComputationalClient
             StreamReader streamReader = new StreamReader(name);
             var problemString = streamReader.ReadToEnd();
             streamReader.Close();
+            Console.WriteLine(problemBytes);
             return DataSerialization.GetBytes(problemString);
         }
     }

@@ -26,7 +26,8 @@ namespace DvrpUtils.ProblemDataModel
             DEPOTS,
             EOF,
             ROUTE,
-            TOTAL_COST
+            TOTAL_COST,
+            VRPTEST
         }
 
 
@@ -187,7 +188,7 @@ namespace DvrpUtils.ProblemDataModel
         }
 
 
-        public ProblemData Parse(string filename)
+        public ProblemData Parse(string fileContent)
         {
             int mNumDepots = 1;
             int mNumVisits = 1;
@@ -200,10 +201,10 @@ namespace DvrpUtils.ProblemDataModel
             Dictionary<int, Point> nLocation = new Dictionary<int, Point>();
             List<Vehicle> nVehicle = new List<Vehicle>();
 
-            String line;
+            string line;
             try
             {
-                using (StreamReader sr = new StreamReader(defaultFileName))
+                using (StringReader sr = new StringReader(fileContent))
                 {
                     while ((line = sr.ReadLine()) != null)
                     {
@@ -280,6 +281,9 @@ namespace DvrpUtils.ProblemDataModel
                                 break;
                             case DataSection.TIME_AVAIL:
                                 caseTimeAvail(line, ref nCustomer);
+                                break;
+                            case DataSection.VRPTEST:
+                                nProblemData.Name = line;
                                 break;
                             //Add EOFF
                         }
@@ -506,7 +510,10 @@ namespace DvrpUtils.ProblemDataModel
             {
                 mCurrSect = DataSection.TOTAL_COST;
             }
-
+            else if (line.Split(' ').First().CompareTo("VRPTEST") == 0)
+            {
+                mCurrSect = DataSection.VRPTEST;
+            }
         }
 
         public string Parse(ProblemData problemData)
