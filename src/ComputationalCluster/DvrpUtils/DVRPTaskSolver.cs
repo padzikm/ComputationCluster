@@ -35,17 +35,17 @@ namespace DvrpUtils
             var problem = parser.Parse(DataSerialization.GetString(_problemData));
 
             var customersSet = Partitioning.GetAllPartitions(problem.Customers.ToArray()).ToList();
-            var problemsToSend = new List<List<ProblemData>>();
+            var problemsToSend = new List<ProblemData>();
 
             //TODO more depots?
             double cutOffTime = problem.Depots.First().EndTime * cutOff;
-            //each problem
-            for (int i = 0; i < customersSet.Count; i++)
+            //each problem set
+            foreach (var set in customersSet)
             {
                 List<ProblemData> datas = new List<ProblemData>();
                 int vehicleCount = problem.Vehicles.Count();
-                //each set
-                for (int j = 0; j < customersSet[i].Length; j++)
+                //each subSet
+                foreach (var subSet in set)
                 {
                     var data = new ProblemData{Depots = problem.Depots, Path = new Dictionary<int, Point>()};
                     var locations = new List<Point>();
@@ -57,9 +57,8 @@ namespace DvrpUtils
                         locations.Add(depot.Location);
                         path.Add(depot.DepotId);
                     }
-                    for (int k = 0; k < customersSet[i][j].Length; k++)
+                    foreach (var customer in subSet)
                     {
-                        var customer = customersSet[i][j][k];
                         if (customer.TimeAvailable > cutOffTime)
                             customer.TimeAvailable = 0;
 
@@ -77,13 +76,13 @@ namespace DvrpUtils
                     if (vehicleCount < 0) break;
                 }
                 if (vehicleCount >= 0)
-                    problemsToSend.Add(datas);
+                    problemsToSend.Concat(datas);
             }
 
             var serializedProblems = new List<byte[]>();
             foreach (var problems in problemsToSend)
             {
-                serializedProblems.AddRange(problems.Select(DataSerialization.BinarySerializeObject));
+                serializedProblems.Add(DataSerialization.BinarySerializeObject(problems));
             }
             
             if (ProblemDividingFinished != null) ProblemDividingFinished(new EventArgs(), this);
