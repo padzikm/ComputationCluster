@@ -105,7 +105,7 @@ namespace TaskManager
                 taskSolver = new DVRPTaskSolver(problem.Data);
                 var dividedProblems = taskSolver.DivideProblem((int) problem.ComputationalNodes);
                 var solvePartialProblemsPartialProblem = new SolvePartialProblemsPartialProblem[dividedProblems.Length];
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < dividedProblems.Length; i++)
                 {
                     solvePartialProblemsPartialProblem[i] = new SolvePartialProblemsPartialProblem {Data = dividedProblems[i], TaskId = ++taskId};
                 }
