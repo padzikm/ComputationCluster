@@ -115,6 +115,8 @@ namespace Common
                     if (!Send(CurrentStatus, false))
                         break;
 
+                    Thread.Sleep(period);
+
                     var readBuffer = new byte[MaxBufferLenght];
                     stream.Read(readBuffer, 0, readBuffer.Length);
                     
@@ -139,7 +141,7 @@ namespace Common
                         }
                     }
                 }
-                Thread.Sleep(period);
+                
                 
             });
             t.Start();
