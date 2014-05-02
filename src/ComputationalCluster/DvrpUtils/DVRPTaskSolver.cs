@@ -144,26 +144,23 @@ namespace DvrpUtils
         {
             State = TaskSolverState.Solving;
 
-            double timeout_ms = 0;
-            timeout_ms += timeout.Milliseconds;
-            timeout_ms += 1000 * timeout.Seconds;
-            timeout_ms += 1000 * 60 * timeout.Minutes;
+            double timeoutMs = 0;
+            timeoutMs += timeout.Milliseconds;
+            timeoutMs += 1000 * timeout.Seconds;
+            timeoutMs += 1000 * 60 * timeout.Minutes;
 
-            string partialDataString = DataSerialization.GetString(partialData);
-            ProblemData partialProblemData = Parser.Parse(partialDataString);
+            var partialProblemData = DataSerialization.BinaryDeserializeObject<ProblemData>(partialData);
  
-            Dictionary<int, Point> Path = partialProblemData.Path as Dictionary<int, Point>;
-            List<int> path = partialProblemData.Path.Values as List<int>;
+            Dictionary<int, Point> dictionaryPath = partialProblemData.Path as Dictionary<int, Point>;
+            if (dictionaryPath == null) throw new ArgumentNullException("partialData");
+            var path = partialProblemData.Path.Values as List<int>;
 
-            Algorithms tsp = new Algorithms(Path.Values.ToList(), timeout_ms);
+            Algorithms tsp = new Algorithms(dictionaryPath.Values.ToList(), timeoutMs);
 
             try
             {
-                double min_cost = tsp.Run(ref path);
-                Route route = new Route();
-                route.RouteID = partialProblemData.VehicleID;
-                route.Cost = min_cost;
-                route.Locations = path;
+                double minCost = tsp.Run(ref path);
+                Route route = new Route {RouteID = partialProblemData.VehicleID, Cost = minCost, Locations = path};
 
                 if (ProblemSolvingFinished != null) ProblemSolvingFinished(new EventArgs(), this);
 
