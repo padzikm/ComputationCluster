@@ -47,10 +47,10 @@ namespace TaskManager
             networkAdapter.CloseConnection();
             statusThreads = new StatusThread[1];
 
-            statusThreads[0] = new StatusThread { State = StatusThreadState.Busy, HowLong = 1000, TaskId = registerResponse.Id, ProblemType = "DVRP" };
+            statusThreads[0] = new StatusThread { State = StatusThreadState.Idle, HowLong = 0, TaskId = registerResponse.Id, ProblemType = "DVRP" };
             networkAdapter.CurrentStatus = new Status { Id = registerResponse.Id, Threads = statusThreads };
             int timeout = int.Parse(registerResponse.Timeout.Substring(6, 2));
-            networkAdapter.StartKeepAliveTask(timeout * 1000, SendPartialProblems, SendFinalSolution);
+            networkAdapter.StartKeepAliveTask(timeout * 1000, SendPartialProblems, SendFinalSolution, ReceiveDivide, ReceiveSolutions);
         }
 
         private void SendRegisterMessage()
@@ -83,11 +83,18 @@ namespace TaskManager
         {
             try
             {
+                List<byte[]> solutions = new List<byte[]>();
+                foreach (var partialSolution in solution.Solutions1)
+                {
+                    solutions.Add(partialSolution.Data);
+                }
+                taskSolver.MergeSolution(solutions.ToArray());
+                
                 var solutionToSend = new Solutions
                 {
                     ProblemType = "DVRP",
                     Id = 1,
-                    Solutions1 = new[] { new SolutionsSolution { Type = SolutionsSolutionType.Final, TaskId = (ulong) id, Data = new byte[5]} }
+                    Solutions1 = new[] { new SolutionsSolution { Type = SolutionsSolutionType.Final, TaskId = (ulong) id, Data = taskSolver.Solution} }
                 };
                 networkAdapter.Send(solutionToSend, true);
             }
@@ -129,6 +136,16 @@ namespace TaskManager
                 Console.WriteLine("Cannot send partial problems to server");
             }
 
+        }
+
+        private void ReceiveDivide(DivideProblem divideProblem)
+        {
+            problem = divideProblem;
+        }
+
+        private void ReceiveSolutions(Solutions solutions)
+        {
+            this.solution = solutions;
         }
 
     }

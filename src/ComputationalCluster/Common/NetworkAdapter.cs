@@ -103,7 +103,7 @@ namespace Common
         /// <param name="period"> Keepalive timeout </param>
         /// <param name="sendDivide">method handling divide action</param>
         /// <param name="sendMerge">method handling merge action</param>
-        public void StartKeepAliveTask(int period, Action<ulong> sendDivide, Action<ulong> sendMerge)
+        public void StartKeepAliveTask(int period, Action<ulong> sendDivide, Action<ulong> sendMerge, Action<DivideProblem> handleDivide, Action<Solutions> handleSolutions)
         {
             var t = new Thread(() =>
             {
@@ -128,17 +128,20 @@ namespace Common
 
                         if (deserialized != null)
                         {
+                            handleDivide(deserialized);
                             sendDivide(deserialized.Id);
                         }
                         else
                         {
                             var deserialized2 = MessageSerialization.Deserialize<Solutions>(readMessage);
+                            handleSolutions(deserialized2);
                             if (deserialized2 != null)
                                 sendMerge(deserialized2.Id);
                         }
                     }
+                    Thread.Sleep(period);
                 }
-                Thread.Sleep(period);
+                
                 
             });
             t.Start();
