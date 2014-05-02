@@ -141,6 +141,7 @@ namespace DvrpUtils
             if (finalCost != 0) SolutionsMergingFinished(new EventArgs(), this);
         }
 
+        // TODO: if (ProblemSolvingFinished != null) TO JEST DOBRZE?
         public override byte[] Solve(byte[] partialData, TimeSpan timeout)
         {
             State = TaskSolverState.Solving;
@@ -154,7 +155,7 @@ namespace DvrpUtils
  
             Dictionary<int, Point> dictionaryPath = partialProblemData.Path as Dictionary<int, Point>;
             if (dictionaryPath == null) throw new ArgumentNullException("partialData");
-            var path = partialProblemData.Path.Values as List<int>;
+            var path = partialProblemData.Path.Keys.ToList(); 
 
             Algorithms tsp = new Algorithms(dictionaryPath.Values.ToList(), timeoutMs);
 
@@ -162,6 +163,8 @@ namespace DvrpUtils
             {
                 double minCost = tsp.Run(ref path);
                 Route route = new Route {RouteID = partialProblemData.VehicleID, Cost = minCost, Locations = path};
+
+                Console.WriteLine(minCost);
 
                 if (ProblemSolvingFinished != null) ProblemSolvingFinished(new EventArgs(), this);
 
