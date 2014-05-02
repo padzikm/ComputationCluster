@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace DvrpUtils
 {
@@ -11,6 +12,8 @@ namespace DvrpUtils
         Dictionary<Tuple<int, int>, double> Distances = new Dictionary<Tuple<int, int>, double>();
 
         List<Point> Points;
+
+        Timer timer;
 
         private void WriteLinePoint(List<Point> list)
         {
@@ -30,21 +33,38 @@ namespace DvrpUtils
             Console.WriteLine(l);
         }
 
-        public Algorithms(List<Point> points)
+        public Algorithms(List<Point> points, double timeout)
         {
             Points = points;
             Points.Add(points[0]);
             ComputeDistances();
+
+            Timer timer = new Timer()
+            {
+                Interval = timeout,
+                Enabled = true,
+            };
+            timer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
+        }
+
+        private void OnTimedEvent(object source, ElapsedEventArgs e)
+        {
+            throw new TimeoutException();
         }
 
         public double Run(ref List<int> points)
         {
+            timer.Start();
+
             WriteLineInt(points);
             List<int> temp = PreProcessing(points);
             WriteLineInt(temp);
             TwoOpt(ref temp);
             WriteLineInt(temp);
             points = temp;
+
+            timer.Stop();
+
             return RouteDistance(points);
         }
 
