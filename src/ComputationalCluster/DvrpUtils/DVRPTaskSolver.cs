@@ -41,63 +41,60 @@ namespace DvrpUtils
             var problem = Parser.Parse(DataSerialization.GetString(_problemData));
 
             var customersSet = Partitioning.Partition(problem.Customers.ToList());
-            var problemsToSend = new List<ProblemData>();
-
-            //TODO more depots?
-            double cutOffTime = problem.Depots.First().EndTime * cutOff;
-            //each problem set
-            int partitions = 0;
-            foreach (var set in customersSet)
-            {
-                List<ProblemData> datas = new List<ProblemData>();
-                int vehicleCount = problem.VehiclesCount;
-                //each subSet
-                foreach (var subSet in set)
-                {
-                    var data = new ProblemData{Depots = problem.Depots, Path = new Dictionary<int, Point>()};
-                    int capacity = problem.Capacity;
-
-                    foreach (var depot in problem.Depots)
-                    {
-                        data.Path.Add(depot.DepotId, depot.Location);
-                    }
-                    foreach (var customer in subSet)
-                    {
-                        if (customer.TimeAvailable > cutOffTime)
-                            customer.TimeAvailable = 0;
-
-                        capacity += customer.Demand;
-                        data.Path.Add(customer.CustomerId, customer.Location);
-                    }
-                    //TODO more depots?
-                    if (capacity > 0 && vehicleCount > 0)
-                    {
-                        datas.Add(data);
-                        vehicleCount--;
-                    }
-                    else
-                    {
-                        vehicleCount = -1;
-                        break;
-                    }
-                    if (vehicleCount < 0) break;
-                }
-                if (vehicleCount >= 0)
-                {
-                    problemsToSend.AddRange(datas);
-                    partitions++;
-                }
-            }
-
             var serializedProblems = new List<byte[]>();
-            foreach (var problems in problemsToSend)
+            foreach (var partition in customersSet)
             {
-                serializedProblems.Add(DataSerialization.BinarySerializeObject(problems));
+                var newProblem = problem.Clone();
+                newProblem.Partitions = partition;
+                serializedProblems.Add(DataSerialization.BinarySerializeObject(newProblem));
             }
             
             if (ProblemDividingFinished != null) ProblemDividingFinished(new EventArgs(), this);
 
             return serializedProblems.ToArray();
+        }
+
+        private bool ValidatePartition(IEnumerable<List<Customer>> customerSet, ProblemData problem, out List<ProblemData> problemDatasList )
+        {
+            //TODO more depots
+            double cutOffTime = problem.Depots.First().EndTime * cutOff;
+            problemDatasList = new List<ProblemData>();
+            int vehicleCount = problem.VehiclesCount;
+            //each subSet
+            foreach (var subSet in customerSet)
+            {
+                var data = new ProblemData { Depots = problem.Depots, Path = new Dictionary<int, Point>() };
+                int capacity = problem.Capacity;
+
+                foreach (var depot in problem.Depots)
+                {
+                    data.Path.Add(depot.DepotId, depot.Location);
+                }
+                foreach (var customer in subSet)
+                {
+                    if (customer.TimeAvailable > cutOffTime)
+                        customer.TimeAvailable = 0;
+
+                    capacity += customer.Demand;
+                    data.Path.Add(customer.CustomerId, customer.Location);
+                }
+                //TODO more depots?
+                if (capacity > 0 && vehicleCount > 0)
+                {
+                    problemDatasList.Add(data);
+                    vehicleCount--;
+                }
+                else
+                {
+                    vehicleCount = -1;
+                    break;
+                }
+                if (vehicleCount < 0) break;
+            }
+            if (vehicleCount > 0)
+                return true;
+            problemDatasList.Clear();
+            return false;
         }
 
         // TODO: czy jest na 100% poprawnie? zamiast uzywac += string uzywac StringBuilder
@@ -165,10 +162,6 @@ namespace DvrpUtils
         public override byte[] Solve(byte[] partialData, TimeSpan timeout)
         {
             State = TaskSolverState.Solving;
-
-
-
-            
 
             int timeoutMs = 0;
             
