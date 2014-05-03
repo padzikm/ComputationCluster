@@ -155,7 +155,8 @@ namespace ComputationalNode
 
                     foreach (var problemData in problem.PartialProblems)
                     {                      
-                        var solution = DVRPSolver.Solve(problemData.Data, new TimeSpan((long)problem.SolvingTimeout));
+                        var solution = DVRPSolver.Solve(problemData.Data, TimeSpan.FromMilliseconds( (long)problem.SolvingTimeout ));
+                        if (solution != null)
                         solutions.Add(problemData.TaskId, solution);
                     }
 
