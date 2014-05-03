@@ -40,7 +40,8 @@ namespace DvrpUtils
             //WriteLineInt(points);
             List<int> temp = PreProcessing(points);
             //WriteLineInt(temp);
-            TwoOpt(ref temp);
+            if (temp.Count > 2)
+                TwoOpt(ref temp);
             //WriteLineInt(temp);
             points = temp;
 
