@@ -109,32 +109,49 @@ namespace DvrpUtils
             State = TaskSolverState.Merging;
 
             List<Route> solut = new List<Route>();
-            string finalCostString = "";
-            string finalString = "";
-            double finalCost = 0;
+            Dictionary<int, double> vehicles = new Dictionary<int, double>();
 
             for (int i = 0; i < solutions.GetLength(0); i++)
             {
                 solut.Add(DataSerialization.BinaryDeserializeObject<Route>(solutions[i]));
             }
 
+            // czy to dobrze dodaje wszystkie unikalne numery aut z listy rozwiazan?
+            //vehicles.Keys = solut.Select(x=>x.RouteID).Distinct();
+
+            foreach(var el in solut)
+            {
+                if (!vehicles.ContainsKey(el.RouteID))
+                    vehicles.Add(el.RouteID, double.MaxValue);
+            }
+
+            string finalCostString = "";
+            string finalString = "";
+            double finalCost = 0;
+
             foreach (var el in solut)
             {
-                finalCost += el.Cost;
+                if (el.Cost < vehicles[el.RouteID])
+                    vehicles[el.RouteID] = el.Cost;
+            }
+
+            foreach (var el in vehicles)
+            {
+                finalCost += el.Value;
             }
 
             finalCostString = String.Format("TOTAL_COST: {0}\n", finalCost);
 
-            for (int i = 0; i < solut.Count; i++)
-            {
-                finalString += "ROUTE: ";
-                foreach(var e in solut[i].Locations)
-                {
-                    finalString += e.ToString() + " ";
-                }
-                finalString += "\n";
-            }
-            finalString += finalCostString;
+            //for (int i = 0; i < solut.Count; i++)
+            //{
+            //    finalString += "ROUTE: ";
+            //    foreach(var e in solut[i].Locations)
+            //    {
+            //        finalString += e.ToString() + " ";
+            //    }
+            //    finalString += "\n";
+            //}
+            //finalString += finalCostString;
 
             //wynikowy string:
             //ROUTE: 1 2 3 55
@@ -153,7 +170,7 @@ namespace DvrpUtils
             State = TaskSolverState.Solving;
 
             int timeoutMs = 0;
-            timeoutMs += timeout.Milliseconds;
+            
             timeoutMs += 1000 * timeout.Seconds;
             timeoutMs += 1000 * 60 * timeout.Minutes;
 
@@ -173,7 +190,7 @@ namespace DvrpUtils
                         minCost = tsp.Run(ref path);                  
                     }, timeoutMs);
 
-                Route route = new Route {RouteID = partialProblemData.VehicleID, Cost = minCost, Locations = path};
+                Route route = new Route { RouteID = partialProblemData.VehicleID, Cost = minCost, Locations = path };
 
                 Console.WriteLine(minCost);
 

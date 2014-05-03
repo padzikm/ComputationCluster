@@ -156,7 +156,9 @@ namespace ComputationalNode
                     foreach (var problemData in problem.PartialProblems)
                     {                      
                         var solution = DVRPSolver.Solve(problemData.Data, new TimeSpan((long)problem.SolvingTimeout));
-                        solutions.Add(problemData.TaskId, solution);
+
+                        if (solution != null)
+                            solutions.Add(problemData.TaskId, solution);
                     }
 
                     Console.WriteLine("Recive SolvePartialProblems");

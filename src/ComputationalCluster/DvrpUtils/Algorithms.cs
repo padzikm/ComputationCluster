@@ -58,7 +58,10 @@ namespace DvrpUtils
                     Distances.Add(point, actualDist);
 
                     if (i != j)
-                        Distances.Add(point, actualDist);
+                    {
+                        Tuple<int, int> pointTranspon = new Tuple<int, int>(j, i);
+                        Distances.Add(pointTranspon, actualDist);
+                    }
                 }
             }
         }
