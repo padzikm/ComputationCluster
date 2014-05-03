@@ -164,36 +164,55 @@ namespace DvrpUtils
             State = TaskSolverState.Solving;
 
             int timeoutMs = 0;
-            
+
             timeoutMs += 1000 * timeout.Seconds;
             timeoutMs += 1000 * 60 * timeout.Minutes;
             timeoutMs += timeout.Milliseconds;
 
             var partialProblemData = DataSerialization.BinaryDeserializeObject<ProblemData>(partialData);
- 
-            Dictionary<int, Point> dictionaryPath = partialProblemData.Path as Dictionary<int, Point>;
-            if (dictionaryPath == null) throw new ArgumentNullException("partialData");
-            var path = partialProblemData.Path.Keys.ToList();
+
+            List<ProblemData> ValidatedProblems = new List<ProblemData>();
+            List<Point> points = new List<Point>();
+            List<int> path = null;
+            List<double> finalCosts = new List<double>();
+            double cost = 0;
 
             try
             {
-                double minCost = 0;
-   
                 Compute(() =>
+                {
+                    if (partialProblemData != null) throw new ArgumentNullException("partialProblemData");
+
+                    points.AddRange(partialProblemData.Depots.Select(x => x.Location));
+                    points.AddRange(partialProblemData.Customers.Select(x => x.Location));
+
+                    Algorithms tsp = new Algorithms(points);
+
+                    
+                    points = partialProblemData.Path.Values.ToList();
+
+                    var combinations = Partitioning.Combinations(new int[2], 0, 0);// TODO: int -> Customer
+
+                    if(ValidatePartition(new List<List<Customer>>(), partialProblemData, out ValidatedProblems))
                     {
-                        Algorithms tsp = new Algorithms(dictionaryPath.Values.ToList(), timeoutMs); 
-                        minCost = tsp.Run(ref path);                  
-                    }, timeoutMs);
+                        foreach (var com in ValidatedProblems)
+                        {
+                            path = com.Path.Keys.ToList();
+                            cost += tsp.Run(ref path);                
+                        }
 
-                Route route = new Route { RouteID = 0, Cost = minCost, Locations = path };
+                        finalCosts.Add(cost); // TODO: how to handle final cost?
+                    }
+                                  
+                }, timeoutMs);
 
-                Console.WriteLine(minCost);
+                Console.WriteLine("Ilość kosztów dla różnych możliwości: {0}", finalCosts.Count);
 
                 if (ProblemSolvingFinished != null) ProblemSolvingFinished(new EventArgs(), this);
 
-                return DataSerialization.BinarySerializeObject(route);
+                return DataSerialization.BinarySerializeObject(finalCosts.Min());
             }
-            catch(TimeoutException t)
+            catch (TimeoutException t)
             {
                 State = TaskSolverState.Error | TaskSolverState.Idle;
                 ErrorOccured(this, new UnhandledExceptionEventArgs(t, true));

@@ -36,7 +36,7 @@ namespace DvrpUtils
 
         }
 
-        private static List<List<int>> Combinations(int[] array, int startingIndex = 0, int combinationLenght = 2)
+        public static List<List<int>> Combinations(int[] array, int startingIndex = 0, int combinationLenght = 2)
         {
 
             List<List<int>> combinations = new List<List<int>>();
