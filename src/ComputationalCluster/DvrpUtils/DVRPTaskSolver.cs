@@ -165,11 +165,7 @@ namespace DvrpUtils
         public override byte[] Solve(byte[] partialData, TimeSpan timeout)
         {
             State = TaskSolverState.Solving;
-
-
-
             
-
             int timeoutMs = 0;
             
             timeoutMs += 1000 * timeout.Seconds;
@@ -177,28 +173,44 @@ namespace DvrpUtils
             timeoutMs += timeout.Milliseconds;
 
             var partialProblemData = DataSerialization.BinaryDeserializeObject<ProblemData>(partialData);
- 
-            Dictionary<int, Point> dictionaryPath = partialProblemData.Path as Dictionary<int, Point>;
-            if (dictionaryPath == null) throw new ArgumentNullException("partialData");
-            var path = partialProblemData.Path.Keys.ToList();
+            
+            List<Point> points = new List<Point>();
+            List<int> path = null;
+            List<double> finalCosts = new List<double>();
+            double cost = 0;
 
             try
             {
-                double minCost = 0;
-   
                 Compute(() =>
                     {
-                        Algorithms tsp = new Algorithms(dictionaryPath.Values.ToList(), timeoutMs); 
-                        minCost = tsp.Run(ref path);                  
+                        if (partialProblemData != null) throw new ArgumentNullException("partialProblemData");
+
+                        points.AddRange(partialProblemData.Depots.Select(x => x.Location));
+                        points.AddRange(partialProblemData.Customers.Select(x => x.Location));
+
+                        Algorithms tsp = new Algorithms(points);
+
+                        // validation()
+
+                        path = partialProblemData.Path.Keys.ToList();
+                        points = partialProblemData.Path.Values.ToList();
+
+                        var combinations = SetCombinations(path, points);
+
+                        foreach(var com in combinations)
+                        {
+                            foreach(var com2 in com)
+                                cost += tsp.Run(ref path);
+
+                            finalCosts.Add(cost);
+                        } 
                     }, timeoutMs);
 
-                Route route = new Route { RouteID = 0, Cost = minCost, Locations = path };
-
-                Console.WriteLine(minCost);
+                Console.WriteLine("Ilość kosztów dla różnych możliwości: {0}", finalCosts.Count);
 
                 if (ProblemSolvingFinished != null) ProblemSolvingFinished(new EventArgs(), this);
 
-                return DataSerialization.BinarySerializeObject(route);
+                return DataSerialization.BinarySerializeObject(finalCosts.Min());
             }
             catch(TimeoutException t)
             {
@@ -207,6 +219,11 @@ namespace DvrpUtils
 
                 return null;
             }
+        }
+
+        private List<List<List<Customer>>> SetCombinations(List<int> partition, List<Point> customers)
+        {
+            throw new NotImplementedException();
         }
 
         private void Compute(Action action, int timeout)

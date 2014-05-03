@@ -29,10 +29,17 @@ namespace DvrpUtils
             Console.WriteLine(l);
         }
 
-        public Algorithms(List<Point> points, double timeout)
+        public Algorithms(List<Point> points)
         {
-            points.Add(points[0]);
-            ComputeDistances(points);
+            try
+            {
+                points.Add(points[0]);
+                ComputeDistances(points);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Probably empty list: " + e.Message);
+            }
         }
 
         public double Run(ref List<int> points)
