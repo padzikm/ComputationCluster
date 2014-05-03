@@ -54,14 +54,11 @@ namespace DvrpUtils
                 foreach (var subSet in set)
                 {
                     var data = new ProblemData{Depots = problem.Depots, Path = new Dictionary<int, Point>()};
-                    var locations = new List<Point>();
-                    var path = new List<int>();
                     int capacity = problem.Capacity;
 
                     foreach (var depot in problem.Depots)
                     {
-                        locations.Add(depot.Location);
-                        path.Add(depot.DepotId);
+                        data.Path.Add(depot.DepotId, depot.Location);
                     }
                     foreach (var customer in subSet)
                     {
