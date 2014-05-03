@@ -37,7 +37,7 @@ namespace DvrpUtils
 
         public double Run(ref List<int> points)
         {
-            Console.WriteLine("Elements in path to TSP: {0}", points.Count));
+            Console.WriteLine("Elements in path to TSP: {0}", points.Count);
             //WriteLineInt(points);
             List<int> temp = PreProcessing(points);
             //WriteLineInt(temp);
