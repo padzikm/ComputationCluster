@@ -72,7 +72,6 @@ namespace DvrpUtils
                     //TODO more depots?
                     if (capacity > 0 && vehicleCount > 0)
                     {
-                        data.VehicleID = vehicleCount;
                         datas.Add(data);
                         vehicleCount--;
                     }
@@ -193,7 +192,7 @@ namespace DvrpUtils
                         minCost = tsp.Run(ref path);                  
                     }, timeoutMs);
 
-                Route route = new Route { RouteID = partialProblemData.VehicleID, Cost = minCost, Locations = path };
+                Route route = new Route { RouteID = 0, Cost = minCost, Locations = path };
 
                 Console.WriteLine(minCost);
 
