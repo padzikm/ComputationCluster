@@ -27,5 +27,12 @@ namespace DvrpUtils.ProblemDataModel
             get { return path; }
             set { path = value; }
         }
+
+        internal ProblemData Clone()
+        {
+            ProblemData problem = new ProblemData {Capacity = this.Capacity, Customers = this.Customers,
+                Depots = this.Depots, Name = this.Name, Partitions = this.Partitions, Path = this.Path, VehiclesCount = this.VehiclesCount};
+            return problem;
+        }
     }
 }
