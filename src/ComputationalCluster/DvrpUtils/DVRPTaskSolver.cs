@@ -5,6 +5,7 @@ using System.Linq;
 using DvrpUtils.ProblemDataModel;
 using UCCTaskSolver;
 using System.Threading;
+using System.Diagnostics;
 
 namespace DvrpUtils
 {
@@ -166,6 +167,10 @@ namespace DvrpUtils
         {
             State = TaskSolverState.Solving;
 
+
+
+            
+
             int timeoutMs = 0;
             
             timeoutMs += 1000 * timeout.Seconds;
@@ -207,6 +212,8 @@ namespace DvrpUtils
 
         private void Compute(Action action, int timeout)
         {
+            Stopwatch sw = Stopwatch.StartNew();
+
             ManualResetEvent evt = new ManualResetEvent(false);
             AsyncCallback cb = delegate { evt.Set(); };
             IAsyncResult result = action.BeginInvoke(cb, null);
@@ -218,6 +225,10 @@ namespace DvrpUtils
             {
                 throw new TimeoutException();
             }
+
+            sw.Stop();
+
+            Console.WriteLine("Time taken: {0}ms", sw.Elapsed.TotalMilliseconds);
         }
     }
 }
