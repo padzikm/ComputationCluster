@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DvrpUtils.ProblemDataModel;
 
 namespace DvrpUtils
 {
@@ -36,10 +37,10 @@ namespace DvrpUtils
 
         }
 
-        public static List<List<int>> Combinations(int[] array, int startingIndex = 0, int combinationLenght = 2)
+        public static List<List<T>> Combinations<T>(T[] array, int startingIndex = 0, int combinationLenght = 2)
         {
 
-            List<List<int>> combinations = new List<List<int>>();
+            List<List<T>> combinations = new List<List<T>>();
             if (combinationLenght == 2)
             {
 
@@ -49,7 +50,7 @@ namespace DvrpUtils
 
                     for (int i = arrayIndex + 1; i < array.Length; i++)
                     {
-                        combinations.Add(new List<int>());
+                        combinations.Add(new List<T>());
 
                         combinations[combinationsListIndex].Add(array[arrayIndex]);
                         while (combinations[combinationsListIndex].Count < combinationLenght)
@@ -64,12 +65,12 @@ namespace DvrpUtils
                 return combinations;
             }
 
-            List<List<int>> combinationsofMore = new List<List<int>>();
+            List<List<T>> combinationsofMore = new List<List<T>>();
             for (int i = startingIndex; i < array.Length - combinationLenght + 1; i++)
             {
                 combinations = Combinations(array, i + 1, combinationLenght - 1);
 
-                foreach (List<int> element in combinations)
+                foreach (List<T> element in combinations)
                 {
                     element.Insert(0, array[i]);
                 }
@@ -78,6 +79,47 @@ namespace DvrpUtils
             }
 
             return combinationsofMore;
+        }
+
+        public static void GenerateValidProblems(List<int> partition, IEnumerable<Customer> customers, int number, out List<List<List<Customer>>> allCombinations)
+        {
+            while (true)
+            {
+                if (number == 0)
+                {
+                    allCombinations = new List<List<List<Customer>>>();
+
+                    var combinations = Combinations(customers.ToArray(), 0, partition[number]);
+                    foreach (var combination in combinations)
+                    {
+                        var list = new List<List<Customer>> {combination};
+                        allCombinations.Add(list);
+                    }
+                }
+                else
+                {
+                    var combinations = Combinations(customers.ToArray(), 0, partition[number]);
+                    allCombinations = null;
+
+                    foreach (var allCombination in allCombinations)
+                    {
+                        foreach (List<Customer> combination in combinations)
+                        {
+                            foreach (List<Customer> list in allCombination)
+                            {
+                                if (!list.Intersect(combination).Any())
+                                    allCombination.Add(combination);
+                            }
+                        }
+                    }
+                }
+                if (number + 1 < partition.Count)
+                {
+                    number = number + 1;
+                    continue;
+                }
+                break;
+            }
         }
     }
 }
