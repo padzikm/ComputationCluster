@@ -29,10 +29,13 @@ namespace DvrpUtils
 
         private DVRPParser Parser;
 
+        private List<List<Customer>> allCombinations;
+
         public DVRPTaskSolver(byte[] problemData) : base(problemData) 
         { 
             Parser = new DVRPParser();
             State = TaskSolverState.Idle;
+            allCombinations = new List<List<Customer>>();
         }
 
         public override byte[][] DivideProblem(int threadCount)
@@ -147,14 +150,33 @@ namespace DvrpUtils
 
                     Algorithms tsp = new Algorithms(points);
 
-                    var combinations = Partitioning.Combinations(new int[2], 0, 0);// TODO: int -> Customer
+                    List<List<Customer>> outerList = new List<List<Customer>>();
 
-                    if(ValidatePartition(new List<List<Customer>>(), partialProblemData, out ValidatedProblems))
+                    for (int i = 0; i < partialProblemData.Partitions.Count; ++i)
                     {
+                        var p = Partitioning.Combinations(new int[2]);
+                        foreach (var el in p)
+                            outerList.Add(el);
+                    }
+                    
+                    Customer[] result = new Customer[outerList.Count];
+
+                    int count = 1;
+                    foreach (var e in outerList)
+                        count *= e.Count;
+                    
+                    for (int i = 0; i < count; ++i)
+                        allCombinations.Add(new List<Customer>());
+
+                    Recurse(result, 0, outerList);
+
+                    if (ValidatePartition(allCombinations, partialProblemData, out ValidatedProblems))
+                    {
+
                         foreach (var com in ValidatedProblems)
                         {
                             path = com.Path.Keys.ToList();
-                            cost += tsp.Run(ref path);                
+                            cost += tsp.Run(ref path);
                         }
 
                         finalCosts.Add(cost); // TODO: how to handle final cost?
@@ -174,6 +196,27 @@ namespace DvrpUtils
                 ErrorOccured(this, new UnhandledExceptionEventArgs(t, true));
 
                 return null;
+            }
+        }
+
+        private void Recurse<TList>(Customer[] selected, int index, IEnumerable<TList> remaining) where TList : IEnumerable<Customer>
+        {
+            IEnumerable<Customer> nextList = remaining.FirstOrDefault();
+            if (nextList == null)
+            {   
+                foreach (Customer i in selected)
+                {
+           
+                    allCombinations[index].Add(i);
+                }             
+            }
+            else
+            {
+                foreach (Customer i in nextList)
+                {
+                    selected[index] = i;
+                    Recurse(selected, index + 1, remaining.Skip(1));
+                }
             }
         }
 
