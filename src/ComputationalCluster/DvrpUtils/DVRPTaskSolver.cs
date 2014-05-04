@@ -154,7 +154,7 @@ namespace DvrpUtils
 
                     for (int i = 0; i < partialProblemData.Partitions.Count; ++i)
                     {
-                        var p = Partitioning.Combinations(new int[2]);
+                        var p = Partitioning.Combinations<Customer>(partialProblemData.Customers.ToArray(), 0, partialProblemData.Partitions[i]);
                         foreach (var el in p)
                             outerList.Add(el);
                     }
@@ -172,7 +172,6 @@ namespace DvrpUtils
 
                     if (ValidatePartition(allCombinations, partialProblemData, out ValidatedProblems))
                     {
-
                         foreach (var com in ValidatedProblems)
                         {
                             path = com.Path.Keys.ToList();
@@ -206,7 +205,6 @@ namespace DvrpUtils
             {   
                 foreach (Customer i in selected)
                 {
-           
                     allCombinations[index].Add(i);
                 }             
             }
