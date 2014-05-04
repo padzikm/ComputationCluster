@@ -6,6 +6,7 @@ using DvrpUtils.ProblemDataModel;
 using UCCTaskSolver;
 using System.Threading;
 using System.Diagnostics;
+using System.Text;
 
 namespace DvrpUtils
 {
@@ -97,65 +98,23 @@ namespace DvrpUtils
             return false;
         }
 
-        // TODO: czy jest na 100% poprawnie? zamiast uzywac += string uzywac StringBuilder
         public override void MergeSolution(byte[][] solutions)
         {
             State = TaskSolverState.Merging;
 
-            List<Route> solut = new List<Route>();
-            Dictionary<int, double> vehicles = new Dictionary<int, double>();
+            List<double> solut = new List<double>();
 
             for (int i = 0; i < solutions.GetLength(0); i++)
             {
-                solut.Add(DataSerialization.BinaryDeserializeObject<Route>(solutions[i]));
+                solut.Add(DataSerialization.BinaryDeserializeObject<double>(solutions[i]));
             }
 
-            // czy to dobrze dodaje wszystkie unikalne numery aut z listy rozwiazan?
-            //vehicles.Keys = solut.Select(x=>x.RouteID).Distinct();
+            StringBuilder sb = new StringBuilder();
+            sb.Append("TOTAL_COST: ").Append(solut.Min()).AppendLine();
 
-            foreach(var el in solut)
-            {
-                if (!vehicles.ContainsKey(el.RouteID))
-                    vehicles.Add(el.RouteID, double.MaxValue);
-            }
+            Solution = DataSerialization.GetBytes(sb.ToString());
 
-            string finalCostString = "";
-            string finalString = "";
-            double finalCost = 0;
-
-            foreach (var el in solut)
-            {
-                if (el.Cost < vehicles[el.RouteID])
-                    vehicles[el.RouteID] = el.Cost;
-            }
-
-            foreach (var el in vehicles)
-            {
-                finalCost += el.Value;
-            }
-
-            finalCostString = String.Format("TOTAL_COST: {0}\n", finalCost);
-
-            //for (int i = 0; i < solut.Count; i++)
-            //{
-            //    finalString += "ROUTE: ";
-            //    foreach(var e in solut[i].Locations)
-            //    {
-            //        finalString += e.ToString() + " ";
-            //    }
-            //    finalString += "\n";
-            //}
-            //finalString += finalCostString;
-
-            //wynikowy string:
-            //ROUTE: 1 2 3 55
-            //ROUTE: 2 3 4 66
-            //TOTAL_COST: 777
-            //ostatnia liczba w ROUTE to koszt dla danej drogi
-
-            Solution = DataSerialization.GetBytes(finalString);
-
-            if (finalCost != 0) SolutionsMergingFinished(new EventArgs(), this);
+            SolutionsMergingFinished(new EventArgs(), this);
         }
 
         // TODO: if (ProblemSolvingFinished != null) TO JEST DOBRZE?
@@ -187,9 +146,6 @@ namespace DvrpUtils
                     points.AddRange(partialProblemData.Customers.Select(x => x.Location));
 
                     Algorithms tsp = new Algorithms(points);
-
-                    
-                    points = partialProblemData.Path.Values.ToList();
 
                     var combinations = Partitioning.Combinations(new int[2], 0, 0);// TODO: int -> Customer
 
