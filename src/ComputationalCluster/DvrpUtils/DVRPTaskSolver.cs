@@ -143,7 +143,7 @@ namespace DvrpUtils
             {
                 Compute(() =>
                 {
-                    if (partialProblemData != null) throw new ArgumentNullException("partialProblemData");
+                    if (partialProblemData == null) throw new ArgumentNullException("partialProblemData");
 
                     points.AddRange(partialProblemData.Depots.Select(x => x.Location));
                     points.AddRange(partialProblemData.Customers.Select(x => x.Location));
@@ -159,12 +159,14 @@ namespace DvrpUtils
                             outerList.Add(el);
                     }
                     
-                    Customer[] result = new Customer[outerList.Count];
+                    
 
                     int count = 1;
                     foreach (var e in outerList)
                         count *= e.Count;
-                    
+
+                    Customer[] result = new Customer[count];
+
                     for (int i = 0; i < count; ++i)
                         allCombinations.Add(new List<Customer>());
 
@@ -187,7 +189,7 @@ namespace DvrpUtils
 
                 if (ProblemSolvingFinished != null) ProblemSolvingFinished(new EventArgs(), this);
 
-                return DataSerialization.BinarySerializeObject(finalCosts.Min());
+                return finalCosts.Count == 0 ? DataSerialization.BinarySerializeObject(finalCosts.Min()) : DataSerialization.BinarySerializeObject(-1);
             }
             catch (TimeoutException t)
             {
