@@ -46,6 +46,7 @@ namespace DvrpUtils
 
             var customersSet = Partitioning.Partition(problem.Customers.ToList());
             var serializedProblems = new List<byte[]>();
+            //todo divide
             foreach (var partition in customersSet)
             {
                 var newProblem = problem.Clone();
@@ -143,7 +144,7 @@ namespace DvrpUtils
             {
                 Compute(() =>
                 {
-                    if (partialProblemData != null) throw new ArgumentNullException("partialProblemData");
+                    if (partialProblemData == null) throw new ArgumentNullException("partialProblemData");
 
                     points.AddRange(partialProblemData.Depots.Select(x => x.Location));
                     points.AddRange(partialProblemData.Customers.Select(x => x.Location));
@@ -186,8 +187,7 @@ namespace DvrpUtils
                 Console.WriteLine("Ilość kosztów dla różnych możliwości: {0}", finalCosts.Count);
 
                 if (ProblemSolvingFinished != null) ProblemSolvingFinished(new EventArgs(), this);
-
-                return DataSerialization.BinarySerializeObject(finalCosts.Min());
+                return finalCosts.Count == 0 ? DataSerialization.BinarySerializeObject(-1) : DataSerialization.BinarySerializeObject(finalCosts.Min());
             }
             catch (TimeoutException t)
             {

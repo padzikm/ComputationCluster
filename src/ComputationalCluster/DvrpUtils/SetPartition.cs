@@ -59,9 +59,17 @@ namespace DvrpUtils
                         }
                         combinationsListIndex++;
                     }
-
                 }
 
+                return combinations;
+            }
+            if (combinationLenght == 1)
+            {
+                foreach (var element in array)
+                {
+                    var list = new List<T> {element};
+                    combinations.Add(list);
+                }
                 return combinations;
             }
 
