@@ -160,12 +160,14 @@ namespace DvrpUtils
                             outerList.Add(el);
                     }
                     
-                    Customer[] result = new Customer[outerList.Count];
+                    
 
                     int count = 1;
                     foreach (var e in outerList)
                         count *= e.Count;
-                    
+
+                    Customer[] result = new Customer[count];
+
                     for (int i = 0; i < count; ++i)
                         allCombinations.Add(new List<Customer>());
 
