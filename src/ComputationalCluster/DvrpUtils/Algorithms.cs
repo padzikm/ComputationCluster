@@ -9,25 +9,10 @@ namespace DvrpUtils
 {
     public class Algorithms
     {
+        /// <summary>
+        /// Tablica odległości pomiędzy każdym możliwym numerem Customer'a
+        /// </summary>
         Dictionary<Tuple<int, int>, double> Distances = new Dictionary<Tuple<int, int>, double>();
-
-        private void WriteLinePoint(List<Point> list)
-        {
-            foreach (var e in list)
-            {
-                Console.WriteLine("(" + e.X + "," + e.Y + ")");
-            }
-        }
-
-        private void WriteLineInt(List<int> list)
-        {
-            string l = "LISTA: ";
-            foreach (var e in list)
-            {
-                l = l + e + " ";
-            }
-            Console.WriteLine(l);
-        }
 
         public Algorithms(List<Point> points)
         {
@@ -42,20 +27,20 @@ namespace DvrpUtils
             }
         }
 
-        public double Run(ref List<int> points)
+        public double Run(List<int> points)
         {
-            Console.WriteLine("Elements in path to TSP: {0}", points.Count);
-            //WriteLineInt(points);
             List<int> temp = PreProcessing(points);
-            //WriteLineInt(temp);
+   
             if (temp.Count > 2)
                 TwoOpt(ref temp);
-            //WriteLineInt(temp);
-            points = temp;
 
-            return RouteDistance(points);
+            return RouteDistance(temp);
         }
 
+        /// <summary>
+        /// Oblicza odległości euklidesowe dla zbioru punktów Points
+        /// </summary>
+        /// <param name="Points"></param>
         private void ComputeDistances(List<Point> Points)
         {
             for (int i = 0; i < Points.Count; ++i)
@@ -75,6 +60,12 @@ namespace DvrpUtils
             }
         }
 
+        /// <summary>
+        /// Liczy odległość euklidesową pomiędzy dwoma punktami.
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="q"></param>
+        /// <returns> Odległość euklidesowa dla punktów p i q. </returns>
         private double EuclideanDistance(Point p, Point q)
         {
             return Math.Sqrt(Math.Pow(p.X - q.X, 2) + Math.Pow(p.Y - q.Y, 2));
@@ -85,6 +76,11 @@ namespace DvrpUtils
             return Distances[new Tuple<int, int>(i, j)];
         }
 
+        /// <summary>
+        /// Długość euklidesowa dla zadanej trasy.
+        /// </summary>
+        /// <param name="points"></param>
+        /// <returns></returns>
         private double RouteDistance(List<int> points)
         {
             double dist = 0.0;
@@ -106,6 +102,14 @@ namespace DvrpUtils
             list[j] = temp;
         }
 
+        /// <summary>
+        /// Algorytm dwu optymalizacyjny. Dla każdych 4 punktów zamienia 2 środkowe jeśli w wyniku otrzymamy ścieżkę o krótszej trasie
+        /// </summary>
+        /// <param name="p1"></param>
+        /// <param name="p2"></param>
+        /// <param name="p3"></param>
+        /// <param name="p4"></param>
+        /// <param name="points"></param>
         private void DoTwoOpt(int p1, int p2, int p3, int p4, ref List<int> points)
         {
             if (p3 == p1 || p3 == p2 || p4 == p1 || p4 == p2) return;
@@ -127,6 +131,11 @@ namespace DvrpUtils
             }
         }
 
+        /// <summary>
+        /// Wstępne przygotowanie trasy - użycie algorytmu NearestNeighbour
+        /// </summary>
+        /// <param name="points"></param>
+        /// <returns></returns>
         private List<int> PreProcessing(List<int> points)
         {
             List<int> prePath = new List<int>();
@@ -161,6 +170,13 @@ namespace DvrpUtils
             points.RemoveAt(points.Count - 1);
         }
 
+        /// <summary>
+        /// Algorytm iterujący każdy punkt. Dla danego punktu szuka jego najbliższego sąsiada (względem dystansu euklidesowego) oraz jeśli taki znajdzie to dodaje go do listy i iteruje dalej szukając kolejnego sąsiada dla nowo dodanego punktu.
+        /// </summary>
+        /// <param name="i"></param>
+        /// <param name="list"></param>
+        /// <param name="added"></param>
+        /// <returns></returns>
         private int GetNearestNeighbour(int i, List<int> list, List<int> added)
         {
             int node = 0;

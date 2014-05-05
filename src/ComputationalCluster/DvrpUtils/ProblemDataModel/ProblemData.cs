@@ -4,23 +4,29 @@ using System.Collections.Generic;
 
 namespace DvrpUtils.ProblemDataModel
 {
+    /// <summary>
+    /// Opis jednego problemu
+    /// </summary>
     [Serializable]
-    public class ProblemData // ~1000 bytes
+    public class ProblemData
     {
+        /// <summary>
+        /// Słownik tworzony w metodzie Solve, gdzie klucze to numery Customer'ów w danej ścieżce, a wartości to odpowiadające im lokacje. Używane w metodzie klasy Algorithms o nazwie Run().
+        /// </summary>
         [NonSerialized]
         private IDictionary<int, Point> path;
 
-        public string Name { get; set; } // 20
+        public string Name { get; set; } 
 
-        public int Capacity { get; set; } // 4
+        public int Capacity { get; set; } 
 
-        public int VehiclesCount { get; set; } // 4
+        public int VehiclesCount { get; set; }
 
-        public IEnumerable<Customer> Customers { get; set; } // 32 * ilosc ~ 400
+        public IEnumerable<Customer> Customers { get; set; } 
 
-        public IEnumerable<Depot> Depots { get; set; } // 28 * ilosc ~ 300
+        public IEnumerable<Depot> Depots { get; set; }
 
-        public List<int> Partitions { get; set; } // 4 * ilosc ~ 50
+        public List<int> Partitions { get; set; } 
 
         public IDictionary<int, Point> Path
         {

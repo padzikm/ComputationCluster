@@ -61,7 +61,7 @@ namespace Common.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ..\\..\\..\\..\\..\\doc\\SampleProblems\\okul12D.vrp.
+        ///   Looks up a localized string similar to ..\\doc\\SampleProblems\\okul12D.vrp.
         /// </summary>
         public static string okul12D {
             get {
@@ -70,7 +70,7 @@ namespace Common.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ..\\..\\..\\..\\..\\doc\\SampleProblems\\.
+        ///   Looks up a localized string similar to ..\\doc\\SampleProblems\\.
         /// </summary>
         public static string SampleProblems {
             get {

@@ -17,6 +17,14 @@ namespace DvrpUtils
             return partitions;
         }
 
+        /// <summary>
+        /// Wykonuje podział zbioru na wszystkie możliwe podzbiory.
+        /// </summary>
+        /// <param name="n"></param>
+        /// <param name="m"></param>
+        /// <param name="ti"></param>
+        /// <param name="helper"></param>
+        /// <param name="list"></param>
         private static void Partition(int n, int m, int ti, int[] helper, ref List<List<int>> list)
         {
             if (n == 0)
@@ -37,6 +45,14 @@ namespace DvrpUtils
 
         }
 
+        /// <summary>
+        /// Znajduje wszyskie możliwe kombinacje n po k, gdzie n - ilość wszystkich Customer'ów, k - ilość Customer'ów w danym podziale dla jednego pojazdu.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="array"></param>
+        /// <param name="startingIndex"></param>
+        /// <param name="combinationLenght"></param>
+        /// <returns></returns>
         public static List<List<T>> Combinations<T>(T[] array, int startingIndex = 0, int combinationLenght = 2)
         {
 
@@ -89,6 +105,13 @@ namespace DvrpUtils
             return combinationsofMore;
         }
 
+        /// <summary>
+        /// Wybiera tylko takie zbiory z powyższych wszystkich kombinacji, dla których elementy w sumie dla danego podziału są unikalne i razem tworzą zbiór wszystkich Customer'ów;
+        /// </summary>
+        /// <param name="partition"></param>
+        /// <param name="customers"></param>
+        /// <param name="number"></param>
+        /// <param name="allCombinations"></param>
         public static void GenerateValidProblems(List<int> partition, IEnumerable<Customer> customers, int number,
             out List<List<List<Customer>>> allCombinations)
         {
@@ -102,8 +125,6 @@ namespace DvrpUtils
             number++;
             for (int i = number; i < partition.Count; i++)
             {
-
-
                 combinations = Combinations(customers.ToArray(), 0, partition[i]);
                 for (int j = 0; j < allCombinations.Count; j++)
                 {
@@ -126,10 +147,8 @@ namespace DvrpUtils
                         }
                         if (found)
                             break;
-                        
                     }
                 }
-
             }
 
         }

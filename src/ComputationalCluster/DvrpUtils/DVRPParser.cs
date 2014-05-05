@@ -271,14 +271,6 @@ namespace DvrpUtils.ProblemDataModel
             }
         }
 
-        IEnumerable<Route> ReadRoutes(List<Route> list)
-        {
-            foreach (var e in list)
-            {
-                yield return e;
-            }
-        }
-
         public void checkLine(String line)
         {
             if (line.CompareTo("DATA_SECTION") == 0)
