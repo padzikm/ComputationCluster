@@ -142,7 +142,6 @@ namespace DvrpUtils
                             {
                                 allCombination.Add(combination);
                                 found = true;
-                                break;
                             }
                         }
                         if (found)

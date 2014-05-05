@@ -131,6 +131,7 @@ namespace DvrpUtils
 
                     // Metoda generująca w parametrze out prawidłowe zbiory dla danego podziału. Prawidłowe, tzn. że suma wszystkich Customer'ów dla każdego samochodu jest zbiorem wszystkich Cutomer'ów oraz że żaden z nich się nie powtarza.
                     Partitioning.GenerateValidProblems(partialProblemData.Partitions, partialProblemData.Customers, 0, out outerList);
+<<<<<<< HEAD
 
                     // Walidowanie poprawności wyżej wygenerowanych zbiorów ze względu na założenia DVRP
                     if (ValidatePartition(allCombinations, partialProblemData, out ValidatedProblems))
@@ -139,6 +140,23 @@ namespace DvrpUtils
                         foreach (var com in ValidatedProblems)
                             finalCosts.Add(tsp.Run(com.Path.Keys.ToList())); 
                     }            
+=======
+                    foreach (var list in outerList)
+                    {
+                        if (ValidatePartition(list, partialProblemData, out ValidatedProblems))
+                        {
+                            foreach (var com in ValidatedProblems)
+                            {
+                                path = com.Path.Keys.ToList();
+                                cost += tsp.Run(ref path);
+                            }
+
+                            finalCosts.Add(cost); // TODO: how to handle final cost?
+                        }
+                    }
+
+                                  
+>>>>>>> b1329d88b3e8fec4667e1fc6d58f1eeb76175294
                 }, timeoutMs);
 
                 Console.WriteLine("Ilość kosztów dla różnych możliwości: {0}", finalCosts.Count);
