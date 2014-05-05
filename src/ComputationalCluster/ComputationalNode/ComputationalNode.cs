@@ -177,7 +177,6 @@ namespace ComputationalNode
         // TODO: ComputationsTime, TimeoutOccured (false jesli ok, true jesli przekroczylo czas) - dodać w odpowiednich przypadkach
         private void Solution()
         {
-            Thread.Sleep(3000);
             try
             {
                 List<SolutionsSolution> s = new List<SolutionsSolution>();

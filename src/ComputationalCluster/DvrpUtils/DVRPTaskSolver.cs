@@ -154,17 +154,20 @@ namespace DvrpUtils
                     List<List<List<Customer>>> outerList;
 
                     Partitioning.GenerateValidProblems(partialProblemData.Partitions, partialProblemData.Customers, 0, out outerList);
-
-                    if (ValidatePartition(allCombinations, partialProblemData, out ValidatedProblems))
+                    foreach (var list in outerList)
                     {
-                        foreach (var com in ValidatedProblems)
+                        if (ValidatePartition(list, partialProblemData, out ValidatedProblems))
                         {
-                            path = com.Path.Keys.ToList();
-                            cost += tsp.Run(ref path);
-                        }
+                            foreach (var com in ValidatedProblems)
+                            {
+                                path = com.Path.Keys.ToList();
+                                cost += tsp.Run(ref path);
+                            }
 
-                        finalCosts.Add(cost); // TODO: how to handle final cost?
+                            finalCosts.Add(cost); // TODO: how to handle final cost?
+                        }
                     }
+
                                   
                 }, timeoutMs);
 

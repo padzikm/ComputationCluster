@@ -1,0 +1,564 @@
+commit 13c9d5c6c6b7f2ed0ecff4b38bed519e55a5b2e9
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Mon May 5 21:38:56 2014 +0200
+
+    Modified partition
+
+commit fe3e4470cb5db7c7869c5693ab102df0cca41c9b
+Merge: 7e57c58 38b0f8f
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Mon May 5 09:47:35 2014 +0200
+
+    Merge branch 'master' of https://github.com/padzikm/ComputationCluster
+    
+    Conflicts:
+    	src/ComputationalCluster/DvrpUtils/DVRPTaskSolver.cs
+    
+    	modified:   src/ComputationalCluster/DvrpUtils/DVRPTaskSolver.cs
+
+commit 7e57c58e56585171237ebf57e6ae2f06002b0b1a
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Mon May 5 09:45:42 2014 +0200
+
+    Fixed partition
+
+commit 38b0f8fd7bcf4821329f2176f81c5358a59c8e7d
+Author: Lukasz Napora <naporalukasz92@gmail.com>
+Date:   Mon May 5 09:43:12 2014 +0200
+
+    repair bug in DVRPTaskSolver
+
+commit 2acb794445f9139bec31004975277bb90427ab5f
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Mon May 5 01:19:01 2014 +0200
+
+    new Solve with recurse
+
+commit de0cd048103e3354ead28566a94e2d734251d3f3
+Merge: a8861ff 139f604
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Mon May 5 01:15:42 2014 +0200
+
+    Merge branch 'master' of https://github.com/padzikm/ComputationCluster.git
+
+commit a8861ffca56b74db83b460a5c7653e65e1a69025
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Mon May 5 01:15:27 2014 +0200
+
+    new Solve
+
+commit 139f6048d61d2a56508bd9463b480322a286d2dc
+Merge: 7e340d4 e04588b
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Mon May 5 01:14:40 2014 +0200
+
+    Merge branch 'master' of github.com:padzikm/ComputationCluster
+
+commit 7e340d4e9b56d4017ed48e0ab3c872e5a1a508f1
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Mon May 5 01:14:31 2014 +0200
+
+    Added new partition
+
+commit e04588bb36b80fbc3fad3411dd9b0767128d45b9
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sun May 4 21:23:36 2014 +0200
+
+    new merge
+
+commit 14e118ef60216b201adef771d3e586a748c96d2c
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sat May 3 14:13:13 2014 +0200
+
+    another change in solve
+
+commit 4672f852b810e439d4887f79107ee38acbe76235
+Merge: 55c859c 5915da4
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sat May 3 13:56:09 2014 +0200
+
+    Merge branch 'master' of https://github.com/padzikm/ComputationCluster.git
+
+commit 55c859c97adedb7e02ae985a9fca3c8792f74df1
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sat May 3 13:52:13 2014 +0200
+
+    New Solve
+
+commit 5915da4f6897ccd052e79356f08ea0aa3051bb94
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Sat May 3 13:50:49 2014 +0200
+
+    Added generating combinations
+
+commit 4ea3aaa7181c294b293e0c213c84500d5e0d4cb1
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Sat May 3 13:14:19 2014 +0200
+
+    Extract private method from divide
+
+commit c6ce389e4e747a690855f855c48b7e8d51abba93
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sat May 3 12:22:39 2014 +0200
+
+    new problemData
+
+commit de23013bcec76b385ef29f87e6f79f50018bd6cc
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sat May 3 10:41:48 2014 +0200
+
+    missing ) fixed in solve
+
+commit 8ab1f72e881144fb4554f88ec9dd3fad3220d7ab
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sat May 3 10:34:12 2014 +0200
+
+    timer to solve added
+
+commit 9d0e2dde45f2d49e705d2ef7f3908a22ee43baff
+Merge: f78371a 172327e
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sat May 3 02:33:33 2014 +0200
+
+    Merge branch 'master' of https://github.com/padzikm/ComputationCluster.git
+
+commit f78371a3384a99451ac5636dcfbba1c91a18f4d6
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sat May 3 02:33:28 2014 +0200
+
+    fix bug for <3 count in solve
+
+commit 172327e27d202f8f3f85ab587525c003248c7221
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Sat May 3 02:24:30 2014 +0200
+
+    Fixed bug in divide method
+
+commit 986280220663f458537f516a45887b82a45ebb02
+Merge: 44f6195 809ffd7
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Sat May 3 02:13:08 2014 +0200
+
+    Merge branch 'master' of github.com:padzikm/ComputationCluster
+    
+    Conflicts:
+    	src/ComputationalCluster/ComputationalNode/ComputationalNode.cs
+    
+    	modified:   doc/BatScript/IO.bat
+    	modified:   src/ComputationalCluster/ComputationalNode/ComputationalNode.cs
+    	modified:   src/ComputationalCluster/DvrpUtils/Algorithms.cs
+    	modified:   src/ComputationalCluster/DvrpUtils/DVRPTaskSolver.cs
+
+commit 44f6195e257aa342dce720b8ff5295544c6356e5
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Sat May 3 02:02:34 2014 +0200
+
+    Fixed timeout in CN
+
+commit 809ffd74ce5fbf99066d49fa1f3e52633f7adfe9
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sat May 3 02:02:23 2014 +0200
+
+    small changes in solve and merge
+
+commit 34733d3c44e9f06016ec4a769097f81e432b626f
+Merge: 2c297da 861e6ef
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sat May 3 00:33:34 2014 +0200
+
+    Merge branch 'master' of https://github.com/padzikm/ComputationCluster.git
+
+commit 2c297da6a5ab241ff3cab5f35b2937045285bcb9
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sat May 3 00:33:30 2014 +0200
+
+    Cosmetic changes in Algorithms
+
+commit 861e6ef655e665da706288aab42d0ec004560a22
+Merge: 120d176 588c170
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Sat May 3 00:32:21 2014 +0200
+
+    Merge branch 'master' of github.com:padzikm/ComputationCluster
+    
+    Conflicts:
+    	src/ComputationalCluster/ComputationalClient/Program.cs
+    
+    	new file:   doc/BatScript/IO.bat
+    	modified:   src/ComputationalCluster/Common/Common.csproj
+    	new file:   src/ComputationalCluster/Common/Properties/Resources.Designer.cs
+    	new file:   src/ComputationalCluster/Common/Properties/Resources.resx
+    	modified:   src/ComputationalCluster/ComputationalClient/Program.cs
+    	modified:   src/ComputationalCluster/DvrpUtils/Algorithms.cs
+    	modified:   src/ComputationalCluster/DvrpUtils/DVRPTaskSolver.cs
+
+commit 120d176376b855a277b33d87b4ba36c3e92fc26f
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Sat May 3 00:29:33 2014 +0200
+
+    Changed partition of set
+
+commit 588c17056ee7db4a73a98a8263c4c85655ceb2bf
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sat May 3 00:20:41 2014 +0200
+
+    Added script and resource (see Description)
+    
+    Script: to automatically started all exe's (just make shortcut)
+    
+    If some project can see Common project, then:
+    - Common.Properties.Resources.okul12D is relative path to this file
+    
+    - Common.Properties.Resources.SampleProblems is relative path to folder
+    with sample problems
+
+commit 341dc20e8969579e38c84004e137d1d051a05b85
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Fri May 2 22:41:08 2014 +0200
+
+    reacting to timeout in solve
+
+commit b1f4b5568a3a00f103e76a3b32bf4cc3443684b9
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Fri May 2 21:26:06 2014 +0200
+
+    solve refractored
+
+commit d631aec6145f74491744da526455063b9dd631d1
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Fri May 2 19:44:12 2014 +0200
+
+    Customer model and parser changes
+
+commit 8758d042ff30e2cb8d36e609a62a2b031c2df8ad
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Fri May 2 19:32:44 2014 +0200
+
+    changed name of Customer.Size to Customer.Demand
+
+commit a792b0a15e734f985dd090361166cd6da3250405
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Fri May 2 19:28:51 2014 +0200
+
+    added demand to Customer model
+
+commit 6ef7e104c4c09b9c61dfd3807ef8e308c6507729
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Fri May 2 19:25:52 2014 +0200
+
+    debbuging changes (especcialy parser)
+
+commit 7948a4d56bc7af066c602e1763a811021085dde4
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Fri May 2 17:37:50 2014 +0200
+
+    debugging changes: parser
+
+commit 7b6fedad07e3faa6dc693e65228feb5b39a5b5f6
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Fri May 2 16:48:08 2014 +0200
+
+    Temporary commented inacctive component funcionality in server
+
+commit abe19cf4f62b66bd7f432f14f5e756f63d4ec24b
+Merge: 9a06db7 c470483
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Fri May 2 16:39:57 2014 +0200
+
+    Merge branch 'master' of github.com:padzikm/ComputationCluster
+
+commit 9a06db7be86af4c7a0ac9a9bb416761554cfc17e
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Fri May 2 16:39:33 2014 +0200
+
+    Fixed null solution and problem in Task Manager
+
+commit c470483498ec75549e9319774fc4c0b0a3d8c1e8
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Fri May 2 16:19:05 2014 +0200
+
+    TM timeout in loop
+
+commit 49751b5b1865ff4b0949c21cc73451aa5209357c
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Fri May 2 16:06:34 2014 +0200
+
+    timeout in node changed
+
+commit 3e79f70c2c5c0823e01827f98cbc8501c14465ec
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Fri May 2 16:01:21 2014 +0200
+
+    node working now
+
+commit 084354a2942f44319ccf2baa5728e93ee488217f
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Fri May 2 13:34:41 2014 +0200
+
+    Fixed previous commit
+
+commit 6acb8f181aa76409d707b7ad6e7b6dc90516a45d
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Fri May 2 13:29:11 2014 +0200
+
+    Changed receiving problem data in Solve method and some cosmetic refactoring
+
+commit a9b2df421212911b3972b04137be3987bdf44477
+Merge: ed58855 62c70cc
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Fri May 2 12:31:39 2014 +0200
+
+    Merge branch 'master' of github.com:padzikm/ComputationCluster
+
+commit ed5885521e547db24b688d4dbbc695b71dd4d902
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Fri May 2 12:31:27 2014 +0200
+
+    Refactored Divide method
+
+commit 62c70cc8235bf002cbed1da11e7ca2b8f2b7aa83
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Fri May 2 01:20:21 2014 +0200
+
+    Added timer and handler of timeout
+
+commit cc903f7b5062c50c653a8ebd858f21ebec659004
+Merge: 38936e2 337ae8b
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Fri May 2 00:46:26 2014 +0200
+
+    Merge branch 'master' of https://github.com/padzikm/ComputationCluster.git
+
+commit 38936e2c52b2d4395ed46153e7c45343e3cdb07a
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Fri May 2 00:43:51 2014 +0200
+
+    changes in node - fixed parameters, solve refractored
+
+commit 337ae8b3b688fca3dc26d36d57ed09d07cc68bb4
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Thu May 1 22:47:45 2014 +0200
+
+    Added missing files
+
+commit ae97044026ce8ff1d258abc40343bc88b10c353a
+Merge: c20fa09 d705849
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Thu May 1 22:44:33 2014 +0200
+
+    Merge branch 'master' of github.com:padzikm/ComputationCluster
+    
+    Conflicts:
+    	src/ComputationalCluster/DvrpUtils/DVRPTaskSolver.cs
+    	src/ComputationalCluster/DvrpUtils/ProblemDataModel/ProblemData.cs
+    
+    	modified:   src/ComputationalCluster/CommunicationServer/SolvePartialProblemsStrategy.cs
+    	modified:   src/ComputationalCluster/ComputationalClient/Program.cs
+    	modified:   src/ComputationalCluster/ComputationalNode/ComputationalNode.cs
+    	modified:   src/ComputationalCluster/DvrpUtils/Algorithms.cs
+    	modified:   src/ComputationalCluster/DvrpUtils/DVRPTaskSolver.cs
+    	modified:   src/ComputationalCluster/DvrpUtils/ProblemDataModel/ProblemData.cs
+
+commit c20fa092a6f81bf6a1265f0279acc7a7e5fce4ae
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Thu May 1 22:32:56 2014 +0200
+
+    Implemented Divide method
+
+commit d7058490aef4e9e38b582fef7e2a7c3feb59bf8d
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Thu May 1 22:30:46 2014 +0200
+
+    Refractoring Solve - previous method
+
+commit 5f0b113b75a1f2dfae5903d6cbaf126a71800ded
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Thu May 1 21:58:46 2014 +0200
+
+    changed ProblemDataModel
+
+commit 8ff283e5cccf12705cd80cadacdc727328d07343
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Thu May 1 19:37:32 2014 +0200
+
+    Refractoring Solve method with files connected
+
+commit 53ce983f3ce81d39e68cacda05fb75ae9dec00b8
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Thu May 1 18:01:23 2014 +0200
+
+    Code refractoring: node, client
+
+commit 67c0e46cb1e8271e6ca594af3ea909f8a4dcfdb3
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Thu May 1 11:14:36 2014 +0200
+
+    changed client, added problem files
+
+commit bf3ded85bdf49bb888a9f81dfb2e64ece4c6aec7
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Wed Apr 30 03:36:44 2014 +0200
+
+    added tsp alg, problemmodel refractored
+
+commit f7c4caa016b3685a08e87c76a5f4a964a4b41431
+Merge: eb8c298 cc7798e
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Tue Apr 29 22:53:15 2014 +0200
+
+    Merge branch 'master' of https://github.com/padzikm/ComputationCluster.git
+
+commit eb8c2987c549984630e022606c46588ea7d107c7
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Tue Apr 29 22:50:42 2014 +0200
+
+    Add algorithm for 2-opt tsp
+
+commit cc7798ed36628ccf737fd398b20f6e26616bf196
+Author: naporalukasz <naporalukasz92@gmail.com>
+Date:   Tue Apr 29 22:36:41 2014 +0200
+
+    Add new MergeSolution, parser for ProblemSolution
+
+commit 5f3cfed05dc5cc36782986aa84edaea479cee9df
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Mon Apr 28 14:36:42 2014 +0200
+
+    lab changes
+
+commit 38f94f39d4e83a470f768b9099d6b137047f67e5
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Mon Apr 28 10:06:40 2014 +0200
+
+    new data size
+
+commit a4c9a2824b9abe4b006768aaf1b289595b7677a7
+Author: Lukasz Napora <naporalukasz92@gmail.com>
+Date:   Mon Apr 28 09:20:07 2014 +0200
+
+    Node work
+
+commit 4d47b6dbf9cb15a9ecc7bddd30b2c65c7118ba22
+Merge: 03325bb e57dc0d
+Author: Lukasz Napora <naporalukasz92@gmail.com>
+Date:   Mon Apr 28 09:15:24 2014 +0200
+
+    Merge branch 'master' of https://github.com/padzikm/ComputationCluster
+
+commit 03325bbfdac4777a7cbbae55b3181298fb52ce30
+Author: Lukasz Napora <naporalukasz92@gmail.com>
+Date:   Mon Apr 28 09:14:27 2014 +0200
+
+    Node work
+
+commit e57dc0d75a99ce80c33e0bd7f37eb88c003b0463
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Mon Apr 28 09:14:10 2014 +0200
+
+    ww
+
+commit 8a0c84a72ee002748694fba2dbe953494e19a4fe
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Mon Apr 28 01:09:22 2014 +0200
+
+    Cost of route added
+
+commit 231cc55e9f4c12a6eeaec32ab60cd1f38ae5dfda
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Mon Apr 28 00:38:29 2014 +0200
+
+    Route parsers
+
+commit abafa5d9e318cd9ea107ee213a3c8b393d6b70e3
+Author: naporalukasz <naporalukasz92@gmail.com>
+Date:   Sun Apr 27 22:42:04 2014 +0200
+
+    Add Mergesolution
+
+commit 90369ee71e3b9b520a99c09015524ef0c96a6baa
+Author: naporalukasz <naporalukasz92@gmail.com>
+Date:   Sun Apr 27 22:08:49 2014 +0200
+
+    Fixed bug in parser
+
+commit 6e60d43ceb733c27ec8f6d02b9c459194f20b8be
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sun Apr 27 21:36:12 2014 +0200
+
+    Changed model's folders, add simple solve method
+
+commit 0bc6cb1098e62fb51d380935dd44f0146502c0f9
+Merge: 2f2662d 82754f4
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sun Apr 27 21:08:28 2014 +0200
+
+    Merge branch 'master' of https://github.com/padzikm/ComputationCluster.git
+
+commit 2f2662dc654ebb0533b730adeb025085c0e4264b
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sun Apr 27 21:08:06 2014 +0200
+
+    Parser solution, model solution added
+
+commit 82754f45eea418df86c5f95ac972e4f9e96cb477
+Merge: 00884b0 a12d693
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Sun Apr 27 21:05:12 2014 +0200
+
+    Merge branch 'master' of github.com:padzikm/ComputationCluster
+
+commit 00884b0d9f120d0706b712ff5fb1aca42cf03f18
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Sun Apr 27 21:05:02 2014 +0200
+
+    Implemented parser ProblemData -> String
+
+commit a12d693d8334ac99879e0b6c3eafcdf0e5407bc8
+Author: dobrybajer <kamil.zakk@gmail.com>
+Date:   Sun Apr 27 20:10:57 2014 +0200
+
+    Client refractored, correction of parser file name
+
+commit ac285708213f89cc6d4a76dcad47ba254283ec03
+Author: naporalukasz <naporalukasz92@gmail.com>
+Date:   Sun Apr 27 11:03:18 2014 +0200
+
+    Add Parser
+
+commit b3e5fab72206f6a79051e9952ccbf9dcf1a64420
+Merge: 8357e6c 73c0e82
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Sat Apr 26 23:50:14 2014 +0200
+
+    Merge branch 'master' of github.com:padzikm/ComputationCluster
+
+commit 8357e6c40c6e42473c6a0227088b2f0b99866ea7
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Sat Apr 26 23:49:50 2014 +0200
+
+    Changed Problem Model and implemented brute force problem division
+
+commit 73c0e824ec694e91d91f8ffa7ea13a05e0387146
+Merge: 40fa33e 92f3d73
+Author: Michal Padzik <padzikm@gmail.com>
+Date:   Sat Apr 26 14:16:30 2014 +0200
+
+    Merge branch 'master' of https://github.com/padzikm/ComputationCluster
+
+commit 40fa33e0a6eee9094450f4b89764f300a78b707d
+Author: Michal Padzik <padzikm@gmail.com>
+Date:   Sat Apr 26 14:15:18 2014 +0200
+
+    Added inactive component's collector
+
+commit 92f3d73f329a01c13435aef70a83ee584f4d280f
+Author: Michał Mierzyński <mierzynski.michal@gmail.com>
+Date:   Sat Apr 26 12:53:29 2014 +0200
+
+    Added ProblemDataModel and problem data serialization
+
+commit 01b7e1921614eec16bac6fb3d162e03b2086abfe
+Author: Michal Padzik <padzikm@gmail.com>
+Date:   Fri Apr 25 16:55:43 2014 +0200
+
+    Implemented problem life circle in server

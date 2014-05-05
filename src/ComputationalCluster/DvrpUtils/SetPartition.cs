@@ -102,8 +102,6 @@ namespace DvrpUtils
             number++;
             for (int i = number; i < partition.Count; i++)
             {
-
-
                 combinations = Combinations(customers.ToArray(), 0, partition[i]);
                 for (int j = 0; j < allCombinations.Count; j++)
                 {
@@ -121,7 +119,6 @@ namespace DvrpUtils
                             {
                                 allCombination.Add(combination);
                                 found = true;
-                                break;
                             }
                         }
                         if (found)

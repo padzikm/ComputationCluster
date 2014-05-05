@@ -89,10 +89,7 @@ namespace Common
                         break;
 
                     if (receiveHandler())
-                    {
-                        Thread.Sleep(5000);
                         sendhandler();
-                    }
                     Thread.Sleep(period);
                 }
             });
