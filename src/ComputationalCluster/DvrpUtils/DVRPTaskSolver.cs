@@ -151,27 +151,9 @@ namespace DvrpUtils
 
                     Algorithms tsp = new Algorithms(points);
 
-                    List<List<Customer>> outerList = new List<List<Customer>>();
+                    List<List<List<Customer>>> outerList;
 
-                    for (int i = 0; i < partialProblemData.Partitions.Count; ++i)
-                    {
-                        var p = Partitioning.Combinations<Customer>(partialProblemData.Customers.ToArray(), 0, partialProblemData.Partitions[i]);
-                        foreach (var el in p)
-                            outerList.Add(el);
-                    }
-                    
-                    
-
-                    int count = 1;
-                    foreach (var e in outerList)
-                        count *= e.Count;
-
-                    Customer[] result = new Customer[count];
-
-                    for (int i = 0; i < count; ++i)
-                        allCombinations.Add(new List<Customer>());
-
-                    Recurse(result, 0, outerList);
+                    Partitioning.GenerateValidProblems(partialProblemData.Partitions, partialProblemData.Customers, 0, out outerList);
 
                     if (ValidatePartition(allCombinations, partialProblemData, out ValidatedProblems))
                     {

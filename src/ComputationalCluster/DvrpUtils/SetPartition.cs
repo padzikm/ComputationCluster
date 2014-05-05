@@ -67,7 +67,7 @@ namespace DvrpUtils
             {
                 foreach (var element in array)
                 {
-                    var list = new List<T> {element};
+                    var list = new List<T> { element };
                     combinations.Add(list);
                 }
                 return combinations;
@@ -89,45 +89,50 @@ namespace DvrpUtils
             return combinationsofMore;
         }
 
-        public static void GenerateValidProblems(List<int> partition, IEnumerable<Customer> customers, int number, out List<List<List<Customer>>> allCombinations)
+        public static void GenerateValidProblems(List<int> partition, IEnumerable<Customer> customers, int number,
+            out List<List<List<Customer>>> allCombinations)
         {
-            while (true)
+            allCombinations = new List<List<List<Customer>>>();
+            var combinations = Combinations(customers.ToArray(), 0, partition[number]);
+            foreach (var combination in combinations)
             {
-                if (number == 0)
-                {
-                    allCombinations = new List<List<List<Customer>>>();
+                var list = new List<List<Customer>> { combination };
+                allCombinations.Add(list);
+            }
+            number++;
+            for (int i = number; i < partition.Count; i++)
+            {
 
-                    var combinations = Combinations(customers.ToArray(), 0, partition[number]);
-                    foreach (var combination in combinations)
-                    {
-                        var list = new List<List<Customer>> {combination};
-                        allCombinations.Add(list);
-                    }
-                }
-                else
-                {
-                    var combinations = Combinations(customers.ToArray(), 0, partition[number]);
-                    allCombinations = null;
 
-                    foreach (var allCombination in allCombinations)
+                combinations = Combinations(customers.ToArray(), 0, partition[i]);
+                for (int j = 0; j < allCombinations.Count; j++)
+                {
+                    var allCombination = allCombinations[j];
+                    bool found = false;
+                    for (int k = 0; k < combinations.Count; k++)
                     {
-                        foreach (List<Customer> combination in combinations)
+                        var combination = combinations[k];
+
+                        for (int p = 0; p < allCombination.Count; p++)
                         {
-                            foreach (List<Customer> list in allCombination)
+                            var list = allCombination[p];
+
+                            if (!list.Intersect(combination).Any())
                             {
-                                if (!list.Intersect(combination).Any())
-                                    allCombination.Add(combination);
+                                allCombination.Add(combination);
+                                found = true;
+                                break;
                             }
                         }
+                        if (found)
+                            break;
+                        
                     }
                 }
-                if (number + 1 < partition.Count)
-                {
-                    number = number + 1;
-                    continue;
-                }
-                break;
+
             }
+
         }
+
     }
 }

@@ -152,7 +152,7 @@ namespace ComputationalNode
                     DVRPSolver = new DVRPTaskSolver(null);
                    
                     solutions = new Dictionary<ulong, byte[]>();
-
+                    
                     foreach (var problemData in problem.PartialProblems)
                     {                      
 
