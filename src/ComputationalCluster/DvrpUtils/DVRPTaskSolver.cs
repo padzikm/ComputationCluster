@@ -147,7 +147,7 @@ namespace DvrpUtils
                         {
                             foreach (var com in ValidatedProblems)
                                 finalCosts.Add(tsp.Run(com.Path.Keys.ToList()));
-           
+                        }
                     }
                 }, timeoutMs);
 
@@ -184,6 +184,7 @@ namespace DvrpUtils
                 return null;
             }
         }
+        
 
         /// <summary>
         /// Walidacja poprawności zestawu zbiorów Customerów. Brane są pod uwagę Capacity każdego Customera w ramach przydziału do jednego samochodu. Jeśli Capacity po zsumowaniu wszystkich w danym przypisaniu do samochodu będzie mniejsze od 0 (dla danego samochodu), rozwiązanie jest odrzucane.

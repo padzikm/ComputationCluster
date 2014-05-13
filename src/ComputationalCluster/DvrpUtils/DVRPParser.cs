@@ -271,7 +271,7 @@ namespace DvrpUtils.ProblemDataModel
             }
         }
 
-        public void checkLine(String line)
+        private void checkLine(String line)
         {
             if (line.CompareTo("DATA_SECTION") == 0)
             {

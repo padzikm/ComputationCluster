@@ -26,6 +26,7 @@ namespace ComputationalClient
         static string pathToFile;
         static byte[] problemBytes;
         static string defaultProblemFile = Common.Properties.Resources.okul12D;
+        static string problemOkulele = "okul12D.vrp";
 
         static void Main(string[] args)
         {
@@ -47,7 +48,7 @@ namespace ComputationalClient
             catch (Exception)
             {
                 Console.WriteLine("Couldn't work with program parameters. Default one used: okul12D.vrp");
-                client = new Client("localhost", 12345, "DVRP", 100000, GetBytesFromVrp(defaultProblemFile));
+                client = new Client("localhost", 12345, "DVRP", 100000, GetBytesFromVrp(problemOkulele));
             }
 
             client.Start();
