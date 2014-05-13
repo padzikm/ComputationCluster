@@ -88,15 +88,34 @@ namespace CommunicationServer
         private void HandleConnection(object o)
         {
             Socket soc = (Socket)o;
-            Stream stream = new NetworkStream(soc);                        
+            Stream stream = new NetworkStream(soc);
+            stream.ReadTimeout = 1000 * 5;
 
             try
             {
                 ServerNetworkAdapter networkAdapter = new ServerNetworkAdapter(stream);
-                byte[] buffer = new byte[1024 * 1000];
+                bool stopRead = false;
+                StringBuilder sb = new StringBuilder();
                 string msg = string.Empty;
-                stream.Read(buffer, 0, buffer.Length);                
-                msg = MessageSerialization.GetString(buffer).Replace("\0", string.Empty).Trim();
+
+                while (!stopRead)
+                {
+                    try
+                    {
+                        byte[] buffer = new byte[1024];
+                        stream.Read(buffer, 0, buffer.Length);
+                        msg = MessageSerialization.GetString(buffer).Replace("\0", string.Empty).Trim();
+                        sb.Append(msg);
+                        if (msg == "")
+                            stopRead = true;
+                    }
+                    catch (Exception e)
+                    {
+                        stopRead = true;
+                    }
+                }
+
+                msg = sb.ToString();
                 Console.WriteLine("Odebrano: \n{0}", msg);
                 MessageType msgType = MessageTypeConverter.ConvertToMessageType(msg);
                 IMessageStrategy strategy = strategyFactory.GetMessageStrategy(msgType);
