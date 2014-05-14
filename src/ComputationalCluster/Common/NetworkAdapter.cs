@@ -69,7 +69,7 @@ namespace Common
             if (client != null)
                 client.Close();
         }
-       
+
         /// <summary>
         /// In newly created thread CurrentStatus is sent due to inform server that component that uses it is alive.
         /// </summary>
@@ -116,12 +116,14 @@ namespace Common
 
                     var readBuffer = new byte[MaxBufferLenght];
                     stream.Read(readBuffer, 0, readBuffer.Length);
-                    
+
                     var readMessage = MessageSerialization.GetString(readBuffer);
-                    
+
                     readMessage = readMessage.Replace("\0", string.Empty).Trim();
+
+#if DEBUG
                     Console.WriteLine("Odebrano: \n{0}", readMessage);
-                    
+#endif
                     if (MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
                     {
                         var deserialized = MessageSerialization.Deserialize<DivideProblem>(readMessage);
@@ -141,8 +143,8 @@ namespace Common
                     }
                     Thread.Sleep(period);
                 }
-                
-                
+
+
             });
             t.Start();
         }
@@ -172,8 +174,9 @@ namespace Common
                     stream.Close();
                     client.Close();
                 }
-
+#if DEBUG
                 Console.WriteLine("Sent a message: \n{0}\n\n", xml);
+#endif
 
                 return true;
             }
@@ -211,14 +214,18 @@ namespace Common
 
             var readMessage = MessageSerialization.GetString(readBuffer);
             readMessage = readMessage.Replace("\0", string.Empty).Trim();
+#if DEBUG
             Console.WriteLine("Odebrano: \n{0}", readMessage);
+#endif
             if (readMessage != "")
             {
                 if (!MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
                     throw new Exception("Message not valid");
 
                 var deserialized = MessageSerialization.Deserialize<T>(readMessage);
+#if DEBUG
                 Console.WriteLine("Received a message: \n{0}", deserialized);
+#endif
 
                 return deserialized;
             }
