@@ -46,7 +46,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Algorithms.cs" />
+    <Compile Include="EuclideanDistances.cs" />
     <Compile Include="DataSerialization.cs" />
     <Compile Include="DVRPTaskSolver.cs" />
     <Compile Include="Point.cs" />
@@ -55,7 +55,6 @@
     <Compile Include="DVRPParser.cs" />
     <Compile Include="ProblemDataModel\ProblemData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SetPartition.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

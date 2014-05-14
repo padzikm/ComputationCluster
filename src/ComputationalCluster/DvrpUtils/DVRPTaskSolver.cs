@@ -30,16 +30,198 @@ namespace DvrpUtils
 
         // Parser czytający plik .vrp i zwracający klasę modelu ProblemData
         private DVRPParser Parser;
-
-        private List<List<Customer>> allCombinations;
+        List<List<int>> partitions;
+        ProblemData problem;
+        double akt, min;
+        Distances distances;
 
         public DVRPTaskSolver(byte[] problemData) : base(problemData) 
         { 
             Parser = new DVRPParser();
             State = TaskSolverState.Idle;
-            allCombinations = new List<List<Customer>>();
         }
-        
+
+        #region Additional methods for Solve(...)
+        void Stirling2(int n, int k)
+        {
+            if (n < k || k == 0)
+                return;
+
+            if (k == 1)
+            {
+                partitions[k - 1].AddRange(Enumerable.Range(1, n));
+
+                akt = DVRP(partitions);
+                if (akt != -1 && akt < min)
+                    min = akt;
+
+                for (int i = 1; i <= n; ++i)
+                    partitions[k - 1].Remove(i);
+
+                return;
+            }
+            if (k == n)
+            {
+                for (int i = 0; i < k; ++i)
+                    partitions[i].Add(i + 1);
+
+                akt = DVRP(partitions);
+                if (akt != -1 && akt < min)
+                    min = akt;
+
+                for (int i = 0; i < k; ++i)
+                    partitions[i].Remove(i + 1);
+
+                return;
+            }
+
+            partitions[k - 1].Add(n);
+            Stirling2(n - 1, k - 1);
+            partitions[k - 1].Remove(n);
+
+            for (int i = 0; i < k; ++i)
+            {
+                partitions[i].Add(n);
+                Stirling2(n - 1, k);
+                partitions[i].Remove(n);
+            }
+        }
+
+        double DVRP(List<List<int>> list)
+        {
+            double cost = 0;
+            double totalCost = 0;
+
+            foreach (var com in list)
+                if (!PreValidateRoute(com))
+                    return -1;
+
+            foreach (var com in list)
+            {
+                if (TSPwithValidation(com, out cost))
+                    totalCost += cost;
+                else
+                    return -1;
+            }
+
+            return totalCost;
+        }
+
+        bool TSPwithValidation(List<int> customers, out double minCost)
+        {
+            double cost = 0;
+            minCost = double.MaxValue;
+
+            int n = customers.Count;
+            int[] ints = new int[n];
+            List<int> permutation;
+
+            int[] positions = new int[n];
+            bool[] used = new bool[n];
+            bool last;
+
+            for (int i = 0; i < n; i++)
+                positions[i] = i;
+
+            do
+            {
+                for (int i = 0; i < n; i++)
+                    ints[i] = customers[positions[i]];
+                permutation = new List<int>(ints);
+
+                if (ValidateRoute(permutation, minCost, out cost))
+                    minCost = cost;
+
+                last = false;
+                int k = n - 2;
+                while (k >= 0)
+                {
+                    if (positions[k] < positions[k + 1])
+                    {
+                        for (int i = 0; i < n; i++)
+                            used[i] = false;
+                        for (int i = 0; i < k; i++)
+                            used[positions[i]] = true;
+                        do positions[k]++; while (used[positions[k]]);
+                        used[positions[k]] = true;
+                        for (int i = 0; i < n; i++)
+                            if (!used[i]) positions[++k] = i;
+                        break;
+                    }
+                    else k--;
+                }
+                last = (k < 0);
+
+            } while (!last);
+
+            if (minCost == double.MaxValue)
+                return false;
+
+            return true;
+        }
+
+        bool PreValidateRoute(List<int> customers)
+        {
+            int capacity = problem.Capacity;
+
+            foreach (var cust in customers)
+            {
+                Customer customer = problem.Customers.First(x => x.CustomerId == cust);
+                capacity += customer.Demand;
+            }
+
+            return capacity >= 0 ? true : false;
+        }
+
+        bool ValidateRoute(List<int> customers, double minLength, out double length)
+        {
+            var firstDepot = problem.Depots.First();
+            var lastId = firstDepot.DepotId;
+            var previousTime = -1;
+            double time = firstDepot.StartTime;
+            length = 0;
+
+            foreach (var cust in customers)
+            {
+                Customer customer = problem.Customers.First(x => x.CustomerId == cust);
+                var distance = distances.GetDistance(lastId, cust);
+
+                //if (previousTime != -1 && customer.TimeAvailable < previousTime + distance)
+                //    return false;
+
+                if (time < customer.TimeAvailable)
+                    time = customer.TimeAvailable;
+
+                time += distance;
+                length += distance;
+                time += customer.Duration;
+                lastId = cust;
+
+                if (time > firstDepot.EndTime) return false;
+                if (length > minLength) return false;
+
+                previousTime = customer.TimeAvailable;
+            }
+
+            var tmplen = distances.GetDistance(lastId, firstDepot.DepotId);
+            time += tmplen;
+            length += tmplen;
+            if (time > firstDepot.EndTime) return false;
+
+            return true;
+        }
+
+        void CutOff()
+        {
+            for (int i = 0; i < problem.Customers.Count(); ++i)
+            {
+                double cutoff = problem.Depots.First().EndTime * cutOff;
+                if (problem.Customers.ElementAt(i).TimeAvailable > cutoff)
+                    problem.Customers.ElementAt(i).TimeAvailable = 0;
+            }
+        }
+        #endregion
+
         /// <summary>
         /// Dzielenie problemu polega na wyznaczeniu wszystkich podziałów danego zbioru. Jest to szybkie i nie obciąża Task Managera.
         /// Wysyłane są dane podzbiory, a resztę obliczeń wykonuje Computational Node wraz z metodą Solve.
@@ -52,15 +234,12 @@ namespace DvrpUtils
 
             var problem = Parser.Parse(DataSerialization.GetString(_problemData));
 
-            // Podział zbioru na podzbiory
-            var customersSet = Partitioning.Partition(problem.Customers.ToList());
             var serializedProblems = new List<byte[]>();
-            
-            foreach (var partition in customersSet)
+
+            foreach (var partition in problem.Customers)
             {
-                var newProblem = problem.Clone();
-                newProblem.Partitions = partition;
-                serializedProblems.Add(DataSerialization.BinarySerializeObject(newProblem));
+                problem.PartitionCount = partition.CustomerId;
+                serializedProblems.Add(DataSerialization.BinarySerializeObject(problem));
             }
             
             if (ProblemDividingFinished != null) ProblemDividingFinished(new EventArgs(), this);
@@ -107,56 +286,43 @@ namespace DvrpUtils
             timeoutMs += 1000 * 60 * timeout.Minutes;
             timeoutMs += timeout.Milliseconds;
 
-            var partialProblemData = DataSerialization.BinaryDeserializeObject<ProblemData>(partialData);
-
-            List<ProblemData> ValidatedProblems = new List<ProblemData>();
-            List<Point> points = new List<Point>();
-            List<double> finalCosts = new List<double>();
-
             try
             {
                 // Zawartość Compute w nowym wątku
                 Compute(() =>
                 {
+                    var partialProblemData = DataSerialization.BinaryDeserializeObject<ProblemData>(partialData);
+
                     if (partialProblemData == null) throw new ArgumentNullException("partialProblemData");
 
-                    // Jedna lista Depotów oraz Customerów, użyta do obliczenia tablicy dwuwymiarowej odległości euklidesowych
-                    points.AddRange(partialProblemData.Depots.Select(x => x.Location));
-                    points.AddRange(partialProblemData.Customers.Select(x => x.Location));
+                    problem = partialProblemData;
+                    int k = problem.PartitionCount;
+                    akt = 0;
+                    min = double.MaxValue;
 
-                    // Inicjalizacja instacji klasy Algorithms, służącej do obliczenia najkrótszej ścieżki metodą Neirest Neighbour, a następnie optymalizacji metodą 2-opt. W tym kroku obliczane są także wszystkie możliwe odległości euklidesowe pomiędzy punktami w points
-                    Algorithms tsp = new Algorithms(points);
+                    List<Point> points = new List<Point>();
 
-                    List<List<List<Customer>>> outerList;
+                    CutOff();
 
-                    // Metoda generująca w parametrze out prawidłowe zbiory dla danego podziału. Prawidłowe, tzn. że suma wszystkich Customer'ów dla każdego samochodu jest zbiorem wszystkich Cutomer'ów oraz że żaden z nich się nie powtarza.
-                    Partitioning.GenerateValidProblems(partialProblemData.Partitions, partialProblemData.Customers, 0, out outerList);
+                    partitions = new List<List<int>>();
+                    for (int i = 0; i < k; ++i)
+                        partitions.Add(new List<int>());
 
+                    points.AddRange(problem.Depots.Select(x => x.Location));
+                    points.AddRange(problem.Customers.Select(x => x.Location));
 
-                    // Walidowanie poprawności wyżej wygenerowanych zbiorów ze względu na założenia DVRP
-                    if (ValidatePartition(allCombinations, partialProblemData, out ValidatedProblems))
-                    {
-                        // Dla każdego poprawnego ze względu na założenia DVRP liczymy najkrótszą ścieżkę oraz zapisujemy do listy wszystkich takich ścieżek
-                        foreach (var com in ValidatedProblems)
-                            finalCosts.Add(tsp.Run(com.Path.Keys.ToList())); 
-                    }            
+                    distances = new Distances(points);
 
-                    foreach (var list in outerList)
-                    {
-                        if (ValidatePartition(list, partialProblemData, out ValidatedProblems))
-                        {
-                            foreach (var com in ValidatedProblems)
-                                finalCosts.Add(tsp.Run(com.Path.Keys.ToList()));
-                        }
-                    }
+                    Stirling2(partialProblemData.Customers.Count(), k);
+                    Console.WriteLine("Minimalny koszt trasy dla podziału na {0} podzbiorów: {1}", k, min);
+
                 }, timeoutMs);
 
-                Console.WriteLine("Ilość kosztów dla różnych możliwości: {0}", finalCosts.Count);
 
                 if (ProblemSolvingFinished != null) ProblemSolvingFinished(new EventArgs(), this);
 
-                // Jeśli zostały znalezione poprawne trasy w danym podziale zwracamy najmniejszy koszt ze wszystkich, jeśli nie -1
-                return finalCosts.Count == 0 ? DataSerialization.BinarySerializeObject(-1) : DataSerialization.BinarySerializeObject(finalCosts.Min());
+                // Jeśli została znaleziona poprawna trasa w danym podziale zwracamy jej koszt, jeśli nie -1
+                return min == double.MaxValue ? DataSerialization.BinarySerializeObject(-1) : DataSerialization.BinarySerializeObject(min);
             }
             catch (TimeoutException t)
             {
@@ -183,58 +349,7 @@ namespace DvrpUtils
 
                 return null;
             }
-        }
-        
-
-        /// <summary>
-        /// Walidacja poprawności zestawu zbiorów Customerów. Brane są pod uwagę Capacity każdego Customera w ramach przydziału do jednego samochodu. Jeśli Capacity po zsumowaniu wszystkich w danym przypisaniu do samochodu będzie mniejsze od 0 (dla danego samochodu), rozwiązanie jest odrzucane.
-        /// </summary>
-        /// <param name="customerSet"> Lista kombinacji Customer'ów. </param>
-        /// <param name="problem"> Problem wraz ze wspólnymi elementami takimi jak Lista Depot'ów czy Capacity. </param>
-        /// <param name="problemDatasList"> Lista poprawnych kals modelu ProblemData. </param>
-        /// <returns> True jeśli co najmmniej jeden zbiór z customerSet jest poprawny. False w p.p. </returns>
-        private bool ValidatePartition(IEnumerable<List<Customer>> customerSet, ProblemData problem, out List<ProblemData> problemDatasList)
-        {
-            //TODO more depots
-            double cutOffTime = problem.Depots.First().EndTime * cutOff;
-            problemDatasList = new List<ProblemData>();
-            int vehicleCount = problem.VehiclesCount;
-            //each subSet
-            foreach (var subSet in customerSet)
-            {
-                var data = new ProblemData { Depots = problem.Depots, Path = new Dictionary<int, Point>() };
-                int capacity = problem.Capacity;
-
-                foreach (var depot in problem.Depots)
-                {
-                    data.Path.Add(depot.DepotId, depot.Location);
-                }
-                foreach (var customer in subSet)
-                {
-                    if (customer.TimeAvailable > cutOffTime)
-                        customer.TimeAvailable = 0;
-
-                    capacity += customer.Demand;
-                    data.Path.Add(customer.CustomerId, customer.Location);
-                }
-                //TODO more depots?
-                if (capacity > 0 && vehicleCount > 0)
-                {
-                    problemDatasList.Add(data);
-                    vehicleCount--;
-                }
-                else
-                {
-                    vehicleCount = -1;
-                    break;
-                }
-                if (vehicleCount < 0) break;
-            }
-            if (vehicleCount > 0)
-                return true;
-            problemDatasList.Clear();
-            return false;
-        }
+        }     
 
         /// <summary>
         /// Metoda wykonująca action w nowym wątku oraz zliczająca czas obliczeń. W razie przekroczeniu timeout'u obliczenia są kończone i metoda rzuca wyjątek TimeoutException.

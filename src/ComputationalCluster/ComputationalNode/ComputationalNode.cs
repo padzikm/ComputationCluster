@@ -149,6 +149,7 @@ namespace ComputationalNode
                
                 if (problem != null && problem.PartialProblems != null)
                 {
+                    Console.WriteLine("Dostałem problem, zaczynam liczyć.");
                     DVRPSolver = new DVRPTaskSolver(null);
                    
                     solutions = new Dictionary<ulong, byte[]>();
