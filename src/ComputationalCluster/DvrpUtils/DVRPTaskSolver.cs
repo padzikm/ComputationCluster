@@ -295,9 +295,11 @@ namespace DvrpUtils
 
             int timeoutMs = 0;
 
+            timeoutMs += timeout.Milliseconds;
             timeoutMs += 1000 * timeout.Seconds;
             timeoutMs += 1000 * 60 * timeout.Minutes;
-            timeoutMs += timeout.Milliseconds;
+            timeoutMs += 1000 * 60 * 60 * timeout.Hours;
+            timeoutMs += 1000 * 60 * 60 * 24 * timeout.Days;
 
             try
             {
