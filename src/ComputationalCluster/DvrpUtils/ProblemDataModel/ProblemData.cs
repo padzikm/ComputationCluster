@@ -20,7 +20,7 @@ namespace DvrpUtils.ProblemDataModel
 
         public IEnumerable<Depot> Depots { get; set; }
 
-        public int PartitionCount { get; set; } 
+        public List<int> PartitionsCount { get; set; } 
 
         internal ProblemData Clone()
         {

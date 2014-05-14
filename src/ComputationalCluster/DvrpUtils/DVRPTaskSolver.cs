@@ -42,6 +42,7 @@ namespace DvrpUtils
         }
 
         #region Additional methods for Solve(...)
+        // Rekurencyjna metoda wyznaczania wszystkich podzbiorów k-elementowych ze zbioru n-elementowego, wraz z możliwymi kombinacjami w ramach wyznaczonego podziału zbioru. Jest to liczba Stirlinga II rodzaju. Po wyznaczeniu danego podziału i danej kombinacji dane są wykorzystywane do dalszej walidacji i liczenia ścieżki. Jest to oszczędne pamięciowo, gdyż nie zapamiętujemy danego podziału, tylko najmniejszy wynik z wszystkich wartości wyznaczonych tą metodą.
         void Stirling2(int n, int k)
         {
             if (n < k || k == 0)
@@ -87,6 +88,7 @@ namespace DvrpUtils
             }
         }
 
+        // Metoda wywoływana z metody Stirling2. Zawiera zestaw operacji na jednym konkretnym podziale Customerów na k podzbiorów. Zwraca całkowity koszt trasy wszystkich samochodów w danym podziale, lub -1 jeśli dany podział nie spełnia warunków DVRP.
         double DVRP(List<List<int>> list)
         {
             double cost = 0;
@@ -107,6 +109,7 @@ namespace DvrpUtils
             return totalCost;
         }
 
+        // Algorytm wyznacza wszystkie permutacje Customerów w danej trasie. Po wyznaczeniu każdej permutacji dana trasa jest walidowana ze względu na warunki DVRP. Zwraca true, gdy dowolna permutacja trasy przejdzie walidacje. Wtedy koszt najkrótszej z permutacji zawarty jest w parametrze out minCost. Algorytm ma złożonść czasową o(n*n!), ale pamięciową o(n) - alg w miejscu.
         bool TSPwithValidation(List<int> customers, out double minCost)
         {
             double cost = 0;
@@ -160,6 +163,7 @@ namespace DvrpUtils
             return true;
         }
 
+        // Zapobieganie kosztownego wyznaczania permutacji (w TSP) zbioru (np. 12! dla 12 Customerów), opierając się na całkowitemu Capacity na danej trasie, które nie może być większe niż Capacity jednego samochodu. W większości przypadków wyeliminuje to duże n! permutacje. Zwraca true, jeśli dana trasa może być obsłużona przez jeden samochów ze względu na Demand Customera.
         bool PreValidateRoute(List<int> customers)
         {
             int capacity = problem.Capacity;
@@ -173,6 +177,7 @@ namespace DvrpUtils
             return capacity >= 0 ? true : false;
         }
 
+        // Walidacja jednej konkretnej permutacji trasy dla danego samochodu. Sprawdza czy dana trasa może być obsłużona w czasie działania JEDNEGO depotu, jeśli tak zwraca true oraz długość tej trasy w parametrze wyjściowym length.
         bool ValidateRoute(List<int> customers, double minLength, out double length)
         {
             var firstDepot = problem.Depots.First();
@@ -211,6 +216,7 @@ namespace DvrpUtils
             return true;
         }
 
+        // Sprawdzenie wszystkich Customerów pod względem ich czasu pojawienia się. Jeśli dany czas przekracza 0,5 *depot.endtime to zmieniamy go na 0
         void CutOff()
         {
             for (int i = 0; i < problem.Customers.Count(); ++i)
@@ -223,7 +229,7 @@ namespace DvrpUtils
         #endregion
 
         /// <summary>
-        /// Dzielenie problemu polega na wyznaczeniu wszystkich podziałów danego zbioru. Jest to szybkie i nie obciąża Task Managera.
+        /// Dzielenie problemu polega na wyznaczeniu liczb podziału, które wynoszą 1,..., n, gdzie n - liczba Customer'ów w danym problemie. Jest to szybkie i nie obciąża Task Managera.
         /// Wysyłane są dane podzbiory, a resztę obliczeń wykonuje Computational Node wraz z metodą Solve.
         /// </summary>
         /// <param name="threadCount"> Ilość dostępnych wątków (node'ów) </param>
@@ -234,21 +240,30 @@ namespace DvrpUtils
 
             var problem = Parser.Parse(DataSerialization.GetString(_problemData));
 
+            problem.PartitionsCount = new List<int>();
+
             var serializedProblems = new List<byte[]>();
 
-            foreach (var partition in problem.Customers)
+            int workForNode = problem.Customers.Count() / threadCount;
+
+            // TODO: co jeśli customers.count == 15 a threadcount = 4? wtedy workfornode 3, ale pozostaja niewykorzystane podzbiory
+            for (int i = 0; i < threadCount; ++i)
             {
-                problem.PartitionCount = partition.CustomerId;
+                for (int j = i * workForNode + 1; j < (i + 1) * workForNode + 1; ++j)
+                {
+                    if (problem.Customers.Any(x=>x.CustomerId == j))
+                        problem.PartitionsCount.Add(j);
+                }
                 serializedProblems.Add(DataSerialization.BinarySerializeObject(problem));
             }
-            
+                
             if (ProblemDividingFinished != null) ProblemDividingFinished(new EventArgs(), this);
 
             return serializedProblems.ToArray();
         }    
 
         /// <summary>
-        /// Merge wybiera jeden najlepszy wynik z wszystkich możliwych. Każdy podproblem jest daje jedno pełne rozwiązanie.
+        /// Merge wybiera jeden najlepszy wynik z wszystkich możliwych. Każdy podproblem daje jedno pełne rozwiązanie.
         /// </summary>
         /// <param name="solutions"> Tablica wyników zebranych przez TM. </param>
         public override void MergeSolution(byte[][] solutions)
@@ -273,7 +288,8 @@ namespace DvrpUtils
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="partialData"> Dane otrzymane przez Node w ramach jednego podproblemu. </param>
+        /// <param name="partialData"> Dane otrzymane przez Node w ramach pewnego zbioru podproblemów. Dany zbiór może
+        /// być 1-elementowy</param>
         /// <param name="timeout"> Czas po jakim obliczenia zostaną zakończone błędem przekroczenia czasu. </param>
         /// <returns> Rozwiązanie (najmniejszy koszt drogi) dla pewnej ilości podproblemów. </returns>
         public override byte[] Solve(byte[] partialData, TimeSpan timeout)
@@ -296,7 +312,7 @@ namespace DvrpUtils
                     if (partialProblemData == null) throw new ArgumentNullException("partialProblemData");
 
                     problem = partialProblemData;
-                    int k = problem.PartitionCount;
+                    List<int> k = problem.PartitionsCount;
                     akt = 0;
                     min = double.MaxValue;
 
@@ -304,20 +320,23 @@ namespace DvrpUtils
 
                     CutOff();
 
-                    partitions = new List<List<int>>();
-                    for (int i = 0; i < k; ++i)
-                        partitions.Add(new List<int>());
-
                     points.AddRange(problem.Depots.Select(x => x.Location));
                     points.AddRange(problem.Customers.Select(x => x.Location));
 
                     distances = new Distances(points);
 
-                    Stirling2(partialProblemData.Customers.Count(), k);
-                    Console.WriteLine("Minimalny koszt trasy dla podziału na {0} podzbiorów: {1}", k, min);
+                    for (int i = 0; i < k.Count; ++i)
+                    {
+                        partitions = new List<List<int>>();
+                        for (int j = 0; j < k[i]; ++j)
+                            partitions.Add(new List<int>());
+
+                        Stirling2(partialProblemData.Customers.Count(), k[i]);
+                        Console.WriteLine("Minimalny koszt trasy dla podziału na {0} podzbiorów: {1}", k, min);
+                    }
+                    Console.WriteLine("Minimalny koszt dla wszystkich podproblemów w danym node: {0}", min);
 
                 }, timeoutMs);
-
 
                 if (ProblemSolvingFinished != null) ProblemSolvingFinished(new EventArgs(), this);
 

@@ -131,7 +131,7 @@ namespace TaskManager
             }
             catch (Exception e)
             {
-                Console.WriteLine("Cannot send partial problems to server");
+                Console.WriteLine("Cannot send partial problems to server: " + e.Message);
             }
 
         }
