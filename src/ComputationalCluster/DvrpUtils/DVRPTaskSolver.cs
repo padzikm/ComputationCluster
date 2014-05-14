@@ -182,7 +182,7 @@ namespace DvrpUtils
         {
             var firstDepot = problem.Depots.First();
             var lastId = firstDepot.DepotId;
-            var previousTime = -1;
+
             double time = firstDepot.StartTime;
             length = 0;
 
@@ -190,9 +190,6 @@ namespace DvrpUtils
             {
                 Customer customer = problem.Customers.First(x => x.CustomerId == cust);
                 var distance = distances.GetDistance(lastId, cust);
-
-                //if (previousTime != -1 && customer.TimeAvailable < previousTime + distance)
-                //    return false;
 
                 if (time < customer.TimeAvailable)
                     time = customer.TimeAvailable;
@@ -204,14 +201,14 @@ namespace DvrpUtils
 
                 if (time > firstDepot.EndTime) return false;
                 if (length > minLength) return false;
-
-                previousTime = customer.TimeAvailable;
             }
 
             var tmplen = distances.GetDistance(lastId, firstDepot.DepotId);
             time += tmplen;
             length += tmplen;
+
             if (time > firstDepot.EndTime) return false;
+            if (length > minLength) return false;
 
             return true;
         }
@@ -332,7 +329,7 @@ namespace DvrpUtils
                             partitions.Add(new List<int>());
 
                         Stirling2(partialProblemData.Customers.Count(), k[i]);
-                        Console.WriteLine("Minimalny koszt trasy dla podziału na {0} podzbiorów: {1}", k, min);
+                        Console.WriteLine("Minimalny koszt trasy dla podziału na {0} podzbiorów: {1}", k[i], min);
                     }
                     Console.WriteLine("Minimalny koszt dla wszystkich podproblemów w danym node: {0}", min);
 
@@ -348,7 +345,7 @@ namespace DvrpUtils
                 State = TaskSolverState.Error | TaskSolverState.Idle;
                 ErrorOccured(this, new UnhandledExceptionEventArgs(t, true));
 
-                return null;
+                return min == double.MaxValue ? DataSerialization.BinarySerializeObject(-1) : DataSerialization.BinarySerializeObject(min);
             }
             catch (ArgumentNullException a)
             {
@@ -357,7 +354,7 @@ namespace DvrpUtils
                 State = TaskSolverState.Error | TaskSolverState.Idle;
                 ErrorOccured(this, new UnhandledExceptionEventArgs(a, true));
 
-                return null;
+                return DataSerialization.BinarySerializeObject(-1);
             }
             catch (Exception e)
             {
@@ -366,7 +363,7 @@ namespace DvrpUtils
                 State = TaskSolverState.Error | TaskSolverState.Idle;
                 ErrorOccured(this, new UnhandledExceptionEventArgs(e, true));
 
-                return null;
+               return min == double.MaxValue ? DataSerialization.BinarySerializeObject(-1) : DataSerialization.BinarySerializeObject(min);;
             }
         }     
 
