@@ -16,19 +16,19 @@ namespace TaskManager
         private Solutions solution;
         private RegisterResponse registerResponse;
         private StatusThread[] statusThreads;
-        private readonly NetworkAdapter networkAdapter;
+        private readonly TMNetworkAdapter networkAdapter;
         private ulong taskId = 0;
         private TaskSolver taskSolver; 
 
         public TaskManager(IPAddress serverIp, int port)
         {
-            networkAdapter = new NetworkAdapter(serverIp, port);
+            networkAdapter = new TMNetworkAdapter(serverIp, port);
 
         }
 
         public TaskManager(string serverName, int port)
         {
-            networkAdapter = new NetworkAdapter(serverName, port);
+            networkAdapter = new TMNetworkAdapter(serverName, port);
         }
         /// <summary>
         /// Starts new connection between TaskManger and Server

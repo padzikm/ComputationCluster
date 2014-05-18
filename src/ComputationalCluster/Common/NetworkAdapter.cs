@@ -8,17 +8,17 @@ namespace Common
 {
     public class NetworkAdapter
     {
-        private readonly string serverName;
-        private readonly int connectionPort;
-        private TcpClient client;
-        private NetworkStream stream;
+        protected readonly string serverName;
+        protected readonly int connectionPort;
+        protected TcpClient client;
+        protected NetworkStream stream;
 
-        private const int MaxBufferLenght = 1024 * 1000;
+        protected const int MaxBufferLenght = 1024 * 1000;
 
         /// <summary>
         /// Property of processing status that is sent to server. Contains actual working threads and ID of a task.
         /// </summary>
-        public Status CurrentStatus { private get; set; }
+        public Status CurrentStatus { get; set; }
 
         /// <summary>
         /// Constructor that takes IPAddress class as first parameter. Stores input data in private variables.
@@ -78,76 +78,49 @@ namespace Common
         /// <param name="sendhandler">Method handling send action</param>
         public void StartKeepAlive(int period, Func<bool> receiveHandler, Action sendhandler)
         {
+            Semaphore semaphore = new Semaphore(1 , 1);
             var t = new Thread(() =>
             {
                 while (true)
                 {
-                    Thread.Sleep(period);
+                    semaphore.WaitOne();
                     client = new TcpClient(serverName, connectionPort);
                     stream = client.GetStream();
                     if (!Send(CurrentStatus, false))
                         break;
-
-                    if (receiveHandler())
-                        sendhandler();
+                    semaphore.Release();
                     Thread.Sleep(period);
                 }
             });
-            t.Start();
-        }
-        /// <summary>
-        ///  In newly created thread CurrentStatus is sent due to inform server that component that uses it is alive.
-        /// </summary>
-        /// <param name="period"> Keepalive timeout </param>
-        /// <param name="sendDivide">method handling divide action</param>
-        /// <param name="sendMerge">method handling merge action</param>
-        public void StartKeepAliveTask(int period, Action<ulong> sendDivide, Action<ulong> sendMerge, Action<DivideProblem> handleDivide, Action<Solutions> handleSolutions)
-        {
-            var t = new Thread(() =>
+
+            var checkThread = new Thread(() =>
             {
-                while (true)
+                try
                 {
-                    client = new TcpClient(serverName, connectionPort);
-                    stream = client.GetStream();
-                    if (!Send(CurrentStatus, false))
-                        break;
-
-                    Thread.Sleep(period);
-
-                    var readBuffer = new byte[MaxBufferLenght];
-                    stream.Read(readBuffer, 0, readBuffer.Length);
-
-                    var readMessage = MessageSerialization.GetString(readBuffer);
-
-                    readMessage = readMessage.Replace("\0", string.Empty).Trim();
-
-#if DEBUG
-                    Console.WriteLine("Odebrano: \n{0}", readMessage);
-#endif
-                    if (MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
+                    while (true)
                     {
-                        var deserialized = MessageSerialization.Deserialize<DivideProblem>(readMessage);
-
-                        if (deserialized != null)
+                        semaphore.WaitOne();
+                        if (receiveHandler())
                         {
-                            handleDivide(deserialized);
-                            sendDivide(deserialized.Id);
+                            sendhandler();
+                            semaphore.Release();
+                            Thread.CurrentThread.Abort();
+                            
                         }
-                        else
-                        {
-                            var deserialized2 = MessageSerialization.Deserialize<Solutions>(readMessage);
-                            handleSolutions(deserialized2);
-                            if (deserialized2 != null)
-                                sendMerge(deserialized2.Id);
-                        }
+                        semaphore.Release();
                     }
-                    Thread.Sleep(period);
+
                 }
-
-
+                finally
+                {
+                    
+                }
+                
             });
             t.Start();
+            checkThread.Start();
         }
+
         /// <summary>
         /// Generic method sends serialized and encoded message to network stream.
         /// </summary>
