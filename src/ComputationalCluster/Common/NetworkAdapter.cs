@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 
 namespace Common
@@ -168,6 +169,8 @@ namespace Common
         /// <returns> Deserialized message of type T if stream can be read and if serialization is ok. Null otherwise.</returns>
         public T Receive<T>(bool closeConnection) where T : class
         {
+
+
             if (closeConnection)
             {
                 client = new TcpClient(serverName, connectionPort);
@@ -176,8 +179,7 @@ namespace Common
 
             if (!stream.CanRead) throw new Exception("NetworkStream unavaiable");
 
-            var readBuffer = new byte[MaxBufferLenght];
-            stream.Read(readBuffer, 0, readBuffer.Length);
+            var readMessage = ReadMessage();
 
             if (closeConnection)
             {
@@ -185,8 +187,6 @@ namespace Common
                 client.Close();
             }
 
-            var readMessage = MessageSerialization.GetString(readBuffer);
-            readMessage = readMessage.Replace("\0", string.Empty).Trim();
 #if DEBUG
             Console.WriteLine("Odebrano: \n{0}", readMessage);
 #endif
@@ -204,6 +204,33 @@ namespace Common
             }
             else
                 return null;
+        }
+
+        protected string ReadMessage()
+        {
+            StringBuilder sb = new StringBuilder();
+            string readMessage = string.Empty;
+
+            if (readMessage == null) throw new ArgumentNullException("readMessage");
+            bool stopRead = false;
+            while (!stopRead)
+            {
+                try
+                {
+                    byte[] buffer = new byte[1024];
+                    stream.Read(buffer, 0, buffer.Length);
+                    readMessage = MessageSerialization.GetString(buffer).Replace("\0", string.Empty).Trim();
+                    sb.Append(readMessage);
+                    if (readMessage == "")
+                        stopRead = true;
+                }
+                catch (Exception e)
+                {
+                    stopRead = true;
+                }
+            }
+            readMessage = sb.ToString();
+            return readMessage;
         }
     }
 }

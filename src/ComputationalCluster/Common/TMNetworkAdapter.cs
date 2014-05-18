@@ -20,6 +20,8 @@ namespace Common
         {
         }
 
+        private Semaphore semaphore = new Semaphore(1, 1);
+
         /// <summary>
         ///  In newly created thread CurrentStatus is sent due to inform server that component that uses it is alive.
         /// </summary>
@@ -28,49 +30,69 @@ namespace Common
         /// <param name="sendMerge">method handling merge action</param>
         public void StartKeepAliveTask(int period, Action<ulong> sendDivide, Action<ulong> sendMerge, Action<DivideProblem> handleDivide, Action<Solutions> handleSolutions)
         {
+            
             var t = new Thread(() =>
             {
                 while (true)
                 {
+                    semaphore.WaitOne();
                     client = new TcpClient(serverName, connectionPort);
                     stream = client.GetStream();
                     if (!Send(CurrentStatus, false))
                         break;
 
-                    Thread.Sleep(period);
-
-                    var readBuffer = new byte[MaxBufferLenght];
-                    stream.Read(readBuffer, 0, readBuffer.Length);
-
-                    var readMessage = MessageSerialization.GetString(readBuffer);
-
-                    readMessage = readMessage.Replace("\0", string.Empty).Trim();
-
-#if DEBUG
-                    Console.WriteLine("Odebrano: \n{0}", readMessage);
-#endif
-                    if (MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
-                    {
-                        var deserialized = MessageSerialization.Deserialize<DivideProblem>(readMessage);
-
-                        if (deserialized != null)
-                        {
-                            handleDivide(deserialized);
-                            sendDivide(deserialized.Id);
-                        }
-                        else
-                        {
-                            var deserialized2 = MessageSerialization.Deserialize<Solutions>(readMessage);
-                            handleSolutions(deserialized2);
-                            if (deserialized2 != null)
-                                sendMerge(deserialized2.Id);
-                        }
-                    }
+                    semaphore.Release();
                     Thread.Sleep(period);
                 }
 
             });
+            var checkThread = new Thread(() =>
+            {
+                try
+                {
+                    Check(sendDivide, sendMerge, handleDivide, handleSolutions);
+
+                }
+                finally
+                {
+
+                }
+            });
             t.Start();
+            checkThread.Start();
+        }
+
+        private void Check(Action<ulong> sendDivide, Action<ulong> sendMerge, Action<DivideProblem> handleDivide, Action<Solutions> handleSolutions)
+        {
+            while (true)
+            {
+                semaphore.WaitOne();
+                var readMessage = ReadMessage();
+
+#if DEBUG
+                Console.WriteLine("Odebrano: \n{0}", readMessage);
+#endif
+                if (MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
+                {
+                    var deserialized = MessageSerialization.Deserialize<DivideProblem>(readMessage);
+
+                    if (deserialized != null)
+                    {
+                        handleDivide(deserialized);
+                        sendDivide(deserialized.Id);
+                    }
+                    else
+                    {
+                        var deserialized2 = MessageSerialization.Deserialize<Solutions>(readMessage);
+                        handleSolutions(deserialized2);
+                        if (deserialized2 != null)
+                            sendMerge(deserialized2.Id);
+                    }
+                }
+                semaphore.Release();
+            }
+
+
         }
     }
 }
