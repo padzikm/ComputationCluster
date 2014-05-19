@@ -282,7 +282,7 @@ namespace DvrpUtils
 
             Solution = DataSerialization.GetBytes(sb.ToString());
 
-            SolutionsMergingFinished(new EventArgs(), this);
+            if (SolutionsMergingFinished != null) SolutionsMergingFinished(new EventArgs(), this);
         }
 
         /// <summary>

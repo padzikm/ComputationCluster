@@ -30,9 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="graph">
-      <HintPath>..\..\..\lib\graph.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -46,8 +43,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EuclideanDistances.cs" />
     <Compile Include="DataSerialization.cs" />
+    <Compile Include="EuclideanDistances.cs" />
     <Compile Include="DVRPTaskSolver.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="ProblemDataModel\Customer.cs" />
