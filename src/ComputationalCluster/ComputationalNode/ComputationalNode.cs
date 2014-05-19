@@ -7,8 +7,12 @@ using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 using System.IO;
+using System.Threading;
+using System.Diagnostics;
+using System.Text;
 using Common;
 using DvrpUtils;
+
 namespace ComputationalNode
 {
     class ComputationalNode
@@ -18,11 +22,12 @@ namespace ComputationalNode
         private StatusThread[] threads;
         private RegisterResponse registerResponse;
         private SolvePartialProblems problem;
-        private bool working;
         private DVRPTaskSolver DVRPSolver;
         private Dictionary<ulong, byte[]> solutions;
         private ulong taskId = 0;
         private const int availableThreads = 1;
+        private ulong computationsTime = 0;
+        private bool timeOccured = false;
 
         /// <summary>
         /// Specific constructor for ComputationalNode class. Allows to execute node's correctly.
@@ -32,10 +37,7 @@ namespace ComputationalNode
         public ComputationalNode(string serverName, int port)
         {
             if (serverName == null || port < 0)
-                throw new ArgumentNullException();
-
-            working = true;
-            
+                throw new ArgumentNullException();     
             networkAdapter = new NetworkAdapter(serverName, port);
         }
 
@@ -48,9 +50,6 @@ namespace ComputationalNode
         {
             if (serverIp == null || port < 0)
                 throw new ArgumentNullException();
-
-            working = true;
-
             networkAdapter = new NetworkAdapter(serverIp, port);
         }
 
@@ -61,7 +60,6 @@ namespace ComputationalNode
         {
             if (nodeThread != null)
                 throw new InvalidOperationException("Node is already running! Wait for partial problem.\n");
-
             try
             {
                 nodeThread = new Thread(NodeWork);
@@ -78,7 +76,6 @@ namespace ComputationalNode
         /// </summary>
         public void Stop()
         {
-            working = false;
             try
             {
                 if (nodeThread != null)
@@ -89,34 +86,28 @@ namespace ComputationalNode
             {
                 Console.WriteLine("Error in node stop: {0} \n", e.Message);
             }
-
         }
 
         private void NodeWork()
         {
             networkAdapter.StartConnection();
-
             Register();
             RegisterResponse();
-
             networkAdapter.CloseConnection();
 
             initThread();
-
             networkAdapter.CurrentStatus = new Status { Id = registerResponse.Id, Threads = threads };
+            int timeout = 0;
 
-            int timeout = 0;           
-            
             string[] time= registerResponse.Timeout.Split(':');          
             timeout += int.Parse(time[2]);
             timeout += 60 * int.Parse(time[1]);
             timeout += 3600 * int.Parse(time[0]);
             timeout *= 1000;
-            Console.WriteLine(timeout);
+
             networkAdapter.StartKeepAlive(timeout, PartialProblems, Solution);
         }
 
-        // TODO: czym jest parallelthreads? czy dzielimy problem na ilosc node'ow czy na ilosci node'ow * parallelThreads?
         private void Register()
         {
             var registerMessage = new Register()
@@ -139,31 +130,43 @@ namespace ComputationalNode
                 Console.WriteLine("Cannot recieve RegisterResponse");
             }
         }
-
-        // TODO: dodać timer liczący czas obliczenia i zmienić stan threads metodą na samym dole która nie jest skończona :)
+       
         private bool PartialProblems()
         {
+            Action action;
+            int timeout;
             try
             {
                 problem = networkAdapter.Receive<SolvePartialProblems>(false);
                
                 if (problem != null && problem.PartialProblems != null)
                 {
+                    timeout = (int)problem.SolvingTimeout;
                     Console.WriteLine("Dostałem problem, zaczynam liczyć.");
                     DVRPSolver = new DVRPTaskSolver(null);
                    
                     solutions = new Dictionary<ulong, byte[]>();
-                    
-                    foreach (var problemData in problem.PartialProblems)
-                    {                      
 
-                        var solution = DVRPSolver.Solve(problemData.Data, TimeSpan.FromMilliseconds( (long)problem.SolvingTimeout ));
-                        if (solution != null)
-                        solutions.Add(problemData.TaskId, solution);
+                    Stopwatch sw = Stopwatch.StartNew();
+                    action = solve;
+                    ManualResetEvent evt = new ManualResetEvent(false);
+                    AsyncCallback cb = delegate { evt.Set(); };
+                    IAsyncResult result = action.BeginInvoke(cb, null);
+                    if (evt.WaitOne(timeout))
+                    {
+                        action.EndInvoke(result);
+                        timeOccured = false;
 
                     }
+                    else
+                    {
+                        timeOccured = true;
+                        throw new TimeoutException();
+                    }
 
-                    Console.WriteLine("Recive SolvePartialProblems");
+                    sw.Stop();
+                    computationsTime =(ulong) sw.Elapsed.TotalMilliseconds;
+
                     return true;
                 }
             }
@@ -175,7 +178,6 @@ namespace ComputationalNode
             return false;
         }
 
-        // TODO: ComputationsTime, TimeoutOccured (false jesli ok, true jesli przekroczylo czas) - dodać w odpowiednich przypadkach
         private void Solution()
         {
             try
@@ -189,8 +191,8 @@ namespace ComputationalNode
                         Data = e.Value,
                         TaskId = e.Key, 
                         TaskIdSpecified = true,
-                        //ComputationsTime  ???
-                        //TimeoutOccured    ???
+                        ComputationsTime = computationsTime,
+                        TimeoutOccured = timeOccured
                     });
                 }
    
@@ -218,17 +220,18 @@ namespace ComputationalNode
                 threads[i] = new StatusThread
                 {
                     HowLong = 0, 
-                    State = StatusThreadState.Idle 
+                    State = StatusThreadState.Idle ,
                 };
             }        
         }
 
-        // TODO: dokończyć zmianę wątków w trakcie obliczeń
-        private void ChangeThreads()
+         void solve()
         {
-            foreach (var e in threads)
+            foreach (SolvePartialProblemsPartialProblem problemData in problem.PartialProblems)
             {
-                
+                var solution = DVRPSolver.Solve(problemData.Data, TimeSpan.FromMilliseconds((long)problem.SolvingTimeout));
+                if (solution != null)
+                    solutions.Add(problemData.TaskId, solution);
             }
         }
     }
