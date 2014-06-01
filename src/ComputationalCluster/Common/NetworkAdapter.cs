@@ -79,7 +79,7 @@ namespace Common
         /// <param name="sendhandler">Method handling send action</param>
         public void StartKeepAlive(int period, Func<bool> receiveHandler, Action sendhandler)
         {
-            Semaphore semaphore = new Semaphore(1 , 1);
+            Semaphore semaphore = new Semaphore(1, 1);
             var t = new Thread(() =>
             {
                 while (true)
@@ -106,7 +106,7 @@ namespace Common
                             sendhandler();
                             semaphore.Release();
                             Thread.CurrentThread.Abort();
-                            
+
                         }
                         semaphore.Release();
                     }
@@ -114,9 +114,9 @@ namespace Common
                 }
                 finally
                 {
-                    
+
                 }
-                
+
             });
             t.Start();
             checkThread.Start();

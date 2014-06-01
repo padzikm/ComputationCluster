@@ -1,108 +1,130 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net.Sockets;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using Common;
+using System.Windows.Forms;
 using DvrpUtils;
-using System.Threading;
-using System.Resources;
+
 
 namespace ComputationalClient
 {
     class Program
     {
+        private const String DefaultValuesInfo = "Default values used: \n\n" +
+                                                 "Address IP:           localhost\n" +
+                                                 "Port:                 12345\n" +
+                                                 "Problem name:         DVRP\n" +
+                                                 "Computation timeout:  100000\n";
 
-        //static String message = "Problem sent successfully.\nComputation is in progress... Press ENTER to check a problem status.";
+        static string _addressIp;
+        static int _port;
+        static string _name;
+        static ulong _timeout;
+        static byte[] _problemBytes;
+        static bool _registered;
 
-
-        static string addressIp;
-        static int port;
-        static string name;
-        static ulong timeout;
-        static string pathToFile;
-        static byte[] problemBytes;
-        static string defaultProblemFile = Common.Properties.Resources.okul12D;
-        static string problemOkulele = "okul12D.vrp";
-
+        [STAThreadAttribute]
         static void Main(string[] args)
         {
-            string msg = "";
-            Client client;
+            _registered = false;
+            Client client = null;
+       
+            while (!_registered)
+            {
+                WriteLine(@"Do you want to use default values? (y/n)");
 
-            try
-            {
-                addressIp = args[0];
-                port = int.Parse(args[1]);
-                name = args[2];
-                timeout = ulong.Parse(args[3]);
-                pathToFile = args[4];
-                problemBytes = GetBytesFromVrp(pathToFile);
-                //Console.WriteLine(addressIp + " " + port + " " + name + " " + timeout + " " + args[4]);
-                //ReadData();
-                client = new Client(addressIp, port, name, timeout, problemBytes);
+                if (Console.ReadLine() == "y")
+                {
+                    Console.WriteLine(DefaultValuesInfo);
+                    try
+                    {
+                        ChooseFile();
+                        client = new Client("localhost", 12345, "DVRP", 100000, _problemBytes);
+                        _registered = true;
+                        break;
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine(@"Error ocurred while creating client. Propably wrong path to file.");
+                    }
+                }
+
+                try
+                {
+                    WriteLine(@"Type correct values:");
+
+                    _registered = true;
+
+                    ReadData();
+                    client = new Client(_addressIp, _port, _name, _timeout, _problemBytes);
+                }
+                catch (Exception)
+                {
+                    _registered = false;
+                }
             }
-            catch (Exception)
-            {
-                Console.WriteLine("Couldn't work with program parameters. Default one used: okul12D.vrp");
-                client = new Client("localhost", 12345, "DVRP", 100000, GetBytesFromVrp(problemOkulele));
-            }
+
+            WriteLine(@"Client created. Start working...");
+
+            if (client == null) return;
 
             client.Start();
 
-            //while (connected == false)
-            //{
-                //try
-                //{
-                    //client.Start();
-                    //Thread.Sleep(6000);
-                    //connected = true;
-                //}
-                //catch (Exception e)
-                //{
-                //    Console.WriteLine("Some problem occured:\n" + e.Message + "\n\n");
-                //    Console.WriteLine("Try again by typing new values (or press ESC to exit):\n\n");
-                //    ReadData();
-                //    connected = false;
-                //}
-            //}
+            while (Console.ReadKey().Key != ConsoleKey.Escape) { }
 
-            Console.WriteLine("Client created. Start working...\n");
-            Console.WriteLine("Type 'stop' to stop client.\n");
-
-            while (msg.ToLower() != "stop")
-                msg = Console.ReadLine();   
-
-            Console.WriteLine("Client's work ended. Closing program.");
+            WriteLine(@"Client's work ended. Closing program.");
 
             client.Stop();
         }
 
+        static void WriteLine(string content)
+        {
+            Console.WriteLine();
+            Console.WriteLine(content);
+        }
+
         static void ReadData()
         {
-            Console.Write("IP Address:     ");
-            addressIp = Console.ReadLine();
-            Console.Write("Port number:    ");
-            port = int.Parse(Console.ReadLine());
-            Console.Write("Problem name:   ");
-            name = Console.ReadLine();
-            Console.Write("Timeout:        ");
-            timeout = ulong.Parse(Console.ReadLine());
-            Console.Write("Absolute path:  ");
-            pathToFile = Console.ReadLine();
-            problemBytes = GetBytesFromVrp(pathToFile);
+            try
+            {
+                Console.Write(@"IP Address:     ");
+                _addressIp = Console.ReadLine();
+                Console.Write(@"Port number:    ");
+                _port = int.Parse(Console.ReadLine());
+                Console.Write(@"Problem name:   ");
+                _name = Console.ReadLine();
+                Console.Write(@"Timeout:        ");
+                _timeout = ulong.Parse(Console.ReadLine());
+                ChooseFile();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(@"Error while reading input data... " + e.Message);
+                _registered = false;
+            }
         }
 
         static byte[] GetBytesFromVrp(string name)
         {
-            StreamReader streamReader = new StreamReader(name);
+            var streamReader = new StreamReader(name);
             var problemString = streamReader.ReadToEnd();
             streamReader.Close();
-            Console.WriteLine(problemBytes);
+            Console.WriteLine(_problemBytes);
             return DataSerialization.GetBytes(problemString);
+        }
+
+        static void ChooseFile()
+        {
+            var dialog = new OpenFileDialog
+            {
+                Multiselect = false,
+                Title = @"Select XML Document",
+            };
+
+            using (dialog)
+            {
+                if (dialog.ShowDialog() != DialogResult.OK) return;
+                _problemBytes = GetBytesFromVrp(dialog.FileName);
+                Console.WriteLine(@"You have chosen {0} to solve", dialog.FileName);
+            }
         }
     }
 }
