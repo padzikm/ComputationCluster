@@ -37,7 +37,7 @@ namespace Common
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Blad parsera: {0}", ex.Message);
+                Console.WriteLine(@"Blad parsera: {0}", ex.Message);
                 return MessageType.UnknownMessage;
             }
         }

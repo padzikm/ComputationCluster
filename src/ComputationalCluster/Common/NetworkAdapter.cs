@@ -122,7 +122,8 @@ namespace Common
                     readMessage = readMessage.Replace("\0", string.Empty).Trim();
 
 #if DEBUG
-                    Console.WriteLine("Odebrano: \n{0}", readMessage);
+                    Console.WriteLine(@"Odebrano: 
+{0}", readMessage);
 #endif
                     if (MessageValidation.IsMessageValid(MessageTypeConverter.ConvertToMessageType(readMessage), readMessage))
                     {
@@ -175,7 +176,10 @@ namespace Common
                     client.Close();
                 }
 #if DEBUG
-                Console.WriteLine("Sent a message: \n{0}\n\n", xml);
+                Console.WriteLine(@"Sent a message: 
+{0}
+
+", xml);
 #endif
 
                 return true;
@@ -215,7 +219,8 @@ namespace Common
             var readMessage = MessageSerialization.GetString(readBuffer);
             readMessage = readMessage.Replace("\0", string.Empty).Trim();
 #if DEBUG
-            Console.WriteLine("Odebrano: \n{0}", readMessage);
+            Console.WriteLine(@"Odebrano: 
+{0}", readMessage);
 #endif
             if (readMessage != "")
             {
@@ -224,7 +229,8 @@ namespace Common
 
                 var deserialized = MessageSerialization.Deserialize<T>(readMessage);
 #if DEBUG
-                Console.WriteLine("Received a message: \n{0}", deserialized);
+                Console.WriteLine(@"Received a message: 
+{0}", deserialized);
 #endif
 
                 return deserialized;
