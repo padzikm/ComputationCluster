@@ -119,11 +119,11 @@ namespace TaskManager
 
                 var partialProblems = new SolvePartialProblems
                 {
-                    CommonData = new byte[5],
+                    CommonData = problem.Data,
                     Id = id,
                     ProblemType = "DVRP",
                     PartialProblems = solvePartialProblemsPartialProblem,
-                    SolvingTimeout = 3,
+                    SolvingTimeout = 100000,
                     SolvingTimeoutSpecified = true
                 };
                 networkAdapter.Send(partialProblems, true);
