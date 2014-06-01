@@ -5,7 +5,7 @@ using System.Net.Sockets;
 using System.Threading;
 using Common;
 using System.Net;
-using DvrpUtils;
+using DVRP;
 using UCCTaskSolver;
 
 namespace TaskManager
@@ -94,6 +94,7 @@ namespace TaskManager
                 {
                     ProblemType = "DVRP",
                     Id = 1,
+                    
                     Solutions1 = new[] { new SolutionsSolution { Type = SolutionsSolutionType.Final, TaskId = (ulong) id, Data = taskSolver.Solution} }
                 };
                 networkAdapter.Send(solutionToSend, true);
@@ -109,7 +110,7 @@ namespace TaskManager
         {
             try
             {
-                taskSolver = new DVRPTaskSolver(problem.Data);
+                taskSolver = new DVRP.DVRP(problem.Data);
                 var dividedProblems = taskSolver.DivideProblem((int) problem.ComputationalNodes);
                 var solvePartialProblemsPartialProblem = new SolvePartialProblemsPartialProblem[dividedProblems.Length];
                 for (int i = 0; i < dividedProblems.Length; i++)

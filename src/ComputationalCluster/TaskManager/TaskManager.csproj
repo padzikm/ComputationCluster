@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DVRP">
+      <HintPath>C:\Users\Michał\Desktop\mistrzostwa2014\05\DVRP.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -55,10 +58,6 @@
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{627e7240-1177-4665-971a-9b935261e8da}</Project>
       <Name>Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DvrpUtils\DvrpUtils.csproj">
-      <Project>{8e49724f-8d83-4996-b744-fee020c2427b}</Project>
-      <Name>DvrpUtils</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

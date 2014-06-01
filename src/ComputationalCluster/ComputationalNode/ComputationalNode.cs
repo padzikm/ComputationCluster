@@ -11,7 +11,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.Text;
 using Common;
-using DvrpUtils;
+using DVRP;
 
 namespace ComputationalNode
 {
@@ -22,7 +22,7 @@ namespace ComputationalNode
         private StatusThread[] threads;
         private RegisterResponse registerResponse;
         private SolvePartialProblems problem;
-        private DVRPTaskSolver DVRPSolver;
+        private DVRP.DVRP DVRPSolver;
         private Dictionary<ulong, byte[]> solutions;
         private ulong taskId = 0;
         private const int availableThreads = 1;
@@ -143,7 +143,7 @@ namespace ComputationalNode
                 {
                     timeout = (int)problem.SolvingTimeout;
                     Console.WriteLine("Dostałem problem, zaczynam liczyć.");
-                    DVRPSolver = new DVRPTaskSolver(null);
+                    DVRPSolver = new DVRP.DVRP(null);
                    
                     solutions = new Dictionary<ulong, byte[]>();
 
