@@ -32,12 +32,13 @@ namespace CommunicationServer
                 Byte[] data = System.Text.Encoding.UTF8.GetBytes(xml);
                 stream.Write(data, 0, data.Length);
                 stream.Flush();
-                Console.WriteLine("Wyslano: \n{0}", xml);
+                Console.WriteLine(@"Wyslano: 
+{0}", xml);
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Blad w send: {0}", ex.Message);
+                Console.WriteLine(@"Blad w send: {0}", ex.Message);
                 return false;
             }
         }        

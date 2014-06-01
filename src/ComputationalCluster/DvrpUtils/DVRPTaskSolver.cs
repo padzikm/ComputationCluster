@@ -265,21 +265,33 @@ namespace DvrpUtils
         /// <param name="solutions"> Tablica wyników zebranych przez TM. </param>
         public override void MergeSolution(byte[][] solutions)
         {
-            State = TaskSolverState.Merging;
-
-            List<double> solut = new List<double>();
-
-            for (int i = 0; i < solutions.GetLength(0); i++)
+            try
             {
-                solut.Add(DataSerialization.BinaryDeserializeObject<double>(solutions[i]));
+                State = TaskSolverState.Merging;
+
+                List<double> solut = new List<double>();
+
+                for (int i = 0; i < solutions.GetLength(0); i++)
+                {
+                    double d = DataSerialization.BinaryDeserializeObject<double>(solutions[i]);
+                    Console.WriteLine("double {0} is {1}", i,d);
+                    solut.Add(d);
+                }
+
+                StringBuilder sb = new StringBuilder();
+                sb.Append("TOTAL_COST: ").Append(solut.Min()).AppendLine();
+
+                Solution = DataSerialization.GetBytes(sb.ToString());
+
+
+                if(SolutionsMergingFinished != null)
+                    SolutionsMergingFinished(new EventArgs(), this);
             }
-
-            StringBuilder sb = new StringBuilder();
-            sb.Append("TOTAL_COST: ").Append(solut.Min()).AppendLine();
-
-            Solution = DataSerialization.GetBytes(sb.ToString());
-
-            if (SolutionsMergingFinished != null) SolutionsMergingFinished(new EventArgs(), this);
+            catch (Exception e)
+            {
+     
+               Console.WriteLine("blad w merge: "+ e.Message);
+            }
         }
 
         /// <summary>
@@ -333,21 +345,21 @@ namespace DvrpUtils
                         Stirling2(partialProblemData.Customers.Count(), k[i]);
                         Console.WriteLine("Minimalny koszt trasy dla podziału na {0} podzbiorów: {1}", k[i], min);
                     }
-                    Console.WriteLine("Minimalny koszt dla wszystkich podproblemów w danym node: {0}", min);
+                    Console.WriteLine(@"Minimalny koszt dla wszystkich podproblemów w danym node: {0}", min);
 
                 }, timeoutMs);
 
                 if (ProblemSolvingFinished != null) ProblemSolvingFinished(new EventArgs(), this);
 
                 // Jeśli została znaleziona poprawna trasa w danym podziale zwracamy jej koszt, jeśli nie -1
-                return min == double.MaxValue ? DataSerialization.BinarySerializeObject(-1) : DataSerialization.BinarySerializeObject(min);
+                return min == double.MaxValue ? DataSerialization.BinarySerializeObject((double)-1) : DataSerialization.BinarySerializeObject(min);
             }
             catch (TimeoutException t)
             {
                 State = TaskSolverState.Error | TaskSolverState.Idle;
                 ErrorOccured(this, new UnhandledExceptionEventArgs(t, true));
 
-                return min == double.MaxValue ? DataSerialization.BinarySerializeObject(-1) : DataSerialization.BinarySerializeObject(min);
+                return min == double.MaxValue ? DataSerialization.BinarySerializeObject((double)-1) : DataSerialization.BinarySerializeObject(min);
             }
             catch (ArgumentNullException a)
             {
@@ -356,7 +368,7 @@ namespace DvrpUtils
                 State = TaskSolverState.Error | TaskSolverState.Idle;
                 ErrorOccured(this, new UnhandledExceptionEventArgs(a, true));
 
-                return DataSerialization.BinarySerializeObject(-1);
+                return DataSerialization.BinarySerializeObject((double)-1);
             }
             catch (Exception e)
             {
@@ -365,7 +377,7 @@ namespace DvrpUtils
                 State = TaskSolverState.Error | TaskSolverState.Idle;
                 ErrorOccured(this, new UnhandledExceptionEventArgs(e, true));
 
-               return min == double.MaxValue ? DataSerialization.BinarySerializeObject(-1) : DataSerialization.BinarySerializeObject(min);;
+               return min == double.MaxValue ? DataSerialization.BinarySerializeObject((double)-1) : DataSerialization.BinarySerializeObject(min);;
             }
         }     
 
@@ -392,7 +404,7 @@ namespace DvrpUtils
 
             sw.Stop();
 
-            Console.WriteLine("Time taken: {0}ms", sw.Elapsed.TotalMilliseconds);
+            Console.WriteLine(@"Time taken: {0}ms", sw.Elapsed.TotalMilliseconds);
         }
     }
 }

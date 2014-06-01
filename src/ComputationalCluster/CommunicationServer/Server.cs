@@ -48,7 +48,7 @@ namespace CommunicationServer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error in server start: {0}", ex.Message);
+                Console.WriteLine(@"Error in server start: {0}", ex.Message);
             }
         }
 
@@ -64,7 +64,7 @@ namespace CommunicationServer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error in server stop: {0}", ex.Message);
+                Console.WriteLine(@"Error in server stop: {0}", ex.Message);
             }
         }
 
@@ -80,7 +80,7 @@ namespace CommunicationServer
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Error in server listen: {0}", ex.Message);
+                    Console.WriteLine(@"Error in server listen: {0}", ex.Message);
                 }
             }
         }
@@ -116,7 +116,8 @@ namespace CommunicationServer
                 }
 
                 msg = sb.ToString();
-                Console.WriteLine("Odebrano: \n{0}", msg);
+                Console.WriteLine(@"Odebrano: 
+{0}", msg);
                 MessageType msgType = MessageTypeConverter.ConvertToMessageType(msg);
                 IMessageStrategy strategy = strategyFactory.GetMessageStrategy(msgType);
                 if (strategy != null)

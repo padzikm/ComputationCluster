@@ -67,7 +67,7 @@ namespace ComputationalNode
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error in node start: {0}", e.Message);
+                Console.WriteLine(@"Error in node start: {0}", e.Message);
             }
         }
 
@@ -84,7 +84,8 @@ namespace ComputationalNode
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error in node stop: {0} \n", e.Message);
+                Console.WriteLine(@"Error in node stop: {0} 
+", e.Message);
             }
         }
 
@@ -172,7 +173,7 @@ namespace ComputationalNode
             }
             catch (Exception e )
             {
-                Console.WriteLine("Cannot recive SolvePartialProblems {0}",e);
+                Console.WriteLine(@"Cannot recive SolvePartialProblems {0}",e);
                 return false;
             }
             return false;
