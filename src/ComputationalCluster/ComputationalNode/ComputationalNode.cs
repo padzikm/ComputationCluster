@@ -144,7 +144,7 @@ namespace ComputationalNode
                 {
                     timeout = (int)problem.SolvingTimeout;
                     Console.WriteLine("Dostałem problem, zaczynam liczyć.");
-                    DVRPSolver = new DVRP.DVRP(null);
+                    DVRPSolver = new DVRP.DVRP(problem.CommonData);
                    
                     solutions = new Dictionary<ulong, byte[]>();
 
