@@ -352,14 +352,14 @@ namespace DvrpUtils
                 if (ProblemSolvingFinished != null) ProblemSolvingFinished(new EventArgs(), this);
 
                 // Jeśli została znaleziona poprawna trasa w danym podziale zwracamy jej koszt, jeśli nie -1
-                return min == double.MaxValue ? DataSerialization.BinarySerializeObject((double)-1) : DataSerialization.BinarySerializeObject(min);
+                return min == double.MaxValue ? DataSerialization.BinarySerializeObject(double.MaxValue) : DataSerialization.BinarySerializeObject(min);
             }
             catch (TimeoutException t)
             {
                 State = TaskSolverState.Error | TaskSolverState.Idle;
                 ErrorOccured(this, new UnhandledExceptionEventArgs(t, true));
 
-                return min == double.MaxValue ? DataSerialization.BinarySerializeObject((double)-1) : DataSerialization.BinarySerializeObject(min);
+                return min == double.MaxValue ? DataSerialization.BinarySerializeObject(double.MaxValue) : DataSerialization.BinarySerializeObject(min);
             }
             catch (ArgumentNullException a)
             {
@@ -368,7 +368,7 @@ namespace DvrpUtils
                 State = TaskSolverState.Error | TaskSolverState.Idle;
                 ErrorOccured(this, new UnhandledExceptionEventArgs(a, true));
 
-                return DataSerialization.BinarySerializeObject((double)-1);
+                return DataSerialization.BinarySerializeObject(double.MaxValue);
             }
             catch (Exception e)
             {
@@ -377,7 +377,7 @@ namespace DvrpUtils
                 State = TaskSolverState.Error | TaskSolverState.Idle;
                 ErrorOccured(this, new UnhandledExceptionEventArgs(e, true));
 
-               return min == double.MaxValue ? DataSerialization.BinarySerializeObject((double)-1) : DataSerialization.BinarySerializeObject(min);;
+                return min == double.MaxValue ? DataSerialization.BinarySerializeObject(double.MaxValue) : DataSerialization.BinarySerializeObject(min); ;
             }
         }     
 
